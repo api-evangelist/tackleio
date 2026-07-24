@@ -1,0 +1,157 @@
+openapi: 3.0.3
+info:
+  title: Tackle Public Contracts Authentication Solutions API
+  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
+  version: 1.0.0
+servers:
+- url: https://contracts.tackle.io
+  description: Production
+security:
+- tackleJwt: []
+tags:
+- name: Solutions
+  description: 'List the co-sell solutions registered with AWS Partner Central for
+
+    your account. Solution identifiers are referenced by `solutions` on
+
+    opportunities.'
+paths:
+  /api/solutions:
+    get:
+      operationId: listSolutions
+      summary: List co-sell solutions
+      description: 'Returns the active co-sell solutions registered with AWS Partner Central for the
+
+        authenticated vendor.
+
+
+        For vendor accounts provisioned for use in a test environment, this endpoint
+
+        returns a fixed three-solution fixture; the `q`, `from`, `pageSize`, and
+
+        `all` query parameters are **ignored** for these vendors and the response
+
+        body is the same fixture set regardless of what the client sends. Production
+
+        vendor accounts receive vendor-specific results that honor every query
+
+        parameter.'
+      tags:
+      - Solutions
+      parameters:
+      - name: q
+        in: query
+        description: A search query to filter the solutions.
+        schema:
+          type: string
+          example: Example
+      - name: from
+        in: query
+        description: The starting index of the solutions to return.
+        schema:
+          type: integer
+          example: 10
+      - name: pageSize
+        in: query
+        description: The number of solutions to return per page (minimum 1, maximum 100, default 10).
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+          example: 10
+      - name: all
+        in: query
+        description: 'Set to `true` to return solutions in any status, including inactive ones.
+
+          Defaults to `false` (only active solutions are returned).'
+        schema:
+          type: boolean
+          example: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSolutionsResponse'
+              examples:
+                list:
+                  summary: List Solutions
+                  value:
+                    solutions:
+                    - id: tackle-solution-2lFAiYiiVZZabcdefgh7dPNWXWm
+                      cloudProviderId: S-0050456
+                      name: Tackle AI
+                      status: Active
+                      category: Software Product
+                      created: '2024-08-27T13:32:58Z'
+                      lastSynced: '2024-08-27T13:32:58Z'
+                    - id: tackle-solution-2lFAieUdS1PKs6abcdefghbCktS
+                      cloudProviderId: S-0050123
+                      name: Tackle Cloud Sync
+                      status: Active
+                      category: Software Product
+                      created: '2024-08-27T13:32:58Z'
+                      lastSynced: '2024-08-27T13:32:58Z'
+                    total: 5
+                    currentPageCount: 2
+                    isNextPage: true
+                    nextIndex: 2
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  responses:
+    Unauthorized:
+      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
+
+        authenticated principal could not be resolved.'
+    InternalServerError:
+      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
+
+        bodies for 5xx errors may be empty.'
+  schemas:
+    ListSolutionsResponseItem:
+      type: object
+      properties:
+        id:
+          type: string
+        cloudProviderId:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        category:
+          type: string
+        created:
+          type: string
+        lastSynced:
+          type: string
+    ListSolutionsResponse:
+      type: object
+      properties:
+        solutions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListSolutionsResponseItem'
+        total:
+          type: integer
+          example: 5
+        currentPageCount:
+          type: integer
+          example: 10
+        isNextPage:
+          type: boolean
+          example: false
+        nextIndex:
+          description: The starting index to use for fetching the next page of solutions. Only present when `isNextPage` is `true`.
+          type: integer
+  securitySchemes:
+    tackleJwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Tackle-issued JWT (interactive user or MTM token).

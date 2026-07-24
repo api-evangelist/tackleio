@@ -1,0 +1,168 @@
+openapi: 3.0.3
+info:
+  title: Tackle Public Contracts Authentication Entitlements API
+  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
+  version: 1.0.0
+servers:
+- url: https://contracts.tackle.io
+  description: Production
+security:
+- tackleJwt: []
+tags:
+- name: Entitlements
+  description: Legacy entitlements endpoint - returns flat role objects
+paths:
+  /scim/v2/Entitlements:
+    get:
+      tags:
+      - Entitlements
+      summary: Get Entitlements
+      description: 'Returns available roles as flat entitlement objects.
+
+        This is a legacy endpoint; prefer /scim/v2/Groups which returns
+
+        full SCIM Group resources as required by identity providers.
+
+        '
+      operationId: getEntitlements
+      responses:
+        '200':
+          description: Entitlements retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  schemas:
+    ScimError:
+      type: object
+      required:
+      - schemas
+      - status
+      - detail
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:api:messages:2.0:Error
+        status:
+          type: string
+          description: HTTP status code as string
+          example: '400'
+        detail:
+          type: string
+          description: Human-readable error description
+          example: Invalid request
+        scimType:
+          type: string
+          description: SCIM-specific error type
+          enum:
+          - invalidFilter
+          - tooMany
+          - uniqueness
+          - mutability
+          - invalidSyntax
+          - invalidPath
+          - noTarget
+          - invalidValue
+          - invalidVers
+          - sensitive
+          example: invalidValue
+    Entitlement:
+      type: object
+      required:
+      - value
+      - display
+      - type
+      properties:
+        value:
+          type: string
+          description: The unique identifier of the entitlement (role ID)
+          example: role_admin_123
+        display:
+          type: string
+          description: The display name of the entitlement (role name)
+          example: Administrator
+        type:
+          type: string
+          description: The type of entitlement
+          example: role
+    EntitlementListResponse:
+      type: object
+      required:
+      - schemas
+      - totalResults
+      - startIndex
+      - itemsPerPage
+      - Resources
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:api:messages:2.0:ListResponse
+        totalResults:
+          type: integer
+          description: Total number of entitlements
+          example: 3
+        startIndex:
+          type: integer
+          description: 1-based index of the first result
+          example: 1
+        itemsPerPage:
+          type: integer
+          description: Number of entitlements in this response
+          example: 3
+        Resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entitlement'
+  responses:
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '500'
+            detail: Internal server error
+    Unauthorized:
+      description: Authentication information is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '401'
+            detail: Unauthorized
+    Forbidden:
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '403'
+            detail: Forbidden
+  securitySchemes:
+    tackleJwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Tackle-issued JWT (interactive user or MTM token).

@@ -1,0 +1,846 @@
+openapi: 3.0.3
+info:
+  title: Tackle Public Contracts Authentication Private Offer Actions API
+  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
+  version: 1.0.0
+servers:
+- url: https://contracts.tackle.io
+  description: Production
+security:
+- tackleJwt: []
+tags:
+- name: Private Offer Actions
+  description: Private offer lifecycle actions such as archive, cancel, and sync.
+paths:
+  /api/private-offers/{id}/archive:
+    post:
+      tags:
+      - Private Offer Actions
+      summary: Archive an offer
+      description: 'Marks an offer as archived and records an archive activity without
+
+        changing the offer state or status.
+
+
+        Required RBAC action: `offers:UpdateOffer`.
+
+        '
+      operationId: archivePrivateOffer
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/OfferId'
+      - $ref: '#/components/parameters/TackleOperationId'
+      responses:
+        '200':
+          description: Offer archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateOffer'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/private-offers/{id}/unarchive:
+    post:
+      tags:
+      - Private Offer Actions
+      summary: Unarchive an offer
+      description: 'Clears an offer''s archived flag and records an unarchive activity without
+
+        changing the offer state or status.
+
+
+        Required RBAC action: `offers:UpdateOffer`.
+
+        '
+      operationId: unarchivePrivateOffer
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/OfferId'
+      - $ref: '#/components/parameters/TackleOperationId'
+      responses:
+        '200':
+          description: Offer unarchived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateOffer'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/private-offers/{id}/cancel:
+    post:
+      tags:
+      - Private Offer Actions
+      summary: Cancel an offer
+      description: 'Cancels an offer. Accepted offers cannot be canceled. Offers that have
+
+        already been created in Microsoft are moved to pending cancellation,
+
+        while offers that have not reached Microsoft are marked canceled.
+
+
+        Required RBAC action: `offers:UpdateOffer`.
+
+        '
+      operationId: cancelPrivateOffer
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/OfferId'
+      - $ref: '#/components/parameters/TackleOperationId'
+      responses:
+        '200':
+          description: Offer canceled or cancellation requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateOffer'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/private-offers/{id}/sync:
+    post:
+      tags:
+      - Private Offer Actions
+      summary: Sync an offer from Microsoft
+      description: 'Synchronizes the stored Tackle offer from Microsoft. The offer must
+
+        already be associated to a Microsoft offer reference.
+
+
+        Required RBAC action: `offers:GetOffer`.
+
+        '
+      operationId: syncPrivateOffer
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/OfferId'
+      - $ref: '#/components/parameters/UpdateDocs'
+      - $ref: '#/components/parameters/TackleOperationId'
+      responses:
+        '200':
+          description: Offer synchronized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateOffer'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  schemas:
+    OfferStatus:
+      type: string
+      description: 'Controls the offer workflow. Use `draft_status` to save the offer in
+
+        Tackle only. Use `submit_to_cloud` to validate the offer and prepare it
+
+        for Microsoft marketplace submission.
+
+        '
+      enum:
+      - draft_status
+      - draft_in_marketplace_status
+      - submit_to_cloud
+      - created_in_cloud
+      - sent_to_cloud
+      - pending_cancellation
+      - partner_marked_up
+      - canceled
+      - accepted
+      - withdrawn_canceled
+      - errored
+      - subscribed
+      - expired
+      - job_status_pending
+      - detail_retrieval_pending
+      - withdraw_pending
+      - delete_pending
+      - delete_validation_pending
+      - deleted
+    Buyer:
+      type: object
+      properties:
+        full_name:
+          type: string
+        email_address:
+          type: string
+          format: email
+        title:
+          type: string
+    OfferPricing:
+      type: object
+      properties:
+        plan_ref:
+          type: string
+          description: Microsoft plan ID.
+        plan_name:
+          type: string
+        description:
+          type: string
+        contract_duration:
+          $ref: '#/components/schemas/ContractDuration'
+        payment_model:
+          $ref: '#/components/schemas/PaymentModel'
+        payment_installments:
+          oneOf:
+          - $ref: '#/components/schemas/PaymentInstallment'
+          - type: 'null'
+        payment_schedule:
+          oneOf:
+          - $ref: '#/components/schemas/PaymentSchedule'
+          - type: 'null'
+        pricing_type:
+          oneOf:
+          - $ref: '#/components/schemas/PricingType'
+          - type: 'null'
+        user_limits:
+          oneOf:
+          - $ref: '#/components/schemas/UserLimits'
+          - type: 'null'
+        dimensions:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Dimension'
+    PricingType:
+      type: string
+      enum:
+      - flat_rate
+      - per_user
+    Dimension:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        id:
+          type: string
+        unit_of_measure:
+          type: string
+        price_per_unit_in_usd:
+          type: number
+          format: double
+        included_quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/DimensionQuantity'
+    PlanTemplate:
+      type: object
+      properties:
+        ref:
+          type: string
+        display:
+          type: string
+    ProductType:
+      type: string
+      enum:
+      - saas
+      - ami
+      - professional_services
+    OfferType:
+      type: string
+      enum:
+      - direct
+      - partner
+    Partner:
+      type: object
+      properties:
+        partner_name:
+          type:
+          - string
+          - 'null'
+        partner_seller_id:
+          type: string
+    OfferStateValue:
+      type: string
+      enum:
+      - draft
+      - pending
+      - submitted_in_cloud
+      - created_in_cloud
+      - email_sent
+      - instructions_opened
+      - viewed
+      - partner_marked_up
+      - accepted
+      - subscribed
+      - attention_needed
+      - pending_cancellation
+      - pending_cancellation_withdrawn
+      - canceled
+      - deleted_in_cloud
+    StartOn:
+      type: string
+      enum:
+      - acceptance
+      - custom
+    ErrorResponse:
+      type: object
+      required:
+      - message
+      properties:
+        message:
+          type: string
+          description: Human-readable error message.
+          example: missing id
+    PrivateOfferState:
+      type: object
+      properties:
+        draft:
+          oneOf:
+          - $ref: '#/components/schemas/PrivateOfferStateDetail'
+          - type: 'null'
+        submitted:
+          oneOf:
+          - $ref: '#/components/schemas/PrivateOfferStateDetail'
+          - type: 'null'
+        accepted:
+          oneOf:
+          - $ref: '#/components/schemas/PrivateOfferStateDetail'
+          - type: 'null'
+        current_cloud:
+          oneOf:
+          - $ref: '#/components/schemas/PrivateOfferStateDetail'
+          - type: 'null'
+        last_modified:
+          type: string
+          format: date-time
+    PaymentSchedule:
+      type: object
+      properties:
+        initial_charge:
+          $ref: '#/components/schemas/InitialCharge'
+        payment_schedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduleDetail'
+    ScheduleDetail:
+      type: object
+      properties:
+        charge_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        price_per_payment_in_usd:
+          type:
+          - number
+          - 'null'
+          format: double
+        note:
+          type:
+          - string
+          - 'null'
+    PaymentModel:
+      type: string
+      enum:
+      - PaymentSchedule
+      - PerYear
+      - OneTime
+      - PerMonth
+    ContractDuration:
+      type: object
+      properties:
+        type:
+          type: string
+          example: month
+        frequency:
+          type: integer
+          example: 12
+    MsftResponse:
+      type: object
+      properties:
+        job_id:
+          type: string
+        offer_id:
+          type:
+          - string
+          - 'null'
+        resource_uri:
+          type:
+          - string
+          - 'null'
+        raw_response:
+          type: string
+    PreRegistrationDetails:
+      type: object
+      properties:
+        company_website:
+          type:
+          - string
+          - 'null'
+          format: uri
+        details:
+          type: object
+          additionalProperties:
+            type: string
+    InitialCharge:
+      type: object
+      properties:
+        price_per_payment_in_usd:
+          type:
+          - number
+          - 'null'
+          format: double
+        note:
+          type:
+          - string
+          - 'null'
+    UserToNotify:
+      type: object
+      properties:
+        contact_type:
+          type: string
+        value:
+          type:
+          - string
+          - 'null'
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+    PrivateOfferStateDetail:
+      type: object
+      properties:
+        raw_message:
+          type: string
+    Clone:
+      type: object
+      properties:
+        source:
+          $ref: '#/components/schemas/Source'
+        originating_offer_id:
+          type: string
+    PrivateOfferActivity:
+      type: object
+      properties:
+        slug:
+          type:
+          - string
+          - 'null'
+          example: created-draft-offer
+        user_id:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+          format: date-time
+        metadata:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+        user:
+          oneOf:
+          - $ref: '#/components/schemas/PrivateOfferActivityUser'
+          - type: 'null'
+    PrivateOfferError:
+      type: object
+      properties:
+        source:
+          type: string
+        type:
+          type: string
+        message:
+          type: string
+    EULA:
+      type: object
+      properties:
+        type:
+          type:
+          - string
+          - 'null'
+          description: Offer EULA type.
+          example: standard
+        document_urns:
+          type: array
+          items:
+            type: string
+        merged_urn:
+          type:
+          - string
+          - 'null'
+        presigned_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+    BuyerDetails:
+      type: object
+      properties:
+        company_name:
+          type: string
+        billing_account_id:
+          type: string
+        buyers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Buyer'
+    PrivateOfferSalesforce:
+      type: object
+      properties:
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        custom_object_id:
+          type:
+          - string
+          - 'null'
+        opportunity_id:
+          type:
+          - string
+          - 'null'
+    UserLimits:
+      type: object
+      properties:
+        min:
+          type: integer
+        max:
+          type: integer
+    PrivateOfferActivityUser:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        principal_type:
+          type: string
+    Source:
+      type: string
+      enum:
+      - salesforce
+      - tackle
+      - microsoft
+    DimensionQuantity:
+      type: object
+      properties:
+        dimension_term:
+          $ref: '#/components/schemas/ContractDuration'
+        unlimited_quantity:
+          type: boolean
+        quantity:
+          type: number
+          format: double
+    PaymentInstallment:
+      type: object
+      properties:
+        price_per_payment_in_usd:
+          type: number
+          format: double
+    PrivateOffer:
+      type: object
+      description: Stored Tackle Microsoft private offer.
+      properties:
+        po_id:
+          type: string
+        accepted_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        accepted_source:
+          type:
+          - string
+          - 'null'
+        archived_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        cancelled_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        last_modified_at:
+          type: string
+          format: date-time
+        last_update_source:
+          type:
+          - string
+          - 'null'
+        viewed_offer_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        sent_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        submitted_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        opened_instructions_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        subscribed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        partner_marked_up_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        marketplace_acceptance_link:
+          type:
+          - string
+          - 'null'
+          format: uri
+        salesforce:
+          $ref: '#/components/schemas/PrivateOfferSalesforce'
+        vendor_id:
+          type: string
+        vendor_name:
+          type: string
+        product_contact_email:
+          type: string
+          format: email
+        state:
+          $ref: '#/components/schemas/OfferStateValue'
+        status:
+          $ref: '#/components/schemas/OfferStatus'
+        offer_type:
+          $ref: '#/components/schemas/OfferType'
+        marketplace_fee:
+          type: number
+          format: double
+        activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrivateOfferActivity'
+        archived:
+          type: boolean
+        version:
+          type: string
+        product_id:
+          type: string
+        product_name:
+          type: string
+        source:
+          $ref: '#/components/schemas/Source'
+        marketplace_created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        clone:
+          oneOf:
+          - $ref: '#/components/schemas/Clone'
+          - type: 'null'
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        product_type:
+          $ref: '#/components/schemas/ProductType'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrivateOfferError'
+        pre_registration_details:
+          $ref: '#/components/schemas/PreRegistrationDetails'
+        ui_state:
+          $ref: '#/components/schemas/OfferStateValue'
+        partner:
+          oneOf:
+          - $ref: '#/components/schemas/Partner'
+          - type: 'null'
+        total_contract_value_gross_amount:
+          type: number
+          format: double
+        total_contract_value_net_amount:
+          type: number
+          format: double
+        est_min_total_contract_value_gross_amount:
+          type: number
+          format: double
+        est_min_total_contract_value_net_amount:
+          type: number
+          format: double
+        est_max_total_contract_value_gross_amount:
+          type: number
+          format: double
+        est_max_total_contract_value_net_amount:
+          type: number
+          format: double
+        name:
+          type:
+          - string
+          - 'null'
+        description:
+          type:
+          - string
+          - 'null'
+        buyer_details:
+          $ref: '#/components/schemas/BuyerDetails'
+        renewal:
+          type: boolean
+        eula:
+          $ref: '#/components/schemas/EULA'
+        product_ref:
+          type: string
+        users_to_notify:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserToNotify'
+        pricing:
+          $ref: '#/components/schemas/OfferPricing'
+        preparer_email:
+          type: string
+          format: email
+        start_on:
+          $ref: '#/components/schemas/StartOn'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        accept_by_date:
+          type: string
+          format: date
+        offer_ref:
+          type:
+          - string
+          - 'null'
+        plan_template:
+          $ref: '#/components/schemas/PlanTemplate'
+        plan_ref:
+          type:
+          - string
+          - 'null'
+        subscription_ref:
+          type:
+          - string
+          - 'null'
+        notes:
+          type:
+          - string
+          - 'null'
+        offer_state:
+          $ref: '#/components/schemas/PrivateOfferState'
+        msft_response:
+          $ref: '#/components/schemas/MsftResponse'
+  responses:
+    UnauthorizedError:
+      description: Authentication failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: unauthorized
+    BadRequestError:
+      description: Invalid request or unsupported operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: missing id
+    NotFoundError:
+      description: Requested offer or resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: not found
+    InternalServerError:
+      description: Internal server error or upstream dependency failure.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ForbiddenError:
+      description: Caller is not allowed to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: forbidden
+  parameters:
+    TackleOperationId:
+      name: tackle-operation-id
+      in: header
+      required: false
+      description: Optional caller-provided operation ID for request tracing.
+      schema:
+        type: string
+      example: 018f01ec-3f2b-7a70-b81e-4fc3d6a69f42
+    UpdateDocs:
+      name: update_docs
+      in: query
+      required: false
+      description: Whether the manual sync should refresh associated documents.
+      schema:
+        type: boolean
+        default: false
+      example: true
+    OfferId:
+      name: id
+      in: path
+      required: true
+      description: Tackle private offer ID.
+      schema:
+        type: string
+      example: po-1234
+  securitySchemes:
+    tackleJwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Tackle-issued JWT (interactive user or MTM token).

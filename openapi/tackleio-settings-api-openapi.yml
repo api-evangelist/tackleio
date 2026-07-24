@@ -1,0 +1,202 @@
+openapi: 3.0.3
+info:
+  title: Tackle Public Contracts Authentication Settings API
+  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
+  version: 1.0.0
+servers:
+- url: https://contracts.tackle.io
+  description: Production
+security:
+- tackleJwt: []
+tags:
+- name: Settings
+  description: 'Vendor-level reference data, including the picklist endpoint
+
+    that supplies the acceptable values for opportunity fields.'
+paths:
+  /api/settings/picklist-options:
+    get:
+      operationId: getPicklistOptions
+      summary: Get picklist options for Opportunity fields
+      description: 'Returns the acceptable values for enumerable `Opportunity`
+
+        fields, plus reference lists for country, language, and
+
+        currency codes. Use this endpoint to populate picklist UI
+
+        controls so that the values an integrator surfaces stay in
+
+        step with the values the API accepts (which can be a subset
+
+        of the corresponding schema enum — see the `PicklistOptions`
+
+        schema for details).
+
+
+        The response is an object keyed by field path
+
+        (for example `.customerInfo.customerDetails.address.regionCode`);
+
+        each value is the array of acceptable
+
+        `{ display, value }` options for that field.
+
+
+        The response also contains a `.dataMapper.stage` key. This key
+
+        is a curated subset of the `Stage` enum used by Tackle''s Data
+
+        Mapper feature when importing opportunity data from external
+
+        systems. It does not correspond to any field on the
+
+        `Opportunity` payload, and most integrators using this API
+
+        directly can ignore it.
+
+
+        Requires the `cosell:GetPicklistOptions` permission.'
+      tags:
+      - Settings
+      responses:
+        '200':
+          description: Picklist options keyed by field path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PicklistOptions'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  schemas:
+    PicklistOption:
+      type: object
+      required:
+      - display
+      - value
+      properties:
+        display:
+          type: string
+          description: Human-readable label for the option.
+        value:
+          type: string
+          description: The value to send in the request payload.
+        default:
+          type: boolean
+          description: '`true` when this option is the default for the field. Only
+
+            one option per field is marked as default; absent if no
+
+            default is defined.'
+    PicklistOptions:
+      type: object
+      description: 'Object keyed by field path; each value is the array of acceptable
+
+        picklist options for that field. Additional field paths may be
+
+        added over time as the `Opportunity` schema evolves.
+
+
+        Most keys correspond to a field on the `Opportunity` schema and
+
+        mirror the values currently offered for that field. The picklist
+
+        is treated as the source of truth for what to surface in
+
+        integrator UIs: an enum value that appears in this API''s schema
+
+        but is no longer offered by Google may be omitted from the
+
+        picklist, so the picklist values for a given field can be a
+
+        subset of the corresponding enum.
+
+
+        Country, language, and currency codes are populated from public
+
+        standards: `.customerInfo.customerDetails.address.regionCode`
+
+        returns ISO 3166-1 alpha-2 region codes,
+
+        `.customerInfo.customerDetails.address.languageCode` returns
+
+        BCP-47 language codes, and
+
+        `.qualificationInfo.dealSize.currencyCode` returns ISO 4217
+
+        currency codes.
+
+
+        The `.dataMapper.stage` key is an exception: it is a curated
+
+        subset of the `Stage` enum used by Tackle''s Data Mapper feature
+
+        when importing opportunity data from external systems. It does
+
+        not correspond to any field on the `Opportunity` payload;
+
+        integrators not using Data Mapper can ignore it.'
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/PicklistOption'
+      example:
+        .qualificationInfo.budget:
+        - display: Exact budget given
+          value: EXACT_BUDGET_GIVEN
+        - display: Confirmed no budget
+          value: CONFIRMED_NO_BUDGET
+        .customerInfo.customerDetails.address.regionCode:
+        - display: United States (US)
+          value: US
+        .dataMapper.stage:
+        - display: Qualify
+          value: QUALIFY
+        - display: Refine
+          value: REFINE
+    Error:
+      type: object
+      description: 'Error response body. The service emits only a human-readable
+
+        `message`. A request identifier may be included in response headers for support and troubleshooting.'
+      properties:
+        message:
+          type: string
+          description: Human-readable error message.
+  responses:
+    InternalServerError:
+      description: 'An unexpected error occurred while processing the request.
+
+        Retry idempotent reads after a short delay; for writes, check
+
+        the opportunity history (`GET /api/opportunities/{id}/events`)
+
+        before retrying to confirm whether the prior request was
+
+        applied.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid authentication.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: The caller is not authorized to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    tackleJwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Tackle-issued JWT (interactive user or MTM token).

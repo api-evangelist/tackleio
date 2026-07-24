@@ -1,0 +1,494 @@
+openapi: 3.0.3
+info:
+  title: Tackle Public Contracts Authentication Customers API
+  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
+  version: 1.0.0
+servers:
+- url: https://contracts.tackle.io
+  description: Production
+security:
+- tackleJwt: []
+tags:
+- name: Customers
+  description: 'Look up customer accounts in Microsoft Partner Center before
+
+    creating a referral. Use these endpoints to determine
+
+    `customerProfile.ids` and the `dealSensitivity` value
+
+    (`USFed` vs `None`) you should send.'
+paths:
+  /api/customerInfo:
+    post:
+      operationId: customerInfo
+      summary: Lookup customer info to determine if they are a US federal customer.
+      description: 'Looks up the customer in Microsoft Partner Center by company
+
+        name and reports whether Microsoft has tagged the account as a
+
+        US federal customer. Use this before creating a referral so
+
+        you can populate `dealSensitivity` correctly (`USFed` for US
+
+        federal customers, `None` otherwise). Returns an empty
+
+        `customerInfo` array when no match is found.'
+      tags:
+      - Customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                companyName:
+                  type: string
+                  description: Company name, required.
+                  example: Example Corporation
+              required:
+              - companyName
+      responses:
+        '200':
+          description: Response containing info if the customer is a US federal customer.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    format: int64
+                    description: The number of matching customers in the response.
+                    example: 1
+                  customerInfo:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        microsoftCRMId:
+                          type: string
+                          description: The Microsoft CRM ID of the customer.
+                          example: '900002408'
+                        customerName:
+                          type: string
+                          description: The name of the customer.
+                          example: Example Corporation
+                        dunsId:
+                          type: string
+                          description: The DUNS ID of the customer.
+                          example: '123456789'
+                        type:
+                          type: string
+                          description: 'Customer type tag returned by Microsoft. Currently the only
+
+                            value emitted is `USFed`, indicating the customer is a US
+
+                            federal customer; the field is omitted otherwise. Treat as a
+
+                            free-form string and check for the literal `USFed` rather than
+
+                            parsing it.'
+                          example: USFed
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/customerLookup:
+    post:
+      operationId: customerLookup
+      summary: Lookup customer details in Partner Center.
+      description: 'Searches Microsoft Partner Center for matching customer
+
+        accounts by company name plus country, returning managed,
+
+        unmanaged, and Microsoft-account matches. Use this to populate
+
+        `customerProfile.ids` and `customerProfile.address` on a
+
+        subsequent `createIPReferral` call. The full Partner Center
+
+        lookup payload is accepted so callers can forward the same
+
+        body the Partner Center UI would, but only `companyName` and
+
+        `address.country` materially affect matching; other fields
+
+        are ignored.'
+      tags:
+      - Customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 'Customer lookup payload. The full Partner Center customer
+
+                lookup shape is accepted, but only `companyName` and
+
+                `address.country` materially affect matching in Partner
+
+                Center -- the other address fields and the entire
+
+                `contact` block are accepted for compatibility with the
+
+                Microsoft Partner Center UI payload but are ignored by
+
+                the matching service.'
+              properties:
+                companyName:
+                  type: string
+                  description: Company name, required.
+                  example: Example Corporation
+                address:
+                  type: object
+                  properties:
+                    addressLine1:
+                      type: string
+                      description: Street address where the company is located.
+                      example: 1 Example Way
+                    city:
+                      type: string
+                      description: City where the company is located.
+                      example: Redmond
+                    state:
+                      type: string
+                      description: State where the company is located.
+                      example: Washington
+                    country:
+                      type: string
+                      description: Two digit country code where the company is located. Required, and the only address field that affects Partner Center matching.
+                  required:
+                  - country
+                contact:
+                  type: object
+                  description: 'Customer contact block accepted by Partner Center.
+
+                    All fields are optional and ignored by the matching
+
+                    service; included so callers can forward the same
+
+                    payload shape that the Partner Center UI sends.'
+                  properties:
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    phoneNumber:
+                      type: string
+                    email:
+                      type: string
+                    title:
+                      type: string
+                    phoneValidationStatus:
+                      type: string
+                      example: None
+                    emailValidationStatus:
+                      type: string
+                      example: None
+                crmCustomerUniqueID:
+                  type: string
+                  description: CRM Customer Unique ID.
+                  example: 006QL00000BahjXXX
+                microsoftAccountId:
+                  type: string
+                  description: Microsoft Account ID.
+                  example: user@domain.com
+                bestMatchOnly:
+                  type: boolean
+                  description: Return only the best match.
+                  example: false
+              required:
+              - companyName
+              - address
+      responses:
+        '200':
+          description: Response containing the results of the customer lookup
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  managedAccounts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CustomerLookupAccount'
+                  unManagedAccounts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CustomerLookupAccount'
+                  microsoftAccountMatch:
+                    type: object
+                    description: Microsoft account match details.
+                    allOf:
+                    - $ref: '#/components/schemas/CustomerLookupAccount'
+                    properties:
+                      managed:
+                        type: boolean
+                  crmUniqueIdentifierMatch:
+                    type: object
+                    description: CRM unique identifier match details.
+                    allOf:
+                    - $ref: '#/components/schemas/CustomerLookupAccount'
+                    properties:
+                      managed:
+                        type: boolean
+                      referralId:
+                        type: string
+                      name:
+                        type: string
+                      direction:
+                        type: string
+                        enum:
+                        - Incoming
+                        - Outgoing
+                      isvStatus:
+                        type: string
+                        description: "Top-level lifecycle stage of the matched referral on\nthe ISV (partner) side. Combine with `isvSubStatus`\nfor the precise state. Values:\n\n  - `None` — no status has been set yet.\n  - `New` — the referral has been created and is\n    awaiting action by the ISV.\n  - `Active` — the referral has been accepted and\n    is currently being worked on the ISV side.\n  - `Closed` — the referral has reached a terminal\n    state on the ISV side; see `isvSubStatus`\n    (`Won`, `Lost`, `Declined`, `Expired`, `Error`)\n    for the outcome."
+                        enum:
+                        - None
+                        - New
+                        - Active
+                        - Closed
+                      isvSubStatus:
+                        type: string
+                        description: "Sub-state of the matched referral on the ISV side,\nscoped to the parent `isvStatus`. Values:\n\n  - `None` — no sub-state has been set.\n  - `Pending` — submission is in flight or awaiting\n    acceptance.\n  - `Received` — the referral has been received\n    and is awaiting partner action.\n  - `Accepted` — the receiving organization has\n    accepted the referral.\n  - `Won` — the referral closed as a won deal.\n  - `Lost` — the referral closed as lost.\n  - `Declined` — the receiving organization\n    declined the referral.\n  - `Expired` — the referral closed because no\n    action was taken within Microsoft's allowed\n    window.\n  - `Error` — the referral closed in an error\n    state."
+                        enum:
+                        - None
+                        - Pending
+                        - Received
+                        - Accepted
+                        - Won
+                        - Lost
+                        - Declined
+                        - Expired
+                        - Error
+                      microsoftStatus:
+                        type: string
+                        description: "Top-level lifecycle stage of the matched referral on\nthe Microsoft side. Combine with `microsoftSubStatus`\nfor the precise state. Values:\n\n  - `None` — no status has been set yet.\n  - `New` — the referral has been created and is\n    awaiting action.\n  - `Active` — the referral has been accepted and\n    is currently being worked on the Microsoft\n    side.\n  - `Closed` — the referral has reached a terminal\n    state on the Microsoft side; see\n    `microsoftSubStatus` for the outcome."
+                        enum:
+                        - None
+                        - New
+                        - Active
+                        - Closed
+                      microsoftSubStatus:
+                        type: string
+                        description: "Sub-state of the matched referral on the Microsoft\nside, scoped to the parent `microsoftStatus`. Values:\n\n  - `None` — no sub-state has been set.\n  - `Pending` — submission to Microsoft is in\n    flight or awaiting acceptance.\n  - `Received` — Microsoft has received the\n    referral.\n  - `Accepted` — Microsoft has accepted the\n    referral.\n  - `Won` — the referral closed as a won deal.\n  - `Lost` — the referral closed as lost.\n  - `Declined` — Microsoft declined the referral.\n  - `Expired` — the referral closed because no\n    action was taken within Microsoft's allowed\n    window.\n  - `Error` — the referral closed in an error\n    state."
+                        enum:
+                        - None
+                        - Pending
+                        - Received
+                        - Accepted
+                        - Won
+                        - Lost
+                        - Declined
+                        - Expired
+                        - Error
+                      isvAcceptedDateTime:
+                        type: string
+                        format: date-time
+                        description: ISO-8601 timestamp recording when the ISV accepted the matched referral.
+                      isvClosedDateTime:
+                        type: string
+                        format: date-time
+                        description: ISO-8601 timestamp recording when the ISV closed the matched referral.
+                      microsoftAcceptedDateTime:
+                        type: string
+                        format: date-time
+                        description: ISO-8601 timestamp recording when Microsoft accepted the matched referral.
+                      microsoftClosedDateTime:
+                        type: string
+                        format: date-time
+                        description: ISO-8601 timestamp recording when Microsoft closed the matched referral.
+              examples:
+                customerLookup:
+                  summary: Customer Lookup
+                  value:
+                    managedAccounts:
+                    - childAccounts: []
+                      customerAccountDetails:
+                        name: Example Company
+                        msp_accountnumber: 9-ABCD12345
+                        msp_mssalesid: 11111111-aaaa-2222-bbbb-333333333333
+                        address1_country: United States
+                        address1_city: Boston
+                        msp_mstopparentid: '12345678'
+                        msp_endcustomersegmentcode: Major Commercial
+                        msp_endcustomersubsegmentcode: Major - Commercial Other
+                        address1_line1: 123 Example AVE SUITE 3D
+                        territoryidname: SDP.010.DN.100
+                        matchscore: 24.84912
+                        msp_customermacceligibility: 'No'
+                        msp_verticalcode: Other - Unsegmented
+                        msp_subverticalcode: Other - Unsegmented
+                    unManagedAccounts:
+                    - childAccounts: []
+                      customerAccountDetails:
+                        name: Example Corporation 2
+                        msp_accountnumber: 9-ABCD98765
+                        msp_mssalesid: 22222222-aaaa-2222-bbbb-333333333333
+                        address1_country: United States
+                        address1_city: New York
+                        msp_mstopparentid: '87654321'
+                        msp_endcustomersegmentcode: Major Commercial
+                        msp_endcustomersubsegmentcode: Major - Commercial Other
+                        address1_line1: 987 Example AVE SUITE 3D
+                        territoryidname: SDP.010.DN.100
+                        matchscore: 24.84912
+                        msp_customermacceligibility: 'No'
+                        msp_verticalcode: Other - Unsegmented
+                        msp_subverticalcode: Other - Unsegmented
+                    microsoftAccountMatch:
+                      childAccounts: []
+                      customerAccountDetails:
+                        name: Example Company
+                        msp_accountnumber: 9-ABCD12345
+                        msp_mssalesid: 11111111-aaaa-2222-bbbb-333333333333
+                        address1_country: United States
+                        address1_city: Boston
+                        msp_mstopparentid: '12345678'
+                        msp_endcustomersegmentcode: Major Commercial
+                        msp_endcustomersubsegmentcode: Major - Commercial Other
+                        address1_line1: 123 Example AVE SUITE 3D
+                        territoryidname: SDP.010.DN.100
+                        matchscore: 24.84912
+                        msp_customermacceligibility: 'No'
+                        msp_verticalcode: Other - Unsegmented
+                        msp_subverticalcode: Other - Unsegmented
+                      managed: true
+                    crmUniqueIdentifierMatch:
+                      childAccounts: []
+                      customerAccountDetails:
+                        name: Example Company
+                        msp_accountnumber: 9-ABCD12345
+                        msp_mssalesid: 11111111-aaaa-2222-bbbb-333333333333
+                        address1_country: United States
+                        address1_city: Boston
+                        msp_mstopparentid: '12345678'
+                        msp_endcustomersegmentcode: Major Commercial
+                        msp_endcustomersubsegmentcode: Major - Commercial Other
+                        address1_line1: 123 Example AVE SUITE 3D
+                        territoryidname: SDP.010.DN.100
+                        matchscore: 24.84912
+                        msp_customermacceligibility: 'No'
+                        msp_verticalcode: Other - Unsegmented
+                        msp_subverticalcode: Other - Unsegmented
+                      managed: true
+                      referralId: 006QL00000BahjGYAR
+                      name: Example Referral
+                      direction: Outgoing
+                      isvStatus: Active
+                      isvSubStatus: Pending
+                      microsoftStatus: Active
+                      microsoftSubStatus: Accepted
+                      isvAcceptedDateTime: '2025-07-10T05:00:00Z'
+                      isvClosedDateTime: '2025-08-10T05:00:00Z'
+                      microsoftAcceptedDateTime: '2025-07-10T05:00:00Z'
+                      microsoftClosedDateTime: '2025-08-10T05:00:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  responses:
+    InternalServerError:
+      description: 'An unexpected error occurred while processing the request. The response body is
+
+        empty.'
+    Unauthorized:
+      description: 'The request did not include a valid Tackle MTM access token, so no principal
+
+        could be established. The response body is `{}` — the `message` field is omitted.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example: {}
+    BadRequest:
+      description: 'The request was malformed or could not be processed. Returned when the JSON body
+
+        cannot be parsed, when a required field is missing, when an unsupported
+
+        `tackle-operation-id` is supplied, or when a referenced CRM ID is invalid.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Your request could not be processed.
+    Forbidden:
+      description: 'The authenticated principal does not have permission to perform this operation.
+
+        The response body is `{}` — the `message` field is omitted.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example: {}
+  schemas:
+    CustomerLookupAccount:
+      type: object
+      description: Customer Account
+      properties:
+        childAccounts:
+          type: array
+          description: Subsidiaries of the company.
+          items:
+            $ref: '#/components/schemas/CustomerLookupAccount'
+        customerAccountDetails:
+          type: object
+          description: Customer Account Details
+          properties:
+            name:
+              type: string
+            msp_accountnumber:
+              type: string
+            msp_mssalesid:
+              type: string
+            address1_line1:
+              type: string
+            address1_city:
+              type: string
+            address1_country:
+              type: string
+            msp_endcustomersegmentcode:
+              type: string
+            msp_endcustomersubsegmentcode:
+              type: string
+            territoryidname:
+              type: string
+            matchscore:
+              type: number
+            msp_customermacceligibility:
+              type: string
+            msp_verticalcode:
+              type: string
+            msp_subverticalcode:
+              type: string
+    Error:
+      type: object
+      description: 'Standard error envelope returned by this API. The `message` field is included
+
+        for most 4xx responses raised by request validation. For 401, 403, and 500
+
+        responses (and for `GET /api/referrals/{referral_id}` 404 responses) the body is
+
+        either `{}` or omitted entirely.'
+      properties:
+        message:
+          type: string
+          description: Human-readable description of the error condition.
+          example: Your request could not be processed.
+  securitySchemes:
+    tackleJwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Tackle-issued JWT (interactive user or MTM token).

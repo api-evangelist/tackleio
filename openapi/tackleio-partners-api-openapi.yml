@@ -1,0 +1,241 @@
+openapi: 3.0.3
+info:
+  title: Tackle Public Contracts Authentication Partners API
+  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
+  version: 1.0.0
+servers:
+- url: https://contracts.tackle.io
+  description: Production
+security:
+- tackleJwt: []
+tags:
+- name: Partners
+  description: 'Look up partner organizations in Microsoft Partner Center.
+
+    Use the returned `organizationId` when adding a non-Microsoft
+
+    partner via `inviteContexts`.'
+paths:
+  /api/partnerLookup:
+    post:
+      operationId: partnerLookup
+      summary: Lookup partner details in Partner Center.
+      description: 'Searches Microsoft Partner Center for partner organizations
+
+        matching the supplied search text. Use the returned
+
+        `organizationId` when adding a non-Microsoft partner to a
+
+        referral via `inviteContexts`. Returns an empty `partners`
+
+        array when no matches are found.'
+      tags:
+      - Partners
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                searchText:
+                  type: string
+                  description: Search text used to lookup the partner
+                  example: Example Corporation
+              required:
+              - searchText
+      responses:
+        '200':
+          description: Response containing the results of the partner lookup
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    format: int64
+                    description: The number of matching partners in the response
+                    example: 1
+                  partners:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Partner'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /partners:
+    get:
+      summary: List AWS Marketplace Partners
+      description: 'Returns a curated list of AWS Marketplace resale partners with their
+
+        company names and AWS account IDs. Use this list to populate a
+
+        partner picker when creating a partner (resale) private offer.
+
+
+        **Required RBAC permission:** `offers:CreateDraftOffer`
+
+        '
+      operationId: listPartners
+      tags:
+      - Partners
+      security:
+      - TackleJwt: []
+      responses:
+        '200':
+          description: List of AWS Marketplace partners.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partner_2'
+        '401':
+          $ref: '#/components/responses/Unauthorized_2'
+        '403':
+          $ref: '#/components/responses/Forbidden_2'
+components:
+  schemas:
+    Partner:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          description: The organization ID of the partner.
+          example: 26adabec-cc1c-42ed-a63b-849dbf47b95d
+        name:
+          type: string
+          description: The name of the partner.
+          example: Example Corporation
+        address:
+          type: object
+          description: The address of the partner.
+          properties:
+            addressLine1:
+              type: string
+              example: 1 Example Way
+            addressLine2:
+              type: string
+            city:
+              type: string
+              example: Redmond
+            state:
+              type: string
+              example: Washington
+            postalCode:
+              type: string
+              example: '98053'
+            region:
+              type: string
+              example: United States
+            country:
+              type: string
+              description: Two digit country code
+              example: US
+    Partner_2:
+      type: object
+      description: AWS Marketplace partner (reseller).
+      properties:
+        name:
+          type: string
+          description: Partner company name.
+          example: RiskQ, Inc,
+        awsAccountId:
+          type: string
+          description: AWS account ID (12-digit string).
+          pattern: ^\d{12}$
+          example: '977757234053'
+      required:
+      - awsAccountId
+    Error_2:
+      type: object
+      description: 'Error response. Endpoints in the **Private Offers** and **Marketplace**
+
+        tags return the error in a `message` field. The **Partners** endpoint
+
+        returns the error in an `error` field. At least one of the two will
+
+        always be populated.
+
+        '
+      properties:
+        message:
+          type: string
+          description: Error message (Private Offers and Marketplace endpoints).
+          example: private offer not found
+        error:
+          type: string
+          description: Error message (Partners endpoint).
+          example: authorization failed
+    Error:
+      type: object
+      description: 'Standard error envelope returned by this API. The `message` field is included
+
+        for most 4xx responses raised by request validation. For 401, 403, and 500
+
+        responses (and for `GET /api/referrals/{referral_id}` 404 responses) the body is
+
+        either `{}` or omitted entirely.'
+      properties:
+        message:
+          type: string
+          description: Human-readable description of the error condition.
+          example: Your request could not be processed.
+  responses:
+    InternalServerError:
+      description: 'An unexpected error occurred while processing the request. The response body is
+
+        empty.'
+    Unauthorized:
+      description: 'The request did not include a valid Tackle MTM access token, so no principal
+
+        could be established. The response body is `{}` — the `message` field is omitted.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example: {}
+    BadRequest:
+      description: 'The request was malformed or could not be processed. Returned when the JSON body
+
+        cannot be parsed, when a required field is missing, when an unsupported
+
+        `tackle-operation-id` is supplied, or when a referenced CRM ID is invalid.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Your request could not be processed.
+    Forbidden:
+      description: 'The authenticated principal does not have permission to perform this operation.
+
+        The response body is `{}` — the `message` field is omitted.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example: {}
+    Forbidden_2:
+      description: Caller is authenticated but not authorized for this resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error_2'
+    Unauthorized_2:
+      description: Missing or invalid Tackle JWT.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error_2'
+  securitySchemes:
+    tackleJwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Tackle-issued JWT (interactive user or MTM token).
