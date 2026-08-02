@@ -1,0 +1,104 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/* component schemas + id-reference fields
+notes: Entity graph derived from OpenAPI $ref usage and id-reference fields across the nine Tackle services.
+entities:
+- name: Opportunity
+  service: cosell-aws/gcp
+  has_one:
+  - Customer
+  - Project
+  - LifeCycle
+  - SoftwareRevenue
+  has_many:
+  - OpportunityHistoryEvent
+  references:
+  - Solution
+  - crmId
+- name: Invitation
+  service: cosell-aws
+  belongs_to:
+  - Opportunity
+  has_many:
+  - InvitationEvent
+- name: Referral
+  service: cosell-msft
+  has_one:
+  - Customer
+  - Partner
+  has_many:
+  - ListReferralEvent
+- name: PrivateOffer
+  service: offers-aws/msft
+  has_one:
+  - Buyer
+  - Pricing
+  - EULA
+  has_many:
+  - ScheduledPayment
+  - Activity
+  references:
+  - Product
+  - Agreement
+  - Partner
+- name: Product
+  service: platform/offers
+  has_many:
+  - PricingDimension
+  - RegistrationRedirect
+  references:
+  - encrypted_productid (AWS Catalog)
+- name: Subscription
+  service: platform
+  belongs_to:
+  - Product
+  has_many:
+  - SubscriptionItem
+  - Transaction
+  references:
+  - Customer
+- name: UsageRecord
+  service: platform (metering)
+  belongs_to:
+  - Product
+  - Subscription
+  references:
+  - CustomerId
+  - Dimension
+- name: Contract
+  service: contracts
+  references:
+  - CloudDataAwsAgreement
+  - CloudDataMsftSubscription
+- name: Disbursement
+  service: platform
+  has_many:
+  - Transaction
+  references:
+  - Invoice
+- name: Invoice
+  service: platform
+  references:
+  - Money
+- name: ScoredDomain
+  service: prospect
+  has_one:
+  - Demographics
+  - ScoreResult
+  references:
+  - CloudMarketplace
+- name: User
+  service: scim
+  has_one:
+  - EnterpriseUser
+  - Manager
+  has_many:
+  - Group
+  - Entitlement
+- name: Webhook
+  service: platform
+  belongs_to:
+  - Vendor
+  - Product
+  has_many:
+  - EventType

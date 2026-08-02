@@ -1,0 +1,38 @@
+generated: '2026-07-21'
+method: searched
+source: openapi/* + https://developers.tackle.io/docs
+authentication:
+  style: OAuth 2.0 client-credentials (machine-to-machine)
+  token_endpoint: POST https://api.tackle.io/v1/authenticate (client_id, client_secret, grant_type=client_credentials)
+  idp: Auth0 tenant https://auth.tackle.io (token_endpoint https://auth.tackle.io/oauth/token)
+  header: 'Authorization: Bearer <JWT>'
+  token_ttl_seconds: 5400
+  scim_auth: SCIM API uses a static API key in the Authorization header.
+authorization: Fine-grained RBAC permissions carried in the JWT gate every operation (e.g. cosell:CreateOpportunity,
+  offers:CreateDraftOffer). See scopes/tackleio-scopes.yml.
+idempotency:
+  supported: false
+  notes: No Idempotency-Key header. Write safety relies on async 202+poll and per-CRM-ID conflict (409)
+    checks.
+async:
+  pattern: 202 Accepted + requestId; poll GET .../events or the resource
+  operation_router: The tackle-operation-id header selects a sub-operation on co-sell create/update (createDraftOpportunity,
+    submitOpportunity, closeLostOpportunity, ...).
+pagination:
+  contracts: cursor + limit
+  cosell_aws: from + pageSize
+  cosell_gcp: limit + pageSize
+  cosell_msft: opaque 'next' cursor
+  offers_aws: limit + offset + next_token
+  prospect: page_number + records_per_page + metadata.search_after
+  scim: startIndex + count (RFC 7644)
+error_envelope: Custom JSON (Error/ErrorResponse); SCIM uses application/scim+json ScimError; some AWS
+  co-sell errors are text/plain. Not RFC 9457. See errors/tackleio-problem-types.yml.
+rate_limiting: not documented in the OpenAPI (no X-RateLimit headers declared)
+metadata_envelopes: Resources carry Tackle-side metadata alongside the cloud payload (OpportunityMetadata,
+  ReferralMetadata, $tkl-metadata).
+cross_links:
+- errors/tackleio-problem-types.yml
+- lifecycle/tackleio-lifecycle.yml
+- authentication/tackleio-authentication.yml
+- scopes/tackleio-scopes.yml

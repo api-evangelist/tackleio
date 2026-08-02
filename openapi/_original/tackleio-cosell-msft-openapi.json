@@ -1,0 +1,3358 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Tackle Co-Sell for Microsoft Partner Center Customer Engagements",
+    "description": "This API helps you interact with Microsoft to create and manage co-sell\nreferrals that you share with Microsoft as well as receive, respond to,\nand manage referrals originated by Microsoft.\n\n## Authentication\n\nThis API requires a Tackle machine-to-machine (MTM) access token. Issue\nyour M2M client credentials following the [How to get an M2M client ID\nand secret](https://developers.tackle.io/docs/how-to-get-an-m2m-client-id-and-secret)\nguide, exchange them for an access token following the [Getting an\naccess token](https://developers.tackle.io/docs/getting-an-access-token)\nguide, then send the token with each request in the `Authorization`\nheader as `Bearer <access_token>`.\n\nThe MTM token supplies the vendor and organization context for the request.\nFine-grained scoped MTM permissions are not enforced for this API yet.\n\n## Related Tackle Co-Sell APIs\n\nTackle publishes equivalent Co-Sell APIs for other cloud providers. Customer\nengagement domain models differ across providers (AWS and Google Cloud\nChannel use \"opportunities\"; Microsoft Partner Center uses \"referrals\"), so\nendpoint paths, request and response shapes, and pagination details are not\ninterchangeable.\n\n- Tackle Co-Sell for AWS: https://aws.cosell.tackle.io\n- Tackle Co-Sell for Google Cloud Channel: https://gcp.cosell.tackle.io",
+    "version": "1.0"
+  },
+  "externalDocs": {
+    "description": "Tackle Developer Portal",
+    "url": "https://developers.tackle.io"
+  },
+  "servers": [
+    {
+      "url": "https://msft.cosell.tackle.io",
+      "description": "Microsoft Co-Sell production endpoint"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Customers",
+      "description": "Look up customer accounts in Microsoft Partner Center before\ncreating a referral. Use these endpoints to determine\n`customerProfile.ids` and the `dealSensitivity` value\n(`USFed` vs `None`) you should send."
+    },
+    {
+      "name": "Partners",
+      "description": "Look up partner organizations in Microsoft Partner Center.\nUse the returned `organizationId` when adding a non-Microsoft\npartner via `inviteContexts`."
+    },
+    {
+      "name": "Referrals",
+      "description": "Create, read, update, and list events on Microsoft Partner Center co-sell referrals (both outbound and inbound)."
+    }
+  ],
+  "paths": {
+    "/api/customerInfo": {
+      "post": {
+        "operationId": "customerInfo",
+        "summary": "Lookup customer info to determine if they are a US federal customer.",
+        "description": "Looks up the customer in Microsoft Partner Center by company\nname and reports whether Microsoft has tagged the account as a\nUS federal customer. Use this before creating a referral so\nyou can populate `dealSensitivity` correctly (`USFed` for US\nfederal customers, `None` otherwise). Returns an empty\n`customerInfo` array when no match is found.",
+        "tags": [
+          "Customers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "companyName": {
+                    "type": "string",
+                    "description": "Company name, required.",
+                    "example": "Example Corporation"
+                  }
+                },
+                "required": [
+                  "companyName"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response containing info if the customer is a US federal customer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "The number of matching customers in the response.",
+                      "example": 1
+                    },
+                    "customerInfo": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "microsoftCRMId": {
+                            "type": "string",
+                            "description": "The Microsoft CRM ID of the customer.",
+                            "example": "900002408"
+                          },
+                          "customerName": {
+                            "type": "string",
+                            "description": "The name of the customer.",
+                            "example": "Example Corporation"
+                          },
+                          "dunsId": {
+                            "type": "string",
+                            "description": "The DUNS ID of the customer.",
+                            "example": "123456789"
+                          },
+                          "type": {
+                            "type": "string",
+                            "description": "Customer type tag returned by Microsoft. Currently the only\nvalue emitted is `USFed`, indicating the customer is a US\nfederal customer; the field is omitted otherwise. Treat as a\nfree-form string and check for the literal `USFed` rather than\nparsing it.",
+                            "example": "USFed"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/customerLookup": {
+      "post": {
+        "operationId": "customerLookup",
+        "summary": "Lookup customer details in Partner Center.",
+        "description": "Searches Microsoft Partner Center for matching customer\naccounts by company name plus country, returning managed,\nunmanaged, and Microsoft-account matches. Use this to populate\n`customerProfile.ids` and `customerProfile.address` on a\nsubsequent `createIPReferral` call. The full Partner Center\nlookup payload is accepted so callers can forward the same\nbody the Partner Center UI would, but only `companyName` and\n`address.country` materially affect matching; other fields\nare ignored.",
+        "tags": [
+          "Customers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Customer lookup payload. The full Partner Center customer\nlookup shape is accepted, but only `companyName` and\n`address.country` materially affect matching in Partner\nCenter -- the other address fields and the entire\n`contact` block are accepted for compatibility with the\nMicrosoft Partner Center UI payload but are ignored by\nthe matching service.",
+                "properties": {
+                  "companyName": {
+                    "type": "string",
+                    "description": "Company name, required.",
+                    "example": "Example Corporation"
+                  },
+                  "address": {
+                    "type": "object",
+                    "properties": {
+                      "addressLine1": {
+                        "type": "string",
+                        "description": "Street address where the company is located.",
+                        "example": "1 Example Way"
+                      },
+                      "city": {
+                        "type": "string",
+                        "description": "City where the company is located.",
+                        "example": "Redmond"
+                      },
+                      "state": {
+                        "type": "string",
+                        "description": "State where the company is located.",
+                        "example": "Washington"
+                      },
+                      "country": {
+                        "type": "string",
+                        "description": "Two digit country code where the company is located. Required, and the only address field that affects Partner Center matching."
+                      }
+                    },
+                    "required": [
+                      "country"
+                    ]
+                  },
+                  "contact": {
+                    "type": "object",
+                    "description": "Customer contact block accepted by Partner Center.\nAll fields are optional and ignored by the matching\nservice; included so callers can forward the same\npayload shape that the Partner Center UI sends.",
+                    "properties": {
+                      "firstName": {
+                        "type": "string"
+                      },
+                      "lastName": {
+                        "type": "string"
+                      },
+                      "phoneNumber": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "phoneValidationStatus": {
+                        "type": "string",
+                        "example": "None"
+                      },
+                      "emailValidationStatus": {
+                        "type": "string",
+                        "example": "None"
+                      }
+                    }
+                  },
+                  "crmCustomerUniqueID": {
+                    "type": "string",
+                    "description": "CRM Customer Unique ID.",
+                    "example": "006QL00000BahjXXX"
+                  },
+                  "microsoftAccountId": {
+                    "type": "string",
+                    "description": "Microsoft Account ID.",
+                    "example": "user@domain.com"
+                  },
+                  "bestMatchOnly": {
+                    "type": "boolean",
+                    "description": "Return only the best match.",
+                    "example": false
+                  }
+                },
+                "required": [
+                  "companyName",
+                  "address"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response containing the results of the customer lookup",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "managedAccounts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CustomerLookupAccount"
+                      }
+                    },
+                    "unManagedAccounts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CustomerLookupAccount"
+                      }
+                    },
+                    "microsoftAccountMatch": {
+                      "type": "object",
+                      "description": "Microsoft account match details.",
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/CustomerLookupAccount"
+                        }
+                      ],
+                      "properties": {
+                        "managed": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "crmUniqueIdentifierMatch": {
+                      "type": "object",
+                      "description": "CRM unique identifier match details.",
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/CustomerLookupAccount"
+                        }
+                      ],
+                      "properties": {
+                        "managed": {
+                          "type": "boolean"
+                        },
+                        "referralId": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "direction": {
+                          "type": "string",
+                          "enum": [
+                            "Incoming",
+                            "Outgoing"
+                          ]
+                        },
+                        "isvStatus": {
+                          "type": "string",
+                          "description": "Top-level lifecycle stage of the matched referral on\nthe ISV (partner) side. Combine with `isvSubStatus`\nfor the precise state. Values:\n\n  - `None` \u2014 no status has been set yet.\n  - `New` \u2014 the referral has been created and is\n    awaiting action by the ISV.\n  - `Active` \u2014 the referral has been accepted and\n    is currently being worked on the ISV side.\n  - `Closed` \u2014 the referral has reached a terminal\n    state on the ISV side; see `isvSubStatus`\n    (`Won`, `Lost`, `Declined`, `Expired`, `Error`)\n    for the outcome.",
+                          "enum": [
+                            "None",
+                            "New",
+                            "Active",
+                            "Closed"
+                          ]
+                        },
+                        "isvSubStatus": {
+                          "type": "string",
+                          "description": "Sub-state of the matched referral on the ISV side,\nscoped to the parent `isvStatus`. Values:\n\n  - `None` \u2014 no sub-state has been set.\n  - `Pending` \u2014 submission is in flight or awaiting\n    acceptance.\n  - `Received` \u2014 the referral has been received\n    and is awaiting partner action.\n  - `Accepted` \u2014 the receiving organization has\n    accepted the referral.\n  - `Won` \u2014 the referral closed as a won deal.\n  - `Lost` \u2014 the referral closed as lost.\n  - `Declined` \u2014 the receiving organization\n    declined the referral.\n  - `Expired` \u2014 the referral closed because no\n    action was taken within Microsoft's allowed\n    window.\n  - `Error` \u2014 the referral closed in an error\n    state.",
+                          "enum": [
+                            "None",
+                            "Pending",
+                            "Received",
+                            "Accepted",
+                            "Won",
+                            "Lost",
+                            "Declined",
+                            "Expired",
+                            "Error"
+                          ]
+                        },
+                        "microsoftStatus": {
+                          "type": "string",
+                          "description": "Top-level lifecycle stage of the matched referral on\nthe Microsoft side. Combine with `microsoftSubStatus`\nfor the precise state. Values:\n\n  - `None` \u2014 no status has been set yet.\n  - `New` \u2014 the referral has been created and is\n    awaiting action.\n  - `Active` \u2014 the referral has been accepted and\n    is currently being worked on the Microsoft\n    side.\n  - `Closed` \u2014 the referral has reached a terminal\n    state on the Microsoft side; see\n    `microsoftSubStatus` for the outcome.",
+                          "enum": [
+                            "None",
+                            "New",
+                            "Active",
+                            "Closed"
+                          ]
+                        },
+                        "microsoftSubStatus": {
+                          "type": "string",
+                          "description": "Sub-state of the matched referral on the Microsoft\nside, scoped to the parent `microsoftStatus`. Values:\n\n  - `None` \u2014 no sub-state has been set.\n  - `Pending` \u2014 submission to Microsoft is in\n    flight or awaiting acceptance.\n  - `Received` \u2014 Microsoft has received the\n    referral.\n  - `Accepted` \u2014 Microsoft has accepted the\n    referral.\n  - `Won` \u2014 the referral closed as a won deal.\n  - `Lost` \u2014 the referral closed as lost.\n  - `Declined` \u2014 Microsoft declined the referral.\n  - `Expired` \u2014 the referral closed because no\n    action was taken within Microsoft's allowed\n    window.\n  - `Error` \u2014 the referral closed in an error\n    state.",
+                          "enum": [
+                            "None",
+                            "Pending",
+                            "Received",
+                            "Accepted",
+                            "Won",
+                            "Lost",
+                            "Declined",
+                            "Expired",
+                            "Error"
+                          ]
+                        },
+                        "isvAcceptedDateTime": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "ISO-8601 timestamp recording when the ISV accepted the matched referral."
+                        },
+                        "isvClosedDateTime": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "ISO-8601 timestamp recording when the ISV closed the matched referral."
+                        },
+                        "microsoftAcceptedDateTime": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "ISO-8601 timestamp recording when Microsoft accepted the matched referral."
+                        },
+                        "microsoftClosedDateTime": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "ISO-8601 timestamp recording when Microsoft closed the matched referral."
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "customerLookup": {
+                    "summary": "Customer Lookup",
+                    "value": {
+                      "managedAccounts": [
+                        {
+                          "childAccounts": [],
+                          "customerAccountDetails": {
+                            "name": "Example Company",
+                            "msp_accountnumber": "9-ABCD12345",
+                            "msp_mssalesid": "11111111-aaaa-2222-bbbb-333333333333",
+                            "address1_country": "United States",
+                            "address1_city": "Boston",
+                            "msp_mstopparentid": "12345678",
+                            "msp_endcustomersegmentcode": "Major Commercial",
+                            "msp_endcustomersubsegmentcode": "Major - Commercial Other",
+                            "address1_line1": "123 Example AVE SUITE 3D",
+                            "territoryidname": "SDP.010.DN.100",
+                            "matchscore": 24.84912,
+                            "msp_customermacceligibility": "No",
+                            "msp_verticalcode": "Other - Unsegmented",
+                            "msp_subverticalcode": "Other - Unsegmented"
+                          }
+                        }
+                      ],
+                      "unManagedAccounts": [
+                        {
+                          "childAccounts": [],
+                          "customerAccountDetails": {
+                            "name": "Example Corporation 2",
+                            "msp_accountnumber": "9-ABCD98765",
+                            "msp_mssalesid": "22222222-aaaa-2222-bbbb-333333333333",
+                            "address1_country": "United States",
+                            "address1_city": "New York",
+                            "msp_mstopparentid": "87654321",
+                            "msp_endcustomersegmentcode": "Major Commercial",
+                            "msp_endcustomersubsegmentcode": "Major - Commercial Other",
+                            "address1_line1": "987 Example AVE SUITE 3D",
+                            "territoryidname": "SDP.010.DN.100",
+                            "matchscore": 24.84912,
+                            "msp_customermacceligibility": "No",
+                            "msp_verticalcode": "Other - Unsegmented",
+                            "msp_subverticalcode": "Other - Unsegmented"
+                          }
+                        }
+                      ],
+                      "microsoftAccountMatch": {
+                        "childAccounts": [],
+                        "customerAccountDetails": {
+                          "name": "Example Company",
+                          "msp_accountnumber": "9-ABCD12345",
+                          "msp_mssalesid": "11111111-aaaa-2222-bbbb-333333333333",
+                          "address1_country": "United States",
+                          "address1_city": "Boston",
+                          "msp_mstopparentid": "12345678",
+                          "msp_endcustomersegmentcode": "Major Commercial",
+                          "msp_endcustomersubsegmentcode": "Major - Commercial Other",
+                          "address1_line1": "123 Example AVE SUITE 3D",
+                          "territoryidname": "SDP.010.DN.100",
+                          "matchscore": 24.84912,
+                          "msp_customermacceligibility": "No",
+                          "msp_verticalcode": "Other - Unsegmented",
+                          "msp_subverticalcode": "Other - Unsegmented"
+                        },
+                        "managed": true
+                      },
+                      "crmUniqueIdentifierMatch": {
+                        "childAccounts": [],
+                        "customerAccountDetails": {
+                          "name": "Example Company",
+                          "msp_accountnumber": "9-ABCD12345",
+                          "msp_mssalesid": "11111111-aaaa-2222-bbbb-333333333333",
+                          "address1_country": "United States",
+                          "address1_city": "Boston",
+                          "msp_mstopparentid": "12345678",
+                          "msp_endcustomersegmentcode": "Major Commercial",
+                          "msp_endcustomersubsegmentcode": "Major - Commercial Other",
+                          "address1_line1": "123 Example AVE SUITE 3D",
+                          "territoryidname": "SDP.010.DN.100",
+                          "matchscore": 24.84912,
+                          "msp_customermacceligibility": "No",
+                          "msp_verticalcode": "Other - Unsegmented",
+                          "msp_subverticalcode": "Other - Unsegmented"
+                        },
+                        "managed": true,
+                        "referralId": "006QL00000BahjGYAR",
+                        "name": "Example Referral",
+                        "direction": "Outgoing",
+                        "isvStatus": "Active",
+                        "isvSubStatus": "Pending",
+                        "microsoftStatus": "Active",
+                        "microsoftSubStatus": "Accepted",
+                        "isvAcceptedDateTime": "2025-07-10T05:00:00Z",
+                        "isvClosedDateTime": "2025-08-10T05:00:00Z",
+                        "microsoftAcceptedDateTime": "2025-07-10T05:00:00Z",
+                        "microsoftClosedDateTime": "2025-08-10T05:00:00Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/partnerLookup": {
+      "post": {
+        "operationId": "partnerLookup",
+        "summary": "Lookup partner details in Partner Center.",
+        "description": "Searches Microsoft Partner Center for partner organizations\nmatching the supplied search text. Use the returned\n`organizationId` when adding a non-Microsoft partner to a\nreferral via `inviteContexts`. Returns an empty `partners`\narray when no matches are found.",
+        "tags": [
+          "Partners"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "searchText": {
+                    "type": "string",
+                    "description": "Search text used to lookup the partner",
+                    "example": "Example Corporation"
+                  }
+                },
+                "required": [
+                  "searchText"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response containing the results of the partner lookup",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "The number of matching partners in the response",
+                      "example": 1
+                    },
+                    "partners": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Partner"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/referrals": {
+      "post": {
+        "operationId": "createIPReferral",
+        "summary": "Create a referral",
+        "description": "Create a co-sell IP referral and submit it to Microsoft\nPartner Center. The shape of the request and the side effect\ndepend on the optional `tackle-operation-id` header (default\n`createIPReferral`); see the header description for the full\nlist of sub-operations and when to use each. Returns\n`202 Accepted` immediately with a Tackle referral ID and a\n`requestId` you can correlate to subsequent events via\n`listReferralEvents`.",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "tackle-operation-id",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "createIPReferral",
+                "createDraftIPReferral",
+                "cloneIPReferral",
+                "createInboundIPReferral"
+              ],
+              "description": "The unique identifier for the operation to perform when creating the referral. The header is optional; when omitted, it defaults to `createIPReferral`.\n\n- `createIPReferral` (default): Create a new outbound IP co-sell referral and submit it to Microsoft Partner Center.\n- `createDraftIPReferral`: Save a draft referral in Tackle without submitting it to Microsoft. The draft can later be submitted via `POST /api/referrals/{referral_id}` with `tackle-operation-id: createIPReferralFromDraft`.\n- `cloneIPReferral`: Create a new referral by cloning an existing one. The request body must include `trackingInfo.clonedFromOpportunityId` referencing the source referral.\n- `createInboundIPReferral`: **Test-environment-only.** Simulate Microsoft sharing an inbound IP co-sell referral with the ISV without making any real Partner Center calls, so customers can exercise the inbound-referral receive flow end-to-end in a test environment. Production vendors should not use this value; in production environments the request is accepted but no referral is created."
+            },
+            "required": false,
+            "example": "createIPReferral"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReferralInput"
+              },
+              "examples": {
+                "private": {
+                  "summary": "Create a private referral",
+                  "value": {
+                    "name": "Test Tackle V3 Private Referral",
+                    "companyWebsite": "https://www.example.com",
+                    "mpnId": "1234567",
+                    "campaignId": "someCampaignID",
+                    "dealSensitivity": "None",
+                    "customerProfile": {
+                      "name": "test",
+                      "isMatchingComplete": true,
+                      "isMaccEligible": false,
+                      "ids": [
+                        {
+                          "id": "1234567",
+                          "profileType": "External"
+                        }
+                      ],
+                      "address": {
+                        "addressLine1": "1 Microsoft Way",
+                        "city": "Redmond",
+                        "country": "US"
+                      },
+                      "team": [
+                        {
+                          "firstName": "Test",
+                          "lastName": "Employee",
+                          "phoneNumber": "555 555-5555",
+                          "email": "test@example.com"
+                        }
+                      ]
+                    },
+                    "consent": {
+                      "consentToShareReferralWithMicrosoftSellers": false,
+                      "consentToToShareInfoWithOthers": true,
+                      "consentToContact": true,
+                      "consentToMicrosoftToContactSpecificPartners": true
+                    },
+                    "details": {
+                      "notes": "Here are some test notes.",
+                      "dealValue": 500,
+                      "currency": "USD",
+                      "closingDateTime": "2025-07-10T05:00:00Z",
+                      "requirements": {
+                        "customerMarketplaceIntent": "HaveNotDecided",
+                        "solutionArea": "Data and AI",
+                        "solutionPlay": "Data Security",
+                        "solutions": [
+                          {
+                            "type": "Name",
+                            "id": "1234567",
+                            "name": "Test Solution",
+                            "solutionType": "3P",
+                            "publisherName": "example.co"
+                          }
+                        ]
+                      }
+                    },
+                    "team": [
+                      {
+                        "firstName": "Cosell",
+                        "lastName": "Tackle",
+                        "phoneNumber": "8888888888",
+                        "email": "cloudcosell@example.com"
+                      }
+                    ],
+                    "inviteContexts": []
+                  }
+                },
+                "testEnvironmentInbound": {
+                  "summary": "Test-environment-only \u2014 simulate an inbound referral from Microsoft",
+                  "description": "Use with `tackle-operation-id: createInboundIPReferral`. This is supported\nonly for vendors provisioned for use in a test environment so customers can\nexercise the inbound-referral receive flow without real Microsoft Partner\nCenter traffic. The first entry in `inviteContexts` represents the inviting\norganization (e.g. Microsoft); additional entries become related referrals on\nthe engagement.",
+                  "value": {
+                    "name": "Test Environment Inbound IP Co-Sell Referral",
+                    "companyWebsite": "https://www.example.com",
+                    "mpnId": "1234567",
+                    "dealSensitivity": "None",
+                    "customerProfile": {
+                      "name": "test",
+                      "isMatchingComplete": true,
+                      "isMaccEligible": false,
+                      "ids": [
+                        {
+                          "id": "1234567",
+                          "profileType": "External"
+                        }
+                      ],
+                      "address": {
+                        "addressLine1": "1 Microsoft Way",
+                        "city": "Redmond",
+                        "country": "US"
+                      },
+                      "team": [
+                        {
+                          "firstName": "Test",
+                          "lastName": "Customer",
+                          "phoneNumber": "555 555-5555",
+                          "email": "test@example.com"
+                        }
+                      ]
+                    },
+                    "consent": {
+                      "consentToShareReferralWithMicrosoftSellers": true,
+                      "consentToToShareInfoWithOthers": true,
+                      "consentToContact": true,
+                      "consentToMicrosoftToContactSpecificPartners": true
+                    },
+                    "details": {
+                      "notes": "Test environment inbound referral for receive-flow testing.",
+                      "dealValue": 500,
+                      "currency": "USD",
+                      "closingDateTime": "2025-07-10T05:00:00Z",
+                      "requirements": {
+                        "customerMarketplaceIntent": "HaveNotDecided",
+                        "solutionArea": "Data and AI",
+                        "solutionPlay": "Data Security",
+                        "solutions": [
+                          {
+                            "type": "Name",
+                            "id": "1234567",
+                            "name": "Test Solution",
+                            "solutionType": "3P",
+                            "publisherName": "example.co"
+                          }
+                        ]
+                      }
+                    },
+                    "team": [
+                      {
+                        "firstName": "Cosell",
+                        "lastName": "Tackle",
+                        "phoneNumber": "8888888888",
+                        "email": "cloudcosell@example.com"
+                      }
+                    ],
+                    "inviteContexts": [
+                      {
+                        "organizationId": "msft",
+                        "organizationName": "Microsoft",
+                        "assistanceRequestCode": "GeneralOrOther",
+                        "notes": "Microsoft is sharing this inbound referral with the ISV in a test environment."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tackleId": {
+                      "type": "string",
+                      "description": "The unique identifier for the opportunity"
+                    },
+                    "requestId": {
+                      "type": "string",
+                      "description": "Identifier for the call submitted to Microsoft Partner Center on the caller's behalf. Use it to correlate this response with subsequent referral events."
+                    }
+                  }
+                },
+                "example": {
+                  "tackleId": "tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3",
+                  "requestId": "2utc0ITX3k7iCBBNh6CqRLs8yGz"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/referrals/{referral_id}": {
+      "get": {
+        "operationId": "getReferral",
+        "summary": "Get a referral",
+        "description": "Returns the current state of a co-sell referral by Tackle\nreferral ID, including both the Microsoft Partner Center\npayload (`Referral`) and Tackle-side metadata\n(`ReferralMetadata` -- CRM linkage, sync health, archived\nstate, related referrals). Returns `404 Not Found` when the\nreferral does not exist for the authenticated vendor.",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/referral_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferralResponse"
+                },
+                "examples": {
+                  "getReferral": {
+                    "summary": "Get Referral",
+                    "description": "You can retrieve the referral information by providing the unique identifier for the referral.",
+                    "value": {
+                      "id": "472b39ec-634e-433e-afea-8421d95d684c",
+                      "engagementId": "db56246a-5894-442e-80a7-57f18652262c",
+                      "name": "MSFT Test referral",
+                      "createdDateTime": "2025-03-17T12:00:00Z",
+                      "updatedDateTime": "2025-03-17T12:00:00Z",
+                      "acceptedDateTime": "2025-03-17T12:00:00Z",
+                      "status": "Closed",
+                      "substatus": "Won",
+                      "statusReason": "Referral was won",
+                      "type": "Shared",
+                      "tags": [
+                        "IPCosell"
+                      ],
+                      "qualification": "SalesQualified",
+                      "customerProfile": {
+                        "name": "Test Customer",
+                        "isMatchingComplete": true,
+                        "isMaccEligible": false,
+                        "address": {
+                          "addressLine1": "1 Microsoft Way",
+                          "city": "Redmond",
+                          "state": "Washington",
+                          "postalCode": "98052",
+                          "country": "US"
+                        },
+                        "team": [
+                          {
+                            "firstName": "Test",
+                            "lastName": "Employee",
+                            "phoneNumber": "555 555-5555",
+                            "email": "test@customer.com",
+                            "emailValidationStatus": "None",
+                            "phoneValidationStatus": "None"
+                          }
+                        ],
+                        "ids": [
+                          {
+                            "id": "9-VZOAOB6G6",
+                            "profileType": "External"
+                          }
+                        ]
+                      },
+                      "consent": {
+                        "consentToShareReferralWithMicrosoftSellers": true,
+                        "consentToToShareInfoWithOthers": true,
+                        "consentToContact": true,
+                        "consentToMicrosoftToContactSpecificPartners": true
+                      },
+                      "details": {
+                        "notes": "test notes",
+                        "dealValue": 1000,
+                        "currency": "USD",
+                        "closingDateTime": "2025-07-10T05:00:00Z",
+                        "requirements": {
+                          "industries": [],
+                          "products": [],
+                          "services": [],
+                          "solutions": [
+                            {
+                              "id": "d84d9a5b-639f-489d-a95c-100c487def71",
+                              "name": "Tackle Cloud GTM Platform",
+                              "solutionType": "3P",
+                              "type": "Name",
+                              "publisherName": "Tackle.io, Inc."
+                            }
+                          ],
+                          "additionalRequirements": {
+                            "iot": {
+                              "azureCertifiedDevice": false,
+                              "attachServices": false
+                            },
+                            "attributes": [
+                              {
+                                "id": "Business Applications",
+                                "type": "SolutionArea"
+                              },
+                              {
+                                "id": "Accelerate Innovation with Low Code",
+                                "type": "SolutionPlay"
+                              },
+                              {
+                                "id": "No",
+                                "type": "CustomerMarketplaceIntent"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "team": [
+                        {
+                          "firstName": "Tackle",
+                          "lastName": "Tester",
+                          "phoneNumber": "5555555",
+                          "email": "testerupdated@example.com",
+                          "emailValidationStatus": "None",
+                          "phoneValidationStatus": "None"
+                        }
+                      ],
+                      "inviteContext": {
+                        "notes": "Some notes",
+                        "invitedBy": {
+                          "organizationId": "85ce85b8-faef-4c5f-beaa-e8e704ca6cef",
+                          "organizationName": "Tackle.io, Inc."
+                        },
+                        "assistanceRequestCode": "Unknown",
+                        "invitedMpnId": "5341319"
+                      },
+                      "eTag": "\\\"97003301-0000-0100-0000-67d455d30001\\\"",
+                      "target": [
+                        {
+                          "id": "d84d9a5b-639f-489d-a95c-100c487def77",
+                          "type": "SolutionProfile"
+                        }
+                      ],
+                      "mpnId": "5341318",
+                      "direction": "Outgoing",
+                      "organizationId": "85ce85b8-faef-4c5f-beaa-e8e704ca6cef",
+                      "organizationName": "Tackle.io, Inc.",
+                      "lastModifiedVia": "d5e95180-727b-4312-bca9-d46416511ffc",
+                      "lastRunId": "8e797ec8-a0f8-4491-9086-4f1c03bfa7c9",
+                      "favorite": false,
+                      "campaignId": "testCampaignUpdated",
+                      "salesStage": "60",
+                      "quality": "Unknown",
+                      "isSpam": false,
+                      "dealSensitivity": "None",
+                      "createdVia": "d5e95180-727b-4312-bca9-d46416511ffc",
+                      "closedDateTime": "2025-03-17T12:00:00Z",
+                      "registrationStatus": "None",
+                      "links": {
+                        "relatedReferrals": {
+                          "uri": "https://api.partner.microsoft.com/v1.0/engagements/referrals?$filter=engagementId eq \"db56246a-5894-442e-80a7-57f18652262c\"",
+                          "method": "GET"
+                        },
+                        "self": {
+                          "uri": "https://api.partner.microsoft.com/v1.0/engagements/referrals/472b39ec-634e-433e-afea-8421d95d684c",
+                          "method": "GET"
+                        }
+                      },
+                      "metadata": {
+                        "tackleId": "tackle-referral-2uJY3sgyqBz1EnKzRpx0PNol13A",
+                        "companyName": "Test INC.",
+                        "companyWebsite": "www.testInc.com",
+                        "createdDate": "2025-03-17T12:00:00Z",
+                        "lastModifiedDate": "2025-03-17T12:00:00Z",
+                        "crmId": "006QL00000BahjGYAR",
+                        "crmOrgId": "testOrg",
+                        "hasCloudErrors": false,
+                        "hasSalesforceErrors": false,
+                        "relatedReferrals": [],
+                        "classification": "ip",
+                        "dealType": "coSell"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "post": {
+        "operationId": "updateIPReferral",
+        "summary": "Update a referral",
+        "description": "Update a referral. The behavior of the request depends on the\n`tackle-operation-id` header. Sub-operations that look up the\nreferral by ID -- in particular `requestSyncFromSalesforce` --\nmay return `404 Not Found` when the referral does not exist for\nthe authenticated vendor.",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/referral_id"
+          },
+          {
+            "in": "header",
+            "name": "tackle-operation-id",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "updateIPReferral",
+                "updateDraftIPReferral",
+                "closeLostReferral",
+                "closeWonReferral",
+                "closeErrorReferral",
+                "acceptIncomingReferral",
+                "declineIncomingReferral",
+                "retryCreateIPReferral",
+                "createIPReferralFromDraft",
+                "updateReferralCRMID",
+                "resyncReferralToCRM",
+                "requestSyncFromSalesforce"
+              ],
+              "description": "Identifier for the sub-operation to perform when updating\nthe referral. Required. The value selects the request body\nschema and the side-effect -- see the request-body examples\nfor a payload per value.\n\n  - `updateIPReferral` -- update fields on an active outbound IP referral. Body: `UpdateReferralInput`.\n  - `updateDraftIPReferral` -- update fields on a draft referral that has not been submitted to Microsoft. Body: `CreateReferralInput`.\n  - `createIPReferralFromDraft` -- submit a previously-saved draft to Microsoft Partner Center. Body: `CreateReferralInput`.\n  - `retryCreateIPReferral` -- retry a failed create. Body: `CreateReferralInput`.\n  - `closeWonReferral` -- mark the referral closed-won. Body: `{}`.\n  - `closeLostReferral` -- mark the referral closed-lost. Body: `StatusChangedInput` with `statusReason`.\n  - `closeErrorReferral` -- mark the referral closed-error. Body: `StatusChangedInput` with `statusReason`.\n  - `acceptIncomingReferral` -- accept an inbound referral shared by Microsoft. Body: `StatusChangedInput`; supply `team` if the referral has none.\n  - `declineIncomingReferral` -- decline an inbound referral. Body: `StatusChangedInput` with `statusReason`.\n  - `updateReferralCRMID` -- update the CRM linkage only; does not call Microsoft. Body: `StatusChangedInput` with `crmId` / `crmOrgId`.\n  - `resyncReferralToCRM` -- re-push the latest referral state to your CRM. Body: `{}`. Does not call Microsoft.\n  - `requestSyncFromSalesforce` -- pull the latest state from Salesforce. Body: `{}`. Does not call Microsoft. Returns `404` when the referral is not found for the authenticated vendor."
+            },
+            "required": true,
+            "example": "updateIPReferral"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateReferralInput"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CreateReferralInput"
+                  },
+                  {
+                    "$ref": "#/components/schemas/StatusChangedInput"
+                  }
+                ]
+              },
+              "examples": {
+                "closeLostReferral": {
+                  "summary": "Close a referral as lost. Should only include status reason.  Uses the StatusChangedInput schema.",
+                  "value": {
+                    "statusReason": "NotACustomer:This was not our customer"
+                  }
+                },
+                "closeWonReferral": {
+                  "summary": "Close a referral as won. Should be an empty object.",
+                  "value": {}
+                },
+                "closeErrorReferral": {
+                  "summary": "Close a referral as error. Should only include status reason.  Uses the StatusChangedInput schema.",
+                  "value": {
+                    "statusReason": "TestReferral:This was a test."
+                  }
+                },
+                "declineIncomingReferral": {
+                  "summary": "Decline an incoming referral. Should only include status reason.  Uses the StatusChangedInput schema.",
+                  "value": {
+                    "statusReason": "ProjectBudgetNotAdequate:Not enough money."
+                  }
+                },
+                "acceptIncomingReferral": {
+                  "summary": "Accept an incoming referral. May include crmID, crmOrgID, or team.  Team must be included if the referral has no team members. Uses the StatusChangedInput schema.",
+                  "value": {
+                    "crmId": "someSalesforceOpportunityID",
+                    "crmOrgId": "someSalesforceOrgID",
+                    "team": [
+                      {
+                        "firstName": "Cosell",
+                        "lastName": "Tackle",
+                        "phoneNumber": "8888888888",
+                        "email": "test@test.com"
+                      }
+                    ]
+                  }
+                },
+                "retryCreateIPReferral": {
+                  "summary": "Retry creating a referral. Uses the CreateReferralInput schema; supply the same body shape as createIPReferral. See the createIPReferral request examples for a complete payload.",
+                  "value": {
+                    "name": "Test Tackle V3 Private Referral",
+                    "companyWebsite": "https://www.example.com",
+                    "mpnId": "1234567",
+                    "dealSensitivity": "None",
+                    "customerProfile": {
+                      "name": "test",
+                      "isMatchingComplete": true,
+                      "isMaccEligible": false,
+                      "address": {
+                        "addressLine1": "1 Microsoft Way",
+                        "city": "Redmond",
+                        "country": "US"
+                      }
+                    },
+                    "consent": {
+                      "consentToShareReferralWithMicrosoftSellers": false,
+                      "consentToToShareInfoWithOthers": true,
+                      "consentToContact": true,
+                      "consentToMicrosoftToContactSpecificPartners": true
+                    },
+                    "details": {
+                      "dealValue": 500,
+                      "currency": "USD",
+                      "closingDateTime": "2025-07-10T05:00:00Z",
+                      "requirements": {
+                        "customerMarketplaceIntent": "HaveNotDecided"
+                      }
+                    },
+                    "team": [
+                      {
+                        "firstName": "Cosell",
+                        "lastName": "Tackle",
+                        "phoneNumber": "8888888888",
+                        "email": "cloudcosell@example.com"
+                      }
+                    ]
+                  }
+                },
+                "updateDraftIPReferral": {
+                  "summary": "Update a draft referral. Uses the CreateReferralInput schema; supply the same body shape as createIPReferral. See the createIPReferral request examples for a complete payload.",
+                  "value": {
+                    "name": "Test Tackle V3 Private Referral (updated draft)",
+                    "mpnId": "1234567",
+                    "dealSensitivity": "None",
+                    "customerProfile": {
+                      "name": "test",
+                      "isMatchingComplete": true,
+                      "isMaccEligible": false,
+                      "address": {
+                        "addressLine1": "1 Microsoft Way",
+                        "city": "Redmond",
+                        "country": "US"
+                      }
+                    },
+                    "consent": {
+                      "consentToShareReferralWithMicrosoftSellers": false,
+                      "consentToToShareInfoWithOthers": true,
+                      "consentToContact": true,
+                      "consentToMicrosoftToContactSpecificPartners": true
+                    },
+                    "details": {
+                      "dealValue": 750,
+                      "currency": "USD",
+                      "closingDateTime": "2025-07-10T05:00:00Z",
+                      "requirements": {
+                        "customerMarketplaceIntent": "HaveNotDecided"
+                      }
+                    },
+                    "team": [
+                      {
+                        "firstName": "Cosell",
+                        "lastName": "Tackle",
+                        "phoneNumber": "8888888888",
+                        "email": "cloudcosell@example.com"
+                      }
+                    ]
+                  }
+                },
+                "updateReferralCRMID": {
+                  "summary": "Update the CRM ID of a referral. Should only include crmId and crmOrgId.",
+                  "value": {
+                    "crmId": "someSalesforceOpportunityID",
+                    "crmOrgId": "someSalesforceOrgID"
+                  }
+                },
+                "resyncReferralToCRM": {
+                  "summary": "Resync a referral to CRM.",
+                  "value": {}
+                },
+                "requestSyncFromSalesforce": {
+                  "summary": "Request a sync from Salesforce for the referral. Request body can be empty.",
+                  "value": {}
+                },
+                "updateIPReferral": {
+                  "summary": "Update a referral.  Uses the UpdateReferralInput schema.",
+                  "value": {
+                    "name": "Test Tackle V3 Private Referral",
+                    "campaignId": "someCampaignID",
+                    "consent": {
+                      "consentToShareReferralWithMicrosoftSellers": false
+                    },
+                    "details": {
+                      "notes": "Here are some test notes.",
+                      "dealValue": 500,
+                      "currency": "USD",
+                      "closingDateTime": "2025-07-10T05:00:00Z",
+                      "requirements": {
+                        "customerMarketplaceIntent": "HaveNotDecided",
+                        "solutions": [
+                          {
+                            "type": "Name",
+                            "id": "1234567",
+                            "name": "Test Solution",
+                            "solutionType": "3P",
+                            "publisherName": "example.co"
+                          }
+                        ]
+                      }
+                    },
+                    "team": [
+                      {
+                        "firstName": "Cosell",
+                        "lastName": "Tackle",
+                        "phoneNumber": "8888888888",
+                        "email": "cloudcosell@example.com"
+                      }
+                    ],
+                    "inviteContexts": [
+                      {
+                        "assistanceRequestCode": "GeneralOrOther",
+                        "organizationId": "987654321",
+                        "organizationName": "TEST PARTNER",
+                        "notes": "Partner Test Notes Here",
+                        "dealValue": 2,
+                        "currency": "USD",
+                        "closingDateTime": "2025-03-03T07:00:00.000Z",
+                        "solutions": [
+                          {
+                            "id": "1234567",
+                            "type": "Name",
+                            "name": "Tackle Cloud GTM Platform",
+                            "solutionType": "3P",
+                            "publisherName": "Tackle.io, Inc."
+                          }
+                        ],
+                        "team": [
+                          {
+                            "firstName": "Tackle",
+                            "lastName": "Tester",
+                            "phoneNumber": "5555555",
+                            "email": "tester@example.com"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tackleId": {
+                      "type": "string",
+                      "description": "The unique identifier for the opportunity"
+                    },
+                    "requestId": {
+                      "type": "string",
+                      "description": "Identifier for the call submitted to Microsoft Partner Center\non the caller's behalf. Always present in the response body.\nThe value is the empty string for sub-operations that do not\nissue a Partner Center call -- specifically\n`updateReferralCRMID`, `resyncReferralToCRM`, and\n`requestSyncFromSalesforce`."
+                    }
+                  }
+                },
+                "example": {
+                  "tackleId": "tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3",
+                  "requestId": "2utc0ITX3k7iCBBNh6CqRLs8yGz"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/referrals/{referral_id}/events": {
+      "get": {
+        "operationId": "listReferralEvents",
+        "summary": "List referral events",
+        "description": "Returns the recorded history of a referral as a paginated list\nof events: client-initiated operations (matching the\n`tackle-operation-id` values), Microsoft Partner Center\nresponses, and CRM-sync history items. Use this to follow up\non a `requestId` returned from `createIPReferral` /\n`updateIPReferral`, audit lifecycle changes, or surface\nrecent activity to end users. Pagination uses an opaque\n`next` cursor.",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/referral_id"
+          },
+          {
+            "in": "query",
+            "name": "next",
+            "required": false,
+            "description": "Pagination cursor returned by a previous call as the `next` field. Omit on the first call.",
+            "schema": {
+              "type": "string",
+              "example": "re#tackle-cosell-2lsw6vxN7rXsBer0hXABCDEFGH"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "events": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ListReferralEvent"
+                      }
+                    },
+                    "next": {
+                      "type": "string",
+                      "description": "Pagination cursor for the next page of events. Pass this value back as the `next` query parameter to fetch the next page. Omitted when there are no more results.",
+                      "example": "re#tackle-cosell-2lsw6vxN7rXsBer0hXABCDEFGH"
+                    }
+                  }
+                },
+                "examples": {
+                  "listReferralEvents": {
+                    "summary": "List Referral Events for createIPReferral",
+                    "value": {
+                      "events": [
+                        {
+                          "operation": "cloudUpdateEvent",
+                          "eventId": "2lsw8uaIoeMT72IRnlRz19gKxXY",
+                          "timestamp": "2024-09-10T15:25:35Z",
+                          "cloudRaw": {
+                            "id": "472b39ec-634e-433e-afea-8421d95d684c",
+                            "engagementId": "db56246a-5894-442e-80a7-57f18652262c",
+                            "name": "MSFT Test referral",
+                            "createdDateTime": "2025-03-17T12:00:00Z",
+                            "updatedDateTime": "2025-03-17T12:00:00Z",
+                            "acceptedDateTime": "2025-03-17T12:00:00Z",
+                            "status": "Closed",
+                            "substatus": "Won",
+                            "statusReason": "Referral was won",
+                            "type": "Shared",
+                            "tags": [
+                              "IPCosell"
+                            ],
+                            "qualification": "SalesQualified",
+                            "customerProfile": {
+                              "name": "Test Customer",
+                              "isMaccEligible": false,
+                              "address": {
+                                "addressLine1": "1 Microsoft Way",
+                                "city": "Redmond",
+                                "state": "Washington",
+                                "postalCode": "98052",
+                                "country": "US"
+                              },
+                              "team": [
+                                {
+                                  "firstName": "Test",
+                                  "lastName": "Employee",
+                                  "phoneNumber": "555 555-5555",
+                                  "email": "test@customer.com",
+                                  "emailValidationStatus": "None",
+                                  "phoneValidationStatus": "None"
+                                }
+                              ],
+                              "ids": [
+                                {
+                                  "id": "9-VZOAOB6G6",
+                                  "profileType": "External"
+                                }
+                              ]
+                            },
+                            "consent": {
+                              "consentToShareReferralWithMicrosoftSellers": true,
+                              "consentToToShareInfoWithOthers": true,
+                              "consentToContact": true,
+                              "consentToMicrosoftToContactSpecificPartners": true
+                            },
+                            "details": {
+                              "notes": "test notes",
+                              "dealValue": "1000",
+                              "currency": "USD",
+                              "closingDateTime": "2025-07-10T05:00:00Z",
+                              "requirements": {
+                                "industries": [],
+                                "products": [],
+                                "services": [],
+                                "solutions": [
+                                  {
+                                    "id": "d84d9a5b-639f-489d-a95c-100c487def71",
+                                    "name": "Tackle Cloud GTM Platform",
+                                    "solutionType": "3P",
+                                    "type": "Name",
+                                    "publisherName": "Tackle.io, Inc."
+                                  }
+                                ],
+                                "additionalRequirements": {
+                                  "iot": {
+                                    "azureCertifiedDevice": false,
+                                    "attachServices": false
+                                  },
+                                  "attributes": [
+                                    {
+                                      "id": "Business Applications",
+                                      "type": "SolutionArea"
+                                    },
+                                    {
+                                      "id": "Accelerate Innovation with Low Code",
+                                      "type": "SolutionPlay"
+                                    },
+                                    {
+                                      "id": "No",
+                                      "type": "CustomerMarketplaceIntent"
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "team": [
+                              {
+                                "firstName": "Tackle",
+                                "lastName": "Tester",
+                                "phoneNumber": "5555555",
+                                "email": "testerupdated@example.com",
+                                "emailValidationStatus": "None",
+                                "phoneValidationStatus": "None"
+                              }
+                            ],
+                            "inviteContext": {
+                              "notes": "Some notes",
+                              "invitedBy": {
+                                "organizationId": "85ce85b8-faef-4c5f-beaa-e8e704ca6cef",
+                                "organizationName": "Tackle.io, Inc."
+                              },
+                              "assistanceRequestCode": "Unknown",
+                              "invitedMpnId": "5341319"
+                            },
+                            "eTag": "\"97003301-0000-0100-0000-67d455d30001\"",
+                            "target": [
+                              {
+                                "id": "d84d9a5b-639f-489d-a95c-100c487def77",
+                                "type": "SolutionProfile"
+                              }
+                            ],
+                            "mpnId": "5341318",
+                            "direction": "Outgoing",
+                            "organizationId": "85ce85b8-faef-4c5f-beaa-e8e704ca6cef",
+                            "organizationName": "Tackle.io, Inc.",
+                            "lastModifiedVia": "d5e95180-727b-4312-bca9-d46416511ffc",
+                            "lastRunId": "8e797ec8-a0f8-4491-9086-4f1c03bfa7c9",
+                            "favorite": false,
+                            "campaignId": "testCampaignUpdated",
+                            "salesStage": "60",
+                            "quality": "Unknown",
+                            "isSpam": false,
+                            "dealSensitivity": "None",
+                            "createdVia": "d5e95180-727b-4312-bca9-d46416511ffc",
+                            "closedDateTime": "2025-03-17T12:00:00Z",
+                            "registrationStatus": "None",
+                            "links": {
+                              "relatedReferrals": {
+                                "uri": "https://api.partner.microsoft.com/v1.0/engagements/referrals?$filter=engagementId eq \"db56246a-5894-442e-80a7-57f18652262c\"",
+                                "method": "GET"
+                              },
+                              "self": {
+                                "uri": "https://api.partner.microsoft.com/v1.0/engagements/referrals/472b39ec-634e-433e-afea-8421d95d684c",
+                                "method": "GET"
+                              }
+                            }
+                          },
+                          "activityDetails": {
+                            "displayText": "Sent full update to Tackle"
+                          }
+                        },
+                        {
+                          "operation": "createIPReferral",
+                          "eventId": "2lsw6raV18Ymy8DBK0ExX5LBP21",
+                          "timestamp": "2024-09-10T15:25:29Z",
+                          "cloudResponses": [
+                            {
+                              "requestId": "example-00123456789ABCDEFGHIJKL",
+                              "operation": "createIPReferral",
+                              "success": true,
+                              "timestamp": "2024-09-10T15:25:24Z",
+                              "rawResponse": {
+                                "id": "472b39ec-634e-433e-afea-8421d95d684c",
+                                "engagementId": "db56246a-5894-442e-80a7-57f18652262c",
+                                "name": "MSFT Test referral",
+                                "createdDateTime": "2025-03-17T12:00:00Z",
+                                "updatedDateTime": "2025-03-17T12:00:00Z",
+                                "acceptedDateTime": "2025-03-17T12:00:00Z",
+                                "status": "Closed",
+                                "substatus": "Won",
+                                "statusReason": "Referral was won",
+                                "type": "Shared",
+                                "tags": [
+                                  "IPCosell"
+                                ],
+                                "qualification": "SalesQualified",
+                                "customerProfile": {
+                                  "name": "Test Customer",
+                                  "isMaccEligible": false,
+                                  "address": {
+                                    "addressLine1": "1 Microsoft Way",
+                                    "city": "Redmond",
+                                    "state": "Washington",
+                                    "postalCode": "98052",
+                                    "country": "US"
+                                  },
+                                  "team": [
+                                    {
+                                      "firstName": "Test",
+                                      "lastName": "Employee",
+                                      "phoneNumber": "555 555-5555",
+                                      "email": "test@customer.com",
+                                      "emailValidationStatus": "None",
+                                      "phoneValidationStatus": "None"
+                                    }
+                                  ],
+                                  "ids": [
+                                    {
+                                      "id": "9-VZOAOB6G6",
+                                      "profileType": "External"
+                                    }
+                                  ]
+                                },
+                                "consent": {
+                                  "consentToShareReferralWithMicrosoftSellers": true,
+                                  "consentToToShareInfoWithOthers": true,
+                                  "consentToContact": true,
+                                  "consentToMicrosoftToContactSpecificPartners": true
+                                },
+                                "details": {
+                                  "notes": "test notes",
+                                  "dealValue": "1000",
+                                  "currency": "USD",
+                                  "closingDateTime": "2025-07-10T05:00:00Z",
+                                  "requirements": {
+                                    "industries": [],
+                                    "products": [],
+                                    "services": [],
+                                    "solutions": [
+                                      {
+                                        "id": "d84d9a5b-639f-489d-a95c-100c487def71",
+                                        "name": "Tackle Cloud GTM Platform",
+                                        "solutionType": "3P",
+                                        "type": "Name",
+                                        "publisherName": "Tackle.io, Inc."
+                                      }
+                                    ],
+                                    "additionalRequirements": {
+                                      "iot": {
+                                        "azureCertifiedDevice": false,
+                                        "attachServices": false
+                                      },
+                                      "attributes": [
+                                        {
+                                          "id": "Business Applications",
+                                          "type": "SolutionArea"
+                                        },
+                                        {
+                                          "id": "Accelerate Innovation with Low Code",
+                                          "type": "SolutionPlay"
+                                        },
+                                        {
+                                          "id": "No",
+                                          "type": "CustomerMarketplaceIntent"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                },
+                                "team": [
+                                  {
+                                    "firstName": "Tackle",
+                                    "lastName": "Tester",
+                                    "phoneNumber": "5555555",
+                                    "email": "testerupdated@example.com",
+                                    "emailValidationStatus": "None",
+                                    "phoneValidationStatus": "None"
+                                  }
+                                ],
+                                "inviteContext": {
+                                  "notes": "Some notes",
+                                  "invitedBy": {
+                                    "organizationId": "85ce85b8-faef-4c5f-beaa-e8e704ca6cef",
+                                    "organizationName": "Tackle.io, Inc."
+                                  },
+                                  "assistanceRequestCode": "Unknown",
+                                  "invitedMpnId": "5341319"
+                                },
+                                "eTag": "\"97003301-0000-0100-0000-67d455d30001\"",
+                                "target": [
+                                  {
+                                    "id": "d84d9a5b-639f-489d-a95c-100c487def77",
+                                    "type": "SolutionProfile"
+                                  }
+                                ],
+                                "mpnId": "5341318",
+                                "direction": "Outgoing",
+                                "organizationId": "85ce85b8-faef-4c5f-beaa-e8e704ca6cef",
+                                "organizationName": "Tackle.io, Inc.",
+                                "lastModifiedVia": "d5e95180-727b-4312-bca9-d46416511ffc",
+                                "lastRunId": "8e797ec8-a0f8-4491-9086-4f1c03bfa7c9",
+                                "favorite": false,
+                                "campaignId": "testCampaignUpdated",
+                                "salesStage": "60",
+                                "quality": "Unknown",
+                                "isSpam": false,
+                                "dealSensitivity": "None",
+                                "createdVia": "d5e95180-727b-4312-bca9-d46416511ffc",
+                                "closedDateTime": "2025-03-17T12:00:00Z",
+                                "registrationStatus": "None",
+                                "links": {
+                                  "relatedReferrals": {
+                                    "uri": "https://api.partner.microsoft.com/v1.0/engagements/referrals?$filter=engagementId eq \"db56246a-5894-442e-80a7-57f18652262c\"",
+                                    "method": "GET"
+                                  },
+                                  "self": {
+                                    "uri": "https://api.partner.microsoft.com/v1.0/engagements/referrals/472b39ec-634e-433e-afea-8421d95d684c",
+                                    "method": "GET"
+                                  }
+                                }
+                              }
+                            }
+                          ],
+                          "cloudRequests": [
+                            {
+                              "requestId": "example-00123456789ABCDEFGHIJKL",
+                              "operation": "createIPReferral",
+                              "timestamp": "2024-09-10T15:25:20Z",
+                              "request": {
+                                "id": "472b39ec-634e-433e-afea-8421d95d684c",
+                                "engagementId": "db56246a-5894-442e-80a7-57f18652262c",
+                                "name": "MSFT Test referral",
+                                "createdDateTime": "2025-03-17T12:00:00Z",
+                                "updatedDateTime": "2025-03-17T12:00:00Z",
+                                "acceptedDateTime": "2025-03-17T12:00:00Z",
+                                "status": "Closed",
+                                "substatus": "Won",
+                                "statusReason": "Referral was won",
+                                "type": "Shared",
+                                "tags": [
+                                  "IPCosell"
+                                ],
+                                "qualification": "SalesQualified",
+                                "customerProfile": {
+                                  "name": "Test Customer",
+                                  "isMaccEligible": false,
+                                  "address": {
+                                    "addressLine1": "1 Microsoft Way",
+                                    "city": "Redmond",
+                                    "state": "Washington",
+                                    "postalCode": "98052",
+                                    "country": "US"
+                                  },
+                                  "team": [
+                                    {
+                                      "firstName": "Test",
+                                      "lastName": "Employee",
+                                      "phoneNumber": "555 555-5555",
+                                      "email": "test@customer.com",
+                                      "emailValidationStatus": "None",
+                                      "phoneValidationStatus": "None"
+                                    }
+                                  ],
+                                  "ids": [
+                                    {
+                                      "id": "9-VZOAOB6G6",
+                                      "profileType": "External"
+                                    }
+                                  ]
+                                },
+                                "consent": {
+                                  "consentToShareReferralWithMicrosoftSellers": true,
+                                  "consentToToShareInfoWithOthers": true,
+                                  "consentToContact": true,
+                                  "consentToMicrosoftToContactSpecificPartners": true
+                                },
+                                "details": {
+                                  "notes": "test notes",
+                                  "dealValue": "1000",
+                                  "currency": "USD",
+                                  "closingDateTime": "2025-07-10T05:00:00Z",
+                                  "requirements": {
+                                    "industries": [],
+                                    "products": [],
+                                    "services": [],
+                                    "solutions": [
+                                      {
+                                        "id": "d84d9a5b-639f-489d-a95c-100c487def71",
+                                        "name": "Tackle Cloud GTM Platform",
+                                        "solutionType": "3P",
+                                        "type": "Name",
+                                        "publisherName": "Tackle.io, Inc."
+                                      }
+                                    ],
+                                    "additionalRequirements": {
+                                      "iot": {
+                                        "azureCertifiedDevice": false,
+                                        "attachServices": false
+                                      },
+                                      "attributes": [
+                                        {
+                                          "id": "Business Applications",
+                                          "type": "SolutionArea"
+                                        },
+                                        {
+                                          "id": "Accelerate Innovation with Low Code",
+                                          "type": "SolutionPlay"
+                                        },
+                                        {
+                                          "id": "No",
+                                          "type": "CustomerMarketplaceIntent"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                },
+                                "team": [
+                                  {
+                                    "firstName": "Tackle",
+                                    "lastName": "Tester",
+                                    "phoneNumber": "5555555",
+                                    "email": "testerupdated@example.com",
+                                    "emailValidationStatus": "None",
+                                    "phoneValidationStatus": "None"
+                                  }
+                                ],
+                                "inviteContext": {
+                                  "notes": "Some notes",
+                                  "invitedBy": {
+                                    "organizationId": "85ce85b8-faef-4c5f-beaa-e8e704ca6cef",
+                                    "organizationName": "Tackle.io, Inc."
+                                  },
+                                  "assistanceRequestCode": "Unknown",
+                                  "invitedMpnId": "5341319"
+                                },
+                                "eTag": "\"97003301-0000-0100-0000-67d455d30001\"",
+                                "target": [
+                                  {
+                                    "id": "d84d9a5b-639f-489d-a95c-100c487def77",
+                                    "type": "SolutionProfile"
+                                  }
+                                ],
+                                "mpnId": "5341318",
+                                "direction": "Outgoing",
+                                "organizationId": "85ce85b8-faef-4c5f-beaa-e8e704ca6cef",
+                                "organizationName": "Tackle.io, Inc.",
+                                "lastModifiedVia": "d5e95180-727b-4312-bca9-d46416511ffc",
+                                "lastRunId": "8e797ec8-a0f8-4491-9086-4f1c03bfa7c9",
+                                "favorite": false,
+                                "campaignId": "testCampaignUpdated",
+                                "salesStage": "60",
+                                "quality": "Unknown",
+                                "isSpam": false,
+                                "dealSensitivity": "None",
+                                "createdVia": "d5e95180-727b-4312-bca9-d46416511ffc",
+                                "closedDateTime": "2025-03-17T12:00:00Z",
+                                "registrationStatus": "None",
+                                "links": {
+                                  "relatedReferrals": {
+                                    "uri": "https://api.partner.microsoft.com/v1.0/engagements/referrals?$filter=engagementId eq \"db56246a-5894-442e-80a7-57f18652262c\"",
+                                    "method": "GET"
+                                  },
+                                  "self": {
+                                    "uri": "https://api.partner.microsoft.com/v1.0/engagements/referrals/472b39ec-634e-433e-afea-8421d95d684c",
+                                    "method": "GET"
+                                  }
+                                }
+                              }
+                            }
+                          ],
+                          "rawRequest": {
+                            "id": "472b39ec-634e-433e-afea-8421d95d684c",
+                            "engagementId": "db56246a-5894-442e-80a7-57f18652262c",
+                            "name": "MSFT Test referral",
+                            "createdDateTime": "2025-03-17T12:00:00Z",
+                            "updatedDateTime": "2025-03-17T12:00:00Z",
+                            "acceptedDateTime": "2025-03-17T12:00:00Z",
+                            "status": "Closed",
+                            "substatus": "Won",
+                            "statusReason": "Referral was won",
+                            "type": "Shared",
+                            "tags": [
+                              "IPCosell"
+                            ],
+                            "qualification": "SalesQualified",
+                            "customerProfile": {
+                              "name": "Test Customer",
+                              "isMaccEligible": false,
+                              "address": {
+                                "addressLine1": "1 Microsoft Way",
+                                "city": "Redmond",
+                                "state": "Washington",
+                                "postalCode": "98052",
+                                "country": "US"
+                              },
+                              "team": [
+                                {
+                                  "firstName": "Test",
+                                  "lastName": "Employee",
+                                  "phoneNumber": "555 555-5555",
+                                  "email": "test@customer.com",
+                                  "emailValidationStatus": "None",
+                                  "phoneValidationStatus": "None"
+                                }
+                              ],
+                              "ids": [
+                                {
+                                  "id": "9-VZOAOB6G6",
+                                  "profileType": "External"
+                                }
+                              ]
+                            },
+                            "consent": {
+                              "consentToShareReferralWithMicrosoftSellers": true,
+                              "consentToToShareInfoWithOthers": true,
+                              "consentToContact": true,
+                              "consentToMicrosoftToContactSpecificPartners": true
+                            },
+                            "details": {
+                              "notes": "test notes",
+                              "dealValue": "1000",
+                              "currency": "USD",
+                              "closingDateTime": "2025-07-10T05:00:00Z",
+                              "requirements": {
+                                "industries": [],
+                                "products": [],
+                                "services": [],
+                                "solutions": [
+                                  {
+                                    "id": "d84d9a5b-639f-489d-a95c-100c487def71",
+                                    "name": "Tackle Cloud GTM Platform",
+                                    "solutionType": "3P",
+                                    "type": "Name",
+                                    "publisherName": "Tackle.io, Inc."
+                                  }
+                                ],
+                                "additionalRequirements": {
+                                  "iot": {
+                                    "azureCertifiedDevice": false,
+                                    "attachServices": false
+                                  },
+                                  "attributes": [
+                                    {
+                                      "id": "Business Applications",
+                                      "type": "SolutionArea"
+                                    },
+                                    {
+                                      "id": "Accelerate Innovation with Low Code",
+                                      "type": "SolutionPlay"
+                                    },
+                                    {
+                                      "id": "No",
+                                      "type": "CustomerMarketplaceIntent"
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "team": [
+                              {
+                                "firstName": "Tackle",
+                                "lastName": "Tester",
+                                "phoneNumber": "5555555",
+                                "email": "testerupdated@example.com",
+                                "emailValidationStatus": "None",
+                                "phoneValidationStatus": "None"
+                              }
+                            ],
+                            "inviteContext": {
+                              "notes": "Some notes",
+                              "invitedBy": {
+                                "organizationId": "85ce85b8-faef-4c5f-beaa-e8e704ca6cef",
+                                "organizationName": "Tackle.io, Inc."
+                              },
+                              "assistanceRequestCode": "Unknown",
+                              "invitedMpnId": "5341319"
+                            },
+                            "eTag": "\"97003301-0000-0100-0000-67d455d30001\"",
+                            "target": [
+                              {
+                                "id": "d84d9a5b-639f-489d-a95c-100c487def77",
+                                "type": "SolutionProfile"
+                              }
+                            ],
+                            "mpnId": "5341318",
+                            "direction": "Outgoing",
+                            "organizationId": "85ce85b8-faef-4c5f-beaa-e8e704ca6cef",
+                            "organizationName": "Tackle.io, Inc.",
+                            "lastModifiedVia": "d5e95180-727b-4312-bca9-d46416511ffc",
+                            "lastRunId": "8e797ec8-a0f8-4491-9086-4f1c03bfa7c9",
+                            "favorite": false,
+                            "campaignId": "testCampaignUpdated",
+                            "salesStage": "60",
+                            "quality": "Unknown",
+                            "isSpam": false,
+                            "dealSensitivity": "None",
+                            "createdVia": "d5e95180-727b-4312-bca9-d46416511ffc",
+                            "closedDateTime": "2025-03-17T12:00:00Z",
+                            "registrationStatus": "None",
+                            "links": {
+                              "relatedReferrals": {
+                                "uri": "https://api.partner.microsoft.com/v1.0/engagements/referrals?$filter=engagementId eq \"db56246a-5894-442e-80a7-57f18652262c\"",
+                                "method": "GET"
+                              },
+                              "self": {
+                                "uri": "https://api.partner.microsoft.com/v1.0/engagements/referrals/472b39ec-634e-433e-afea-8421d95d684c",
+                                "method": "GET"
+                              }
+                            }
+                          },
+                          "activityDetails": {
+                            "displayText": "Referral created",
+                            "givenName": "John",
+                            "familyName": "Doe",
+                            "pictureUrl": "https://tackle.io/"
+                          }
+                        }
+                      ],
+                      "next": "someNextToken"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "MTM JWT",
+        "description": "Tackle machine-to-machine access token sent as `Authorization: Bearer <access_token>`."
+      }
+    },
+    "parameters": {
+      "referral_id": {
+        "name": "referral_id",
+        "in": "path",
+        "required": true,
+        "description": "The unique identifier for the referral",
+        "schema": {
+          "type": "string",
+          "example": "tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3"
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "The request was malformed or could not be processed. Returned when the JSON body\ncannot be parsed, when a required field is missing, when an unsupported\n`tackle-operation-id` is supplied, or when a referenced CRM ID is invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "message": "Your request could not be processed."
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "The request did not include a valid Tackle MTM access token, so no principal\ncould be established. The response body is `{}` \u2014 the `message` field is omitted.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {}
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "The authenticated principal does not have permission to perform this operation.\nThe response body is `{}` \u2014 the `message` field is omitted.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {}
+          }
+        }
+      },
+      "NotFound": {
+        "description": "The requested resource was not found.\n\nThe response body shape depends on the operation:\n\n- Read operations (for example `getReferral`) return an empty body\n  (no JSON envelope).\n- Write operations that look up a resource by ID before acting on it\n  (for example `updateIPReferral` with `tackle-operation-id:\n  requestSyncFromSalesforce`) return a JSON envelope of the form\n  `{\"message\": \"Referral not found\"}`."
+      },
+      "Conflict": {
+        "description": "The request conflicts with an existing resource. For example, attempting to\ncreate or accept a referral with a CRM ID that is already linked to another\nco-sell opportunity.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "message": "A co-sell opportunity already exists for this CRM ID"
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "An unexpected error occurred while processing the request. The response body is\nempty."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "description": "Standard error envelope returned by this API. The `message` field is included\nfor most 4xx responses raised by request validation. For 401, 403, and 500\nresponses (and for `GET /api/referrals/{referral_id}` 404 responses) the body is\neither `{}` or omitted entirely.",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the error condition.",
+            "example": "Your request could not be processed."
+          }
+        }
+      },
+      "ReferralResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Referral"
+          }
+        ],
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/ReferralMetadata"
+          }
+        }
+      },
+      "ReferralMetadata": {
+        "type": "object",
+        "description": "Tackle-side metadata layered onto a referral when returned by\n`getReferral`. Includes Tackle's stable identifier, CRM linkage\nstate, and sync health signals.",
+        "required": [
+          "tackleId",
+          "companyName",
+          "createdDate",
+          "lastModifiedDate"
+        ],
+        "properties": {
+          "tackleId": {
+            "type": "string",
+            "description": "Tackle's stable identifier for the referral. Use this as your primary key when storing co-sell records on your side.",
+            "example": "tackle-referral-2uJY3sgyqBz1EnKzRpx0PNol13A"
+          },
+          "companyName": {
+            "type": "string",
+            "description": "Customer company name as captured by Tackle. Mirrored from the originating create payload.",
+            "example": "Test INC."
+          },
+          "companyWebsite": {
+            "type": "string",
+            "description": "Customer company website as captured by Tackle. Not forwarded to Microsoft Partner Center.",
+            "example": "www.testInc.com"
+          },
+          "createdDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp recording when the referral record was created in Tackle.",
+            "example": "2025-03-17T12:00:00Z"
+          },
+          "lastModifiedDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp recording when the referral record was last modified in Tackle.",
+            "example": "2025-03-17T12:00:00Z"
+          },
+          "pendingRequestIds": {
+            "type": "array",
+            "description": "Identifiers of in-flight requests for this referral. Each entry corresponds to a `requestId` that has been issued but not yet observed in `listReferralEvents`.",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "00123456789ABCDEFGHIJKL"
+            ]
+          },
+          "crmId": {
+            "type": "string",
+            "description": "Identifier of the parent CRM record this referral is linked to\n(typically a Salesforce 18-character Opportunity ID). 15-character\nSalesforce IDs are accepted and normalized to 18 characters.",
+            "example": "006ABCDEFGHIJKLMNO"
+          },
+          "crmOrgId": {
+            "type": "string",
+            "description": "Organization (tenant) ID of the CRM system. Required in multi-org CRM setups to disambiguate which org the `crmId` belongs to.",
+            "example": "testOrg"
+          },
+          "hasCloudErrors": {
+            "type": "boolean",
+            "description": "True when at least one recent call to Microsoft Partner Center for this referral returned an error. Inspect `listReferralEvents` for details.",
+            "example": false
+          },
+          "hasSalesforceErrors": {
+            "type": "boolean",
+            "description": "True when at least one recent Salesforce sync attempt for this referral failed. Inspect `salesforceSyncError` and `listReferralEvents` for details.",
+            "example": false
+          },
+          "salesforceSyncError": {
+            "type": "string",
+            "description": "Most recent Salesforce sync error message recorded for this referral. Omitted when no error has been recorded.",
+            "example": "Error syncing to Salesforce"
+          },
+          "archivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp recording when the referral was archived. Omitted when the referral is not archived.",
+            "example": "2025-03-17T12:00:00Z"
+          },
+          "relatedReferrals": {
+            "type": "array",
+            "description": "Other referrals related to this one (for example, the partner-side counterpart on a partner-led co-sell engagement). Each entry is a full `Referral`.",
+            "items": {
+              "$ref": "#/components/schemas/Referral"
+            }
+          },
+          "classification": {
+            "type": "string",
+            "description": "Microsoft Partner Center referral classification. Values:\n\n  - `profileMarketplaceLead` \u2014 marketplace lead from a profile listing.\n  - `offerMarketplaceLead` \u2014 marketplace lead from an offer listing.\n  - `coMarketingQualifiedLead` \u2014 co-marketing-qualified lead.\n  - `jointPlanningQualifiedLead` \u2014 lead generated through joint planning.\n  - `qualifiedLead` \u2014 generic qualified lead.\n  - `solutionAssessment` \u2014 solution-assessment engagement.\n  - `oemiot` \u2014 OEM IoT engagement.\n  - `services` \u2014 services co-sell engagement.\n  - `ip` \u2014 IP co-sell engagement.\n  - `unknown` \u2014 Microsoft did not classify the referral.",
+            "enum": [
+              "profileMarketplaceLead",
+              "offerMarketplaceLead",
+              "coMarketingQualifiedLead",
+              "jointPlanningQualifiedLead",
+              "qualifiedLead",
+              "solutionAssessment",
+              "oemiot",
+              "services",
+              "ip",
+              "unknown"
+            ]
+          },
+          "dealType": {
+            "type": "string",
+            "description": "Deal type is only applicable to referrals classified as ip or services. Newly-created referrals start as `draft` and transition to one of the other values once submitted.",
+            "enum": [
+              "draft",
+              "coSell",
+              "p2p",
+              "partnerLed",
+              "private"
+            ]
+          },
+          "lastCRMSyncCloud": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the last CRM-to-Microsoft-Partner-Center sync attempt",
+            "example": "2025-03-17T12:00:00Z"
+          },
+          "lastCRMSyncCloudStatus": {
+            "type": "string",
+            "description": "Status of the last CRM-to-Microsoft-Partner-Center sync attempt",
+            "enum": [
+              "success",
+              "failed"
+            ],
+            "example": "success"
+          },
+          "lastCRMSyncCloudSuccessful": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the last successful CRM-to-Microsoft-Partner-Center sync",
+            "example": "2025-03-17T12:00:00Z"
+          },
+          "lastCRMSyncReceived": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the last data-change event received from the CRM for this referral. Updated on every data-change event (including events that result in no push to Microsoft Partner Center), so it ticks forward whenever Salesforce sends a change \u2014 independent of Microsoft Partner Center push health reported by lastCRMSyncCloudStatus.",
+            "example": "2025-03-17T12:00:00Z"
+          },
+          "lastCRMSyncReceivedStatus": {
+            "type": "string",
+            "description": "Snapshot of the referral's lifecycle state at the moment of the\nlast data-change event from Salesforce. This is a state label,\nnot a success/failure indicator \u2014 for the \"did Salesforce sync\nrecently?\" signal use `lastCRMSyncReceived`, and for sync health\nuse `lastCRMSyncCloudStatus`.\n\nThe set of values is open and may grow over time, so clients\nshould treat unrecognized values as a safe default. Current\nvalues include (non-exhaustive): `pendingCreation`,\n`pendingAcceptance`, `active`, `transitionClosedWon`,\n`transitionClosedLost`, `transitionClosedError`, `closedWon`,\n`closedLost`, `closedError`, `closedDeclined`.",
+            "example": "active"
+          },
+          "lastCRMSyncReceivedChanges": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Map of field name to new value applied by the last data-change event. Empty or absent when the event resulted in no field changes. Intended for future \"what changed?\" UI; not rendered in the current UI.",
+            "example": {
+              "dealValue": 12345,
+              "currency": "USD"
+            }
+          }
+        }
+      },
+      "CreateReferralInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the Referral"
+          },
+          "companyWebsite": {
+            "type": "string",
+            "description": "URL of the customer organization. Captured by Tackle for context and not forwarded to Microsoft Partner Center."
+          },
+          "crmId": {
+            "type": "string",
+            "description": "Identifier of the parent CRM record this referral is linked to\n(typically a Salesforce 18-character Opportunity ID). 15-character\nSalesforce IDs are accepted and normalized to 18 characters."
+          },
+          "crmOrgId": {
+            "type": "string",
+            "description": "Organization (tenant) ID of the CRM system. Required in multi-org CRM setups to disambiguate which org the `crmId` belongs to."
+          },
+          "mpnId": {
+            "type": "string",
+            "description": "The MPN ID of the partner"
+          },
+          "campaignId": {
+            "type": "string",
+            "description": "Marketing campaign ID"
+          },
+          "dealSensitivity": {
+            "type": "string",
+            "description": "The sensitivity of the deal based on the selected customer.",
+            "enum": [
+              "USFed",
+              "None"
+            ]
+          },
+          "customerProfile": {
+            "$ref": "#/components/schemas/CustomerProfileInput"
+          },
+          "consent": {
+            "$ref": "#/components/schemas/ConsentInput"
+          },
+          "details": {
+            "$ref": "#/components/schemas/DetailsInput"
+          },
+          "team": {
+            "type": "array",
+            "description": "Represents users in the organizations that are involved in the partner engagement.",
+            "items": {
+              "$ref": "#/components/schemas/MemberInput"
+            }
+          },
+          "inviteContexts": {
+            "type": "array",
+            "description": "Include to invite Microsoft or another organization to the deal.",
+            "items": {
+              "$ref": "#/components/schemas/InviteContextInput"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "mpnId",
+          "dealSensitivity",
+          "team",
+          "customerProfile",
+          "consent",
+          "details"
+        ]
+      },
+      "UpdateReferralInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the Referral"
+          },
+          "campaignId": {
+            "type": "string",
+            "description": "Marketing campaign ID."
+          },
+          "salesStage": {
+            "type": "string",
+            "description": "Microsoft Partner Center sales-stage code, transmitted as a\nstring. Microsoft's published stages map to:\n\n  - `10` -- Accepted\n  - `20` -- Qualified\n  - `40` -- Developed\n  - `60` -- Proposed\n  - `80` -- Negotiated\n  - `100` -- Won\n\nMicrosoft-defined stage codes outside this list are accepted\nand forwarded unchanged, so treat the value as free-form on\nthe client."
+          },
+          "consent": {
+            "$ref": "#/components/schemas/ConsentUpdateInput"
+          },
+          "details": {
+            "$ref": "#/components/schemas/DetailsUpdateInput"
+          },
+          "team": {
+            "type": "array",
+            "description": "Represents users in the organizations that are involved in the partner engagement. Can be used when updating or accepting a referral.",
+            "items": {
+              "$ref": "#/components/schemas/MemberInput"
+            }
+          },
+          "inviteContexts": {
+            "type": "array",
+            "description": "Include to invite Microsoft or another organization to the deal.",
+            "items": {
+              "$ref": "#/components/schemas/InviteContextInput"
+            }
+          }
+        },
+        "required": [
+          "team"
+        ]
+      },
+      "StatusChangedInput": {
+        "type": "object",
+        "properties": {
+          "statusReason": {
+            "type": "string",
+            "description": "The reason the referral was declined, closed lost, or closed error.  Should be formatted as $reasonCode:$statusChangeNotes."
+          },
+          "crmId": {
+            "type": "string",
+            "description": "Identifier of the parent CRM record this referral is linked to\n(typically a Salesforce 18-character Opportunity ID).\n15-character Salesforce IDs are accepted and normalized to 18\ncharacters. Can be used when updating or accepting a referral."
+          },
+          "crmOrgId": {
+            "type": "string",
+            "description": "Organization (tenant) ID of the CRM system. Required in multi-org CRM setups to disambiguate which org the `crmId` belongs to. Can be used when updating or accepting a referral."
+          },
+          "team": {
+            "type": "array",
+            "description": "Represents users in the organizations that are involved in the partner engagement. Can be used when updating or accepting a referral.",
+            "items": {
+              "$ref": "#/components/schemas/MemberInput"
+            }
+          }
+        }
+      },
+      "ListReferralEvent": {
+        "type": "object",
+        "required": [
+          "operation",
+          "eventId",
+          "timestamp"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "description": "Identifier of the action that produced this history event. The set of values is\nopen-ended: it includes both client-callable operation IDs (the same values\naccepted by the `tackle-operation-id` request header) and additional values\nrecorded automatically when a CRM sync event is captured (for example,\n`referral_INSERT`, `referral_MODIFY`, where the suffix reflects whether the\nevent recorded a new CRM record or an update). Treat this field as a free-form\nstring and use a default branch when displaying it.\n\nCommon values clients will see include:\n  - Referral lifecycle: `createIPReferral`, `retryCreateIPReferral`,\n    `createIPReferralFromDraft`, `cloneIPReferral`, `createDraftIPReferral`,\n    `updateIPReferral`, `updateDraftIPReferral`, `closeWonReferral`,\n    `closeLostReferral`, `closeErrorReferral`, `acceptIncomingReferral`,\n    `declineIncomingReferral`.\n  - CRM sync (Salesforce): `updateReferralCRMID`, `resyncReferralToCRM`,\n    `requestSyncFromSalesforce`, `referral_INSERT`, `referral_MODIFY`.\n  - System-generated history events: `create`, `cloudUpdateEvent`,\n    `internalUpdateEvent`, `salesforceSyncRequestedEvent`.\n  - Test-environment-only: `createInboundIPReferral` (emitted when a test-environment\n    vendor simulates an inbound referral from Microsoft).",
+            "example": "cloudUpdateEvent"
+          },
+          "eventId": {
+            "type": "string",
+            "example": "2lsw6rdFuCz0d7cVNCubTYGSznY"
+          },
+          "timestamp": {
+            "type": "string",
+            "example": "2024-09-10T15:25:19.000Z"
+          },
+          "rawRequest": {
+            "type": "object",
+            "description": "Raw JSON body of the API request that produced this event,\nwhen available. Properties depend on the originating\noperation; the schema is intentionally open.",
+            "properties": {
+              "targetCloseDate": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          },
+          "cloudRaw": {
+            "type": "object",
+            "description": "Full Microsoft Partner Center referral document associated with\nthe event, when captured (for example, on a `cloudUpdateEvent`).\nSchema mirrors `Referral` but is left open because Microsoft is\nthe system of record for this payload.",
+            "additionalProperties": true
+          },
+          "cloudResponses": {
+            "description": "Microsoft Partner Center responses recorded for this event. On\nsuccess, `rawResponse` carries Microsoft's response body. On\nfailure, `errorType` is set, `errorDetails` carries the\nMicrosoft error envelope, `errorMessage` carries a generic\nmessage for unknown errors, and `errors` carries field-keyed\nvalidation messages.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "requestId": {
+                  "type": "string"
+                },
+                "operation": {
+                  "type": "string"
+                },
+                "rawResponse": {
+                  "type": "object",
+                  "description": "Raw cloud response body. Shape depends on the operation; intentionally open.",
+                  "additionalProperties": true
+                },
+                "success": {
+                  "type": "boolean"
+                },
+                "timestamp": {
+                  "type": "string"
+                },
+                "errorType": {
+                  "type": "string"
+                },
+                "errorDetails": {
+                  "type": "object",
+                  "description": "Microsoft error envelope captured from the upstream call.\nAlways present in the response. On successful operations\nthis object is serialized with zero-value strings:\n`{code: \"\", message: \"\", target: \"\"}`. Use `success`\nand/or `errorType` to determine whether the envelope\ncontains a real error.",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "target": {
+                      "type": "string"
+                    },
+                    "innerError": {
+                      "type": "object",
+                      "description": "Recursive Microsoft error inner-error structure.",
+                      "additionalProperties": true
+                    }
+                  }
+                },
+                "errorMessage": {
+                  "type": "string",
+                  "description": "Generic error message for unknown / non-structured errors."
+                },
+                "errors": {
+                  "type": "object",
+                  "description": "Map of field name to error messages. The synthetic key `$errors` carries non-field-scoped messages.",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "cloudRequests": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "requestId": {
+                  "type": "string"
+                },
+                "operation": {
+                  "type": "string"
+                },
+                "timestamp": {
+                  "type": "string"
+                },
+                "request": {
+                  "type": "object",
+                  "description": "Raw cloud request body. Shape depends on the operation; intentionally open.",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "crmRequests": {
+            "type": "array",
+            "description": "CRM-side request records. Emitted for events sourced from CRM-sync history items.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "requestID": {
+                  "type": "string",
+                  "description": "Note that the CRM request/response records use `requestID` (capital `ID`) rather than `requestId`."
+                },
+                "operation": {
+                  "type": "string"
+                },
+                "timestamp": {
+                  "type": "string"
+                },
+                "request": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "crmResponses": {
+            "type": "array",
+            "description": "CRM-side response records. Emitted for events sourced from CRM-sync history items.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "requestID": {
+                  "type": "string",
+                  "description": "Note that the CRM request/response records use `requestID` (capital `ID`) rather than `requestId`."
+                },
+                "operation": {
+                  "type": "string"
+                },
+                "rawResponse": {
+                  "type": "object",
+                  "description": "Raw CRM response body. Shape depends on the operation; intentionally open.",
+                  "additionalProperties": true
+                },
+                "success": {
+                  "type": "boolean"
+                },
+                "timestamp": {
+                  "type": "string"
+                },
+                "errorType": {
+                  "type": "string"
+                },
+                "errorDetails": {
+                  "type": "object",
+                  "description": "Salesforce error envelope captured from the upstream call.",
+                  "properties": {
+                    "errorCode": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "fields": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "request": {
+                      "type": "string"
+                    },
+                    "response": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "errorMessage": {
+                  "type": "string",
+                  "description": "Generic error message for unknown / non-structured errors."
+                }
+              }
+            }
+          },
+          "activityDetails": {
+            "type": "object",
+            "description": "Combined display text and event principal recorded for the\nhistory event. The principal fields (`id`, `type`,\n`givenName`, `familyName`, `pictureUrl`, `email`) describe\nthe principal that produced the event and are flattened\nonto the same object alongside `displayText`.",
+            "properties": {
+              "displayText": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string",
+                "description": "Identifier of the principal that produced the event. Common values include `tackle-internal-update` (used when an update originated from an automated Tackle process) and `microsoft-update` (used when an update originated from Microsoft)."
+              },
+              "type": {
+                "type": "string",
+                "description": "Type of principal that produced the event. The set of values is\nopen; common values include:\n\n  - `user` \u2014 an interactive Microsoft Partner Center user\n    (typically authenticated with a work account).\n  - `otkuser` \u2014 a Microsoft Partner Center \"OTK\" (one-time-key)\n    user, used for service-to-service or guest principals that\n    sign in without a long-lived directory account. Treat the\n    same as `user` for display purposes unless your integration\n    cares about the auth path.\n  - `machine` \u2014 a service principal acting on behalf of an\n    application rather than a person.\n  - `tackle-automation` \u2014 events produced by automated Tackle\n    processes (CRM sync, scheduled actions) rather than direct\n    user action.\n\nTreat unrecognized values as a safe default on the client."
+              },
+              "givenName": {
+                "type": "string"
+              },
+              "familyName": {
+                "type": "string"
+              },
+              "pictureUrl": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "CustomerLookupAccount": {
+        "type": "object",
+        "description": "Customer Account",
+        "properties": {
+          "childAccounts": {
+            "type": "array",
+            "description": "Subsidiaries of the company.",
+            "items": {
+              "$ref": "#/components/schemas/CustomerLookupAccount"
+            }
+          },
+          "customerAccountDetails": {
+            "type": "object",
+            "description": "Customer Account Details",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "msp_accountnumber": {
+                "type": "string"
+              },
+              "msp_mssalesid": {
+                "type": "string"
+              },
+              "address1_line1": {
+                "type": "string"
+              },
+              "address1_city": {
+                "type": "string"
+              },
+              "address1_country": {
+                "type": "string"
+              },
+              "msp_endcustomersegmentcode": {
+                "type": "string"
+              },
+              "msp_endcustomersubsegmentcode": {
+                "type": "string"
+              },
+              "territoryidname": {
+                "type": "string"
+              },
+              "matchscore": {
+                "type": "number"
+              },
+              "msp_customermacceligibility": {
+                "type": "string"
+              },
+              "msp_verticalcode": {
+                "type": "string"
+              },
+              "msp_subverticalcode": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Partner": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "The organization ID of the partner.",
+            "example": "26adabec-cc1c-42ed-a63b-849dbf47b95d"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the partner.",
+            "example": "Example Corporation"
+          },
+          "address": {
+            "type": "object",
+            "description": "The address of the partner.",
+            "properties": {
+              "addressLine1": {
+                "type": "string",
+                "example": "1 Example Way"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string",
+                "example": "Redmond"
+              },
+              "state": {
+                "type": "string",
+                "example": "Washington"
+              },
+              "postalCode": {
+                "type": "string",
+                "example": "98053"
+              },
+              "region": {
+                "type": "string",
+                "example": "United States"
+              },
+              "country": {
+                "type": "string",
+                "description": "Two digit country code",
+                "example": "US"
+              }
+            }
+          }
+        }
+      },
+      "Referral": {
+        "type": "object",
+        "description": "Read-side representation of a co-sell referral as returned by\n`getReferral` and `listReferralEvents`. Fields are populated\nfrom Microsoft Partner Center; `null` or omitted fields\nindicate Microsoft did not return a value for that referral.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Microsoft Partner Center referral ID. Stable across the lifetime of the referral."
+          },
+          "engagementId": {
+            "type": "string",
+            "description": "Microsoft Partner Center engagement ID. All related referrals (for example, partner-led co-sell pairings) share the same `engagementId`."
+          },
+          "name": {
+            "type": "string",
+            "description": "Caller-supplied human-readable name for the referral."
+          },
+          "externalReferenceId": {
+            "type": "string",
+            "description": "Optional external reference ID supplied by the partner system, when present."
+          },
+          "createdDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp recording when the referral was created."
+          },
+          "updatedDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp recording when the referral was last updated."
+          },
+          "expirationDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp recording when the referral will expire."
+          },
+          "acceptedDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp recording when the referral was accepted by the receiving partner. For outgoing referrals this matches `createdDateTime`."
+          },
+          "status": {
+            "type": "string",
+            "description": "Top-level lifecycle stage of the referral. Combine with\n`substatus` to determine the precise state. Values:\n\n  - `None` \u2014 no status has been set yet (typically observed only\n    on draft referrals before submission to Microsoft).\n  - `New` \u2014 the referral has been created and is awaiting action\n    by the receiving organization.\n  - `Active` \u2014 the referral has been accepted and is currently\n    being worked.\n  - `Closed` \u2014 the referral has reached a terminal state; see\n    `substatus` (`Won`, `Lost`, `Declined`, `Expired`, `Error`)\n    for the outcome.",
+            "enum": [
+              "None",
+              "New",
+              "Active",
+              "Closed"
+            ]
+          },
+          "substatus": {
+            "type": "string",
+            "description": "Sub-state of the referral, scoped to the parent `status`. Values:\n\n  - `None` \u2014 no sub-state has been set.\n  - `Pending` \u2014 submission to Microsoft is in flight or awaiting\n    acceptance.\n  - `Received` \u2014 Microsoft has received the referral and it is\n    awaiting partner action.\n  - `Accepted` \u2014 the receiving organization has accepted the\n    referral.\n  - `Won` \u2014 the referral closed as a won deal.\n  - `Lost` \u2014 the referral closed as lost.\n  - `Declined` \u2014 the receiving organization declined the\n    referral.\n  - `Expired` \u2014 the referral was closed because no action was\n    taken within Microsoft's allowed window.\n  - `Error` \u2014 the referral closed in an error state; see\n    `statusReason` for the reported reason.",
+            "enum": [
+              "None",
+              "Pending",
+              "Received",
+              "Accepted",
+              "Won",
+              "Lost",
+              "Declined",
+              "Expired",
+              "Error"
+            ]
+          },
+          "statusReason": {
+            "type": "string",
+            "description": "Reason supplied when the referral closed (won, lost, declined, or error). Format follows `<reasonCode>:<freeFormNotes>`."
+          },
+          "type": {
+            "type": "string",
+            "description": "Whether the referral is shared between the seller and a\npartner organization or independent.\n\n  - `Shared` \u2014 both sides see the referral.\n  - `Independent` \u2014 only the originating organization sees it.",
+            "enum": [
+              "Shared",
+              "Independent"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "description": "Microsoft-applied tags on the referral, such as `IPCosell`. Treat as opaque labels.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "qualification": {
+            "type": "string",
+            "description": "Sales qualification level reported by Microsoft.\n\n  - `None` \u2014 not qualified.\n  - `Direct` \u2014 direct customer interest, no MQL/SQL qualification.\n  - `MarketingQualified` \u2014 marketing-qualified lead.\n  - `SalesQualified` \u2014 sales-qualified lead.",
+            "enum": [
+              "None",
+              "Direct",
+              "MarketingQualified",
+              "SalesQualified"
+            ]
+          },
+          "customerProfile": {
+            "$ref": "#/components/schemas/CustomerProfileInput"
+          },
+          "consent": {
+            "$ref": "#/components/schemas/ConsentInput"
+          },
+          "details": {
+            "$ref": "#/components/schemas/DetailsInput"
+          },
+          "team": {
+            "type": "array",
+            "description": "Members of the partner or seller organization participating in the engagement.",
+            "items": {
+              "$ref": "#/components/schemas/MemberInput"
+            }
+          },
+          "inviteContext": {
+            "$ref": "#/components/schemas/InviteContext"
+          },
+          "eTag": {
+            "type": "string",
+            "description": "Concurrency token for the referral as reported by Microsoft Partner Center. Treat the value as opaque."
+          },
+          "target": {
+            "type": "array",
+            "description": "Microsoft Partner Center targets attached to the referral (for example, the published business profile location or solution profile this referral is aimed at).",
+            "items": {
+              "$ref": "#/components/schemas/Target"
+            }
+          },
+          "mpnId": {
+            "type": "string",
+            "description": "Microsoft Partner Network (MPN) ID of the originating partner."
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Microsoft Partner Center organization ID of the originating partner."
+          },
+          "organizationName": {
+            "type": "string",
+            "description": "Display name of the originating partner organization."
+          },
+          "lastModifiedVia": {
+            "type": "string",
+            "description": "Identifier of the principal that produced the most recent modification (for example, the Microsoft Partner Center user ID or the ID of an automated process)."
+          },
+          "lastRunId": {
+            "type": "string",
+            "description": "Identifier of the most recent processing run that touched the referral. Useful for correlating with audit logs."
+          },
+          "referralSource": {
+            "type": "string",
+            "description": "Source channel that produced the referral (for example, a marketplace listing or a partner-initiated co-sell)."
+          },
+          "favorite": {
+            "type": "boolean",
+            "description": "Whether the referral has been marked as a favorite by the originating user."
+          },
+          "campaignId": {
+            "type": "string",
+            "description": "Marketing campaign ID, when the referral was created from a campaign."
+          },
+          "salesStage": {
+            "type": "string",
+            "description": "Microsoft Partner Center sales-stage code, transmitted as a string. See `UpdateReferralInput.salesStage` for the published code-to-stage mapping."
+          },
+          "quality": {
+            "type": "string",
+            "description": "Microsoft-reported lead-quality grade for the referral (for example, `Unknown`). Treat unrecognized values as a safe default."
+          },
+          "isSpam": {
+            "type": "boolean",
+            "description": "Whether Microsoft has flagged the referral as spam."
+          },
+          "direction": {
+            "type": "string",
+            "description": "Whether the referral is moving outbound from the partner to\nMicrosoft, or inbound from Microsoft to the partner.\n\n  - `Incoming` \u2014 the referral was originated outside the\n    partner organization (for example, by Microsoft) and is\n    being shared with the partner.\n  - `Outgoing` \u2014 the referral was originated by the partner\n    and submitted to Microsoft.",
+            "enum": [
+              "Incoming",
+              "Outgoing"
+            ]
+          },
+          "referralProgram": {
+            "type": "string",
+            "description": "Microsoft co-sell program associated with this referral, when assigned by Microsoft."
+          },
+          "dealSensitivity": {
+            "type": "string",
+            "description": "Special-handling marker for the referral. Currently the only emitted value is `USFed` (US Federal customer); otherwise the value is `None`."
+          },
+          "createdVia": {
+            "type": "string",
+            "description": "Identifier of the principal that originally created the referral (Microsoft Partner Center user ID or automated-process ID)."
+          },
+          "closedDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 timestamp recording when the referral was closed (won, lost, declined, or in error)."
+          },
+          "callToAction": {
+            "type": "string",
+            "description": "Microsoft-suggested next action for the referral, when provided."
+          },
+          "registrationStatus": {
+            "type": "string",
+            "description": "Microsoft Partner Center deal-registration state for the referral (for example, `None` when registration is not applicable). Treat unrecognized values as a safe default."
+          },
+          "isAutoRegistrationEnabled": {
+            "type": "boolean",
+            "description": "Whether Microsoft will automatically register the deal on behalf of the partner."
+          },
+          "links": {
+            "type": "object",
+            "description": "Microsoft Partner Center HATEOAS links for follow-up navigation, keyed by relation name. See `Link`.",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Link"
+            }
+          },
+          "trackingInfo": {
+            "$ref": "#/components/schemas/TrackingInfo"
+          },
+          "exception": {
+            "description": "Free-form exception payload captured when the referral entered an error state, when present. The value may be a structured object or a JSON-encoded string; treat as best-effort diagnostic context.",
+            "oneOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "example": "{\"key\": \"value\"}"
+          }
+        }
+      },
+      "CustomerProfileInput": {
+        "type": "object",
+        "description": "Customer contact information. Required.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The customer organization name."
+          },
+          "isMatchingComplete": {
+            "type": "boolean",
+            "description": "If the customer was matched using the customer lookup endpoint."
+          },
+          "isMaccEligible": {
+            "type": "boolean",
+            "description": "Whether the customer is eligible for a Microsoft Azure Consumption Commitment (MACC). Copy this from the `msp_customermacceligibility` field on the matched account in the `customerLookup` response."
+          },
+          "ids": {
+            "type": "array",
+            "description": "Customer organization identifiers, copied from whichever lookup\nyou used to find the customer:\n\n  - From `customerLookup` -- populate `id` with\n    `customerAccountDetails.msp_accountnumber` and\n    `profileType: External`.\n  - From a DUNS lookup -- populate `id` with the customer's\n    DUNS number and `profileType: duns`.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Customer organization identifier. Source value depends on `profileType`."
+                },
+                "profileType": {
+                  "type": "string",
+                  "description": "Identifier source. Allowed values:\n\n  - `External` -- `id` is `customerAccountDetails.msp_accountnumber` from `customerLookup`.\n  - `duns` -- `id` is the customer's DUNS number from a DUNS lookup.",
+                  "enum": [
+                    "External",
+                    "duns"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "profileType"
+              ]
+            }
+          },
+          "address": {
+            "$ref": "#/components/schemas/AddressInput"
+          },
+          "team": {
+            "type": "array",
+            "description": "The contacts for the customer organization.",
+            "items": {
+              "$ref": "#/components/schemas/MemberInput"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "isMatchingComplete",
+          "isMaccEligible"
+        ]
+      },
+      "AddressInput": {
+        "type": "object",
+        "description": "Customer address used when creating a referral.",
+        "properties": {
+          "addressLine1": {
+            "type": "string",
+            "description": "Street address (line 1). When the customer was matched via\n`customerLookup`, copy `customerAccountDetails.address1_line1`;\nfor DUNS-matched customers, copy `address.addressLine1` from\nthe DUNS lookup."
+          },
+          "city": {
+            "type": "string",
+            "description": "City. When the customer was matched via `customerLookup`,\ncopy `customerAccountDetails.address1_city`; for DUNS-matched\ncustomers, copy `address.city` from the DUNS lookup."
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Postal code. Required only when sourced from a DUNS lookup\n(use `address.postalCode` from that response); ignored when\nsourced from `customerLookup`."
+          },
+          "country": {
+            "type": "string",
+            "description": "Country in ISO 3166-1 alpha-2 form (see\n[ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)).\nWhen the customer was matched via `customerLookup`, convert\n`customerAccountDetails.address1_country` (e.g. \"United\nStates\") to its 2-letter code (`US`); for DUNS-matched\ncustomers, copy `address.country` from the DUNS lookup."
+          },
+          "region": {
+            "type": "string",
+            "description": "Region. Required only when sourced from a DUNS lookup (use\n`address.region` from that response); ignored when sourced\nfrom `customerLookup`."
+          }
+        },
+        "required": [
+          "addressLine1",
+          "country"
+        ]
+      },
+      "ConsentInput": {
+        "type": "object",
+        "description": "Consent flags around sharing information with other organizations and allowing them to contact users. Required.",
+        "properties": {
+          "consentToShareReferralWithMicrosoftSellers": {
+            "type": "boolean",
+            "description": "Indicates consent to share the deal with Microsoft sellers.  Note that to make a referral Partner-led, consentToShareReferralWithMicrosoftSellers is supplied as true. An active Private referral can be converted to Partner-led just by updating the referral for this field."
+          },
+          "consentToToShareInfoWithOthers": {
+            "type": "boolean",
+            "description": "Indicates consent to share personal data with others. Must be true."
+          },
+          "consentToContact": {
+            "type": "boolean",
+            "description": "Indicates consent to contact users.  Must be true."
+          },
+          "consentToMicrosoftToContactSpecificPartners": {
+            "type": "boolean",
+            "description": "Indicates consent to let Microsoft contact specific partners for this deal."
+          }
+        },
+        "required": [
+          "consentToShareReferralWithMicrosoftSellers",
+          "consentToToShareInfoWithOthers",
+          "consentToContact"
+        ]
+      },
+      "ConsentUpdateInput": {
+        "type": "object",
+        "description": "Consent flags around sharing information with other organizations and allowing them to contact users. Required.",
+        "properties": {
+          "consentToShareReferralWithMicrosoftSellers": {
+            "type": "boolean",
+            "description": "Indicates consent to share the deal with Microsoft sellers.  Note that to make a referral Partner-led, consentToShareReferralWithMicrosoftSellers is supplied as true. An active Private referral can be converted to Partner-led just by updating the referral for this field."
+          }
+        }
+      },
+      "DetailsInput": {
+        "type": "object",
+        "description": "Customer details, notes, deal value, currency closing date. Required.",
+        "properties": {
+          "notes": {
+            "type": "string",
+            "description": "Notes for the referral."
+          },
+          "dealValue": {
+            "type": "number",
+            "description": "Value of the referral."
+          },
+          "currency": {
+            "type": "string",
+            "description": "The ISO 4217 currency symbol. https://learn.microsoft.com/en-us/dotnet/api/system.globalization.regioninfo.isocurrencysymbol?view=netframework-4.7.2&preserve-view=true"
+          },
+          "closingDateTime": {
+            "type": "string",
+            "description": "Date the customer is looking to close by."
+          },
+          "requirements": {
+            "$ref": "#/components/schemas/RequirementsInput"
+          }
+        },
+        "required": [
+          "dealValue",
+          "currency",
+          "closingDateTime"
+        ]
+      },
+      "RequirementsInput": {
+        "type": "object",
+        "description": "Industry, products, service type, and solutions the customer is interested in.",
+        "properties": {
+          "solutionArea": {
+            "type": "string",
+            "description": "The Solution area of the Customer need in the opportunity. Required for Services co-sell referrals only"
+          },
+          "solutionPlay": {
+            "type": "string",
+            "description": "The Solution play of the Customer need in the opportunity. Required for Services co-sell referrals only"
+          },
+          "customerMarketplaceIntent": {
+            "type": "string",
+            "description": "Indicates the customers purchase intent on Microsoft marketplace."
+          },
+          "solutions": {
+            "type": "array",
+            "description": "The solutions the customer is interested in.",
+            "items": {
+              "$ref": "#/components/schemas/SolutionInput"
+            }
+          }
+        },
+        "required": [
+          "customerMarketplaceIntent"
+        ]
+      },
+      "DetailsUpdateInput": {
+        "type": "object",
+        "description": "Customer details, notes, deal value, currency closing date. Required.",
+        "properties": {
+          "notes": {
+            "type": "string",
+            "description": "Notes for the referral."
+          },
+          "dealValue": {
+            "type": "number",
+            "description": "Value of the referral."
+          },
+          "currency": {
+            "type": "string",
+            "description": "The ISO 4217 currency symbol. https://learn.microsoft.com/en-us/dotnet/api/system.globalization.regioninfo.isocurrencysymbol?view=netframework-4.7.2&preserve-view=true"
+          },
+          "closingDateTime": {
+            "type": "string",
+            "description": "Date the customer is looking to close by."
+          },
+          "requirements": {
+            "$ref": "#/components/schemas/RequirementsUpdateInput"
+          }
+        }
+      },
+      "RequirementsUpdateInput": {
+        "type": "object",
+        "description": "Industry, products, service type, and solutions the customer is interested in.",
+        "properties": {
+          "customerMarketplaceIntent": {
+            "type": "string",
+            "description": "Indicates the customers purchase intent on Microsoft marketplace."
+          },
+          "solutions": {
+            "type": "array",
+            "description": "The solutions the customer is interested in.",
+            "items": {
+              "$ref": "#/components/schemas/SolutionInput"
+            }
+          }
+        }
+      },
+      "SolutionInput": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of solution. The only currently emitted value for IP is \"Name\".",
+            "enum": [
+              "Name"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "description": "Identifier for the solution. For Microsoft first-party solutions, use `identifiers.id` from the Microsoft solutions response (`type: solution`); for owned or third-party solutions, use `solutionId` from the solution lookup."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the solution. Use `name` from the solution lookup."
+          },
+          "price": {
+            "type": "string",
+            "description": "Price of the solution. Caller-supplied for Microsoft first-party (`1P`) solutions; ignored otherwise."
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Quantity of the solution. Caller-supplied for Microsoft first-party (`1P`) solutions; ignored otherwise."
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code. Caller-supplied for Microsoft first-party (`1P`) solutions; ignored otherwise."
+          },
+          "solutionType": {
+            "type": "string",
+            "description": "The type of solution.  Possible types are 1P, 3P, and SA. type from solution lookup.",
+            "enum": [
+              "1P",
+              "3P",
+              "SA"
+            ]
+          },
+          "publisherName": {
+            "type": "string",
+            "description": "The solution publishers organization name.  publisherName from solution lookup."
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "name",
+          "solutionType",
+          "publisherName"
+        ]
+      },
+      "InviteContextInput": {
+        "type": "object",
+        "description": "Information supplied when inviting another organization into a\nco-sell engagement. Each entry in `inviteContexts` invites one\norganization (Microsoft or a partner). Use the literal\n`organizationId: \"msft\"` to invite Microsoft; use values returned\nby `partnerLookup` to invite other partners.",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "The ID of the organization being invited to participate.  \u201cmsft\u201d for Microsoft, organizationId from partner lookup for other partners."
+          },
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the organization being invited to participate.  \u201cMicrosoft\u201d for Microsoft, name from partner lookup for other partners."
+          },
+          "notes": {
+            "type": "string",
+            "description": "Notes shared with the receiving organization. Optional, may be AI-generated for Microsoft invitees and is typically user-entered for partner invitees."
+          },
+          "assistanceRequestCode": {
+            "type": "string",
+            "description": "Category describing the kind of assistance requested from the\ninvited organization. Used by Microsoft to route the engagement\nto the right team. Allowed values:\n\n  - `GeneralOrOther` \u2014 request that does not fit a more specific\n    category.\n  - `CustomerTechnicalArchitecture` \u2014 help designing the\n    customer's technical architecture.\n  - `ProofOfConceptOrDemo` \u2014 assistance running a proof of\n    concept or product demo.\n  - `QuotesOrLicensing` \u2014 assistance with pricing, quoting, or\n    licensing.\n  - `PostSalesCustomerSuccess` \u2014 post-sale customer-success\n    engagement.\n  - `WorkloadSpecificValueProposition` \u2014 help building or\n    articulating a workload-specific value proposition.\n  - `NoHelpNeededFromMicrosoft` \u2014 partner-led referral where no\n    Microsoft assistance is requested; included so partners can\n    signal intent explicitly.",
+            "enum": [
+              "GeneralOrOther",
+              "CustomerTechnicalArchitecture",
+              "ProofOfConceptOrDemo",
+              "QuotesOrLicensing",
+              "PostSalesCustomerSuccess",
+              "WorkloadSpecificValueProposition",
+              "NoHelpNeededFromMicrosoft"
+            ]
+          },
+          "dealValue": {
+            "type": "number",
+            "description": "Deal value of the partner-side engagement. Required when inviting a non-Microsoft partner; ignored when inviting Microsoft."
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code (see\n[Microsoft .NET ISO currency reference](https://learn.microsoft.com/en-us/dotnet/api/system.globalization.regioninfo.isocurrencysymbol?view=netframework-4.7.2&preserve-view=true)).\nRequired when inviting a non-Microsoft partner; ignored when\ninviting Microsoft."
+          },
+          "closingDateTime": {
+            "type": "string",
+            "description": "Date the partner is targeting for close. Required when inviting a non-Microsoft partner; ignored when inviting Microsoft."
+          },
+          "solutions": {
+            "type": "array",
+            "description": "Solutions the customer is interested in for this partner. Required when inviting a non-Microsoft partner; ignored when inviting Microsoft.",
+            "items": {
+              "$ref": "#/components/schemas/SolutionInput"
+            }
+          },
+          "team": {
+            "type": "array",
+            "description": "Members of the partner organization involved in the engagement. Required when inviting a non-Microsoft partner; ignored when inviting Microsoft.",
+            "items": {
+              "$ref": "#/components/schemas/MemberInput"
+            }
+          }
+        },
+        "required": [
+          "organizationId",
+          "organizationName",
+          "notes",
+          "team"
+        ]
+      },
+      "InviteContext": {
+        "type": "object",
+        "description": "Read-side representation of the invite context returned on a\nreferral. The shape differs from the request-side\n`InviteContextInput`: the inviting organization is wrapped under\n`invitedBy`, and `assistanceRequestCode` is typed as a free-form\nstring so that any value Microsoft returns is preserved verbatim\n(including values outside the input enum, such as `Unknown`).\nWhen constructing a request, use `InviteContextInput`; when\nreading a referral, expect this shape.",
+        "properties": {
+          "notes": {
+            "type": "string",
+            "description": "Notes the inviting organization provided when inviting another organization into the partner engagement."
+          },
+          "invitedBy": {
+            "type": "object",
+            "description": "The organization that initiated the invite.",
+            "properties": {
+              "organizationId": {
+                "type": "string",
+                "description": "The organization ID that sent the referral."
+              },
+              "organizationName": {
+                "type": "string",
+                "description": "The organization name that sent the referral."
+              }
+            }
+          },
+          "assistanceRequestCode": {
+            "type": "string",
+            "description": "Type of help requested by the inviting organization. Whatever value Microsoft sent is returned as-is, which can include values outside the input enum (for example `Unknown`)."
+          },
+          "invitedMpnId": {
+            "type": "string",
+            "description": "MPN ID of the invited partner, when present."
+          }
+        }
+      },
+      "MemberInput": {
+        "type": "object",
+        "description": "Person on the customer or partner side participating in the engagement (a salesperson, technical contact, or executive sponsor).",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "description": "The contact's first name."
+          },
+          "lastName": {
+            "type": "string",
+            "description": "The contact's surname."
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "The contact's phone number, in any locale-appropriate format."
+          },
+          "email": {
+            "type": "string",
+            "description": "The contact's email address."
+          }
+        }
+      },
+      "Target": {
+        "type": "object",
+        "description": "Sales target attached to the referral, identifying which solution profile or business profile location the referral is aimed at.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Microsoft Partner Center identifier for the target resource."
+          },
+          "type": {
+            "type": "string",
+            "description": "What kind of target the `id` refers to.\n\n  - `BusinessProfileLocation` -- a published business profile location.\n  - `SolutionProfile` -- a published solution profile.",
+            "enum": [
+              "BusinessProfileLocation",
+              "SolutionProfile"
+            ]
+          }
+        }
+      },
+      "Link": {
+        "type": "object",
+        "description": "HATEOAS-style link surfaced by Microsoft Partner Center for follow-up navigation. Useful when integrating the Microsoft Partner Center UI side-by-side with a Tackle-driven flow; not required to operate this API.",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "The URI of the related resource."
+          },
+          "method": {
+            "type": "string",
+            "description": "The HTTP method to use when following the link.",
+            "example": "GET"
+          }
+        }
+      },
+      "TrackingInfo": {
+        "type": "object",
+        "description": "Microsoft Partner Center tracking identifiers attached to the\nreferral. Most fields are populated by Microsoft and reflect\nupstream tracking state; expect any field to be omitted when\nMicrosoft has not assigned a value.",
+        "properties": {
+          "microsoftMsxId": {
+            "type": "string",
+            "description": "Microsoft Sales Experience (MSX) identifier for the linked Dynamics 365 opportunity, when present."
+          },
+          "microsoftUSFedOpportunityId": {
+            "type": "string",
+            "description": "Microsoft US Federal opportunity identifier, populated only for US-Federal referrals (`dealSensitivity: USFed`)."
+          },
+          "microsoftUSFedLeadId": {
+            "type": "string",
+            "description": "Microsoft US Federal lead identifier, populated only for US-Federal referrals (`dealSensitivity: USFed`)."
+          },
+          "migratedPSCDealId": {
+            "type": "string",
+            "description": "Legacy Partner Sales Connect (PSC) deal ID preserved on referrals migrated from PSC."
+          },
+          "migratedPSCPartnerDealId": {
+            "type": "string",
+            "description": "Legacy Partner Sales Connect (PSC) partner-deal ID preserved on referrals migrated from PSC."
+          },
+          "leadToOpportunityLinkId": {
+            "type": "string",
+            "description": "Microsoft Partner Center linkage ID joining a lead-stage referral to its converted opportunity."
+          },
+          "microsoftMilestoneIds": {
+            "type": "array",
+            "description": "Microsoft-side milestone identifiers associated with the referral lifecycle. Treat as opaque values.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+generated: '2026-07-21'
+method: searched
+source: openapi/* + https://developers.tackle.io + https://status.tackle.io + https://help.tackle.io/en/collections/11352347-release-notes
+versioning:
+  style: url-path + per-service semver
+  current:
+    platform: v1 (1.0.0)
+    offers-aws: 3.2.0
+    offers-msft: 1.0.0
+    contracts: 1.0.0
+    cosell-aws: '1.0'
+    cosell-gcp: '1.0'
+    cosell-msft: '1.0'
+    prospect: '1.0'
+    scim: 2.0.0
+  version_endpoint: GET https://api.tackle.io/v1/version
+deprecation_policy:
+  documented: true
+  statement: Additive changes are made without a version bump; deprecated fields are not removed without
+    a deprecation notice (Tackle Public Contracts API).
+  sunset_header: false
+status_page:
+  url: https://status.tackle.io
+  provider: Statuspage.io
+  observed: All Systems Operational (2026-07-21)
+async_model: Mutating co-sell/offer operations return 202 Accepted with a requestId; clients poll GET
+  .../events or the resource for the cloud-side outcome.
+token_ttl_seconds: 5400
+sla: not published on the developer hub

@@ -1,0 +1,29 @@
+generated: '2026-07-21'
+method: searched
+source: https://developers.tackle.io/reference + llms.txt
+model: Tackle provisions dedicated test/demo vendor accounts; there is no public shared sandbox key or
+  test-card catalog (Tackle is not a card processor).
+test_vendor_accounts: Vendor accounts can be provisioned for use in a test environment; certain operations
+  are routable only for those accounts and simulate cloud-side responses.
+test_only_operations:
+- service: cosell-aws
+  operation: createInvitation
+  note: Creates a simulated invitation; production vendors receive 403.
+- service: cosell-aws
+  operation: updateOpportunity
+  note: Sub-operations acceptOpportunity / rejectOpportunity simulate AWS responses (test/demo only).
+- service: cosell-gcp
+  operation: updateOpportunity
+  note: Sub-operations acceptOpportunity, rejectOpportunity, closeByAdminOpportunity, confirmCloseWon/LostOpportunity
+    simulate Google-side actions.
+- service: cosell-aws
+  operation: listSolutions
+  note: Returns a fixed three-solution fixture for test vendors (query params ignored).
+dry_run:
+  service: offers-aws
+  operation: createPrivateOffer
+  note: Set dry_run:true to validate the payload without persisting; a successful dry run returns 200
+    instead of 201.
+webhook_testing:
+  endpoint: POST https://api.tackle.io/v1/webhooks/test
+  note: Send a test payload for a product/event_type; forward_to_url can override the target for dev/staging.

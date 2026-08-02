@@ -1,0 +1,49 @@
+generated: '2026-07-21'
+method: searched
+source: https://developers.tackle.io/reference + https://auth.tackle.io/.well-known/openid-configuration
+docs: https://developers.tackle.io/docs/getting-an-access-token
+model: OAuth 2.0 client-credentials issues a JWT whose fine-grained RBAC permissions gate each operation;
+  the OIDC provider (Auth0) also advertises standard OpenID scopes for interactive login.
+oidc_scopes:
+- openid
+- profile
+- email
+- offline_access
+- name
+- given_name
+- family_name
+- nickname
+- email_verified
+- picture
+- phone
+- address
+rbac_permissions:
+- name: cosell:ListOpportunities
+  description: List co-sell opportunities.
+- name: cosell:CreateOpportunity
+  description: Create a co-sell opportunity.
+- name: cosell:GetOpportunity
+  description: Retrieve a co-sell opportunity.
+- name: cosell:UpdateOpportunity
+  description: Update a co-sell opportunity.
+- name: cosell:StartEngagement
+  description: Submit / start engagement on a co-sell opportunity.
+- name: cosell:ListOpportunityEvents
+  description: List the event history for an opportunity.
+- name: cosell:GetPicklistOptions
+  description: Read acceptable picklist values for opportunity fields.
+- name: offers:ListOffers
+  description: List private offers.
+- name: offers:GetOffer
+  description: Retrieve a private offer.
+- name: offers:CreateDraftOffer
+  description: Create/update a draft private offer; also gates agreements, products, pricing, currencies
+    and partner lookups.
+- name: offers:UpdateOffer
+  description: Update/delete/archive/unarchive a private offer.
+- name: offers:CancelOffer
+  description: Cancel a private offer pushed to the marketplace.
+- name: offers:CreateOfferOnMarketplace
+  description: Push/submit a draft offer to the cloud marketplace.
+- name: offers:ListProducts
+  description: List marketplace product listings.

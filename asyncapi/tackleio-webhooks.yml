@@ -1,0 +1,42 @@
+generated: '2026-07-21'
+method: searched
+source: openapi/tackleio-platform-openapi.json + https://developers.tackle.io/docs/test-a-webhook
+transport: HTTP callbacks (POST) to a vendor-registered URL
+registration:
+  create_or_update: POST https://api.tackle.io/v1/webhooks
+  list: GET /v1/webhooks
+  vendor_level: GET/DELETE /v1/webhooks/vendor
+  product_level: GET/DELETE /v1/webhooks/product/{productid}
+  test: POST /v1/webhooks/test (optional forward_to_url override)
+  scoping: Product-level webhook takes precedence; vendor-level is the fallback.
+callback_auth:
+- none
+- basic
+- header_api_key
+- oauth2 client_credentials
+event_types:
+- name: New Order
+  clouds:
+  - AWS
+  - Azure
+  - GCP
+  - RedHat
+  schemas:
+  - AWSNewOrderCallback
+  - AzureNewOrderCallback
+  - GCPNewOrderCallback
+  - RedhatNewOrderCallback
+- name: Private Offer
+  clouds:
+  - AWS
+  - Azure
+  - GCP
+  - RedHat
+  schemas:
+  - AWSPrivateOfferCallback
+  - AzurePrivateOfferCallback
+  - GCPPrivateOfferCallback
+  - RedhatPrivateOfferCallback
+- name: Metering
+  note: Toggled via MeteringEventsEnabled on the webhook registration.
+note: No AsyncAPI document is published; this captures the HTTP webhook/callback catalog only.

@@ -1,0 +1,19 @@
+generated: '2026-07-21'
+method: searched
+status: available
+source: https://developers.tackle.io/mcp
+name: Tackle API MCP Server
+url: https://developers.tackle.io/mcp
+transport: streamable-http
+provider: Hosted by Tackle via the ReadMe developer hub (auto-generated from the OpenAPI definitions).
+authentication: Bearer JWT from POST https://api.tackle.io/v1/authenticate (OAuth2 client credentials).
+notes: GET returns 'This URL can only be accessed with a MCP client.' Exposes ReadMe MCP meta-tools over
+  the full Tackle API surface.
+meta_tools:
+- list-endpoints
+- get-endpoint
+- get-server-variables
+- search-endpoints
+- search
+- fetch
+- execute-request

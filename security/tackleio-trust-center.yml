@@ -1,0 +1,13 @@
+generated: '2026-07-21'
+method: searched
+probe: true
+source: https://trust.tackle.io/
+url: https://trust.tackle.io/
+certifications:
+- SOC 2
+evidence:
+- source: https://trust.tackle.io/
+  keywords:
+  - soc 2
+  - trust center
+compliance_published: true

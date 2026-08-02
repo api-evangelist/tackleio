@@ -1,0 +1,24 @@
+generated: '2026-07-21'
+method: probed
+source: probed .well-known paths across Tackle hosts
+entries:
+- host: auth.tackle.io
+  path: /.well-known/openid-configuration
+  status: 200
+  file: tackleio-auth-openid-configuration.json
+  note: OpenID Connect discovery for the Auth0 tenant that issues Tackle API tokens (issuer https://auth.tackle.io/).
+- host: tackle.io
+  path: /.well-known/security.txt
+  status: 404
+- host: tackle.io
+  path: /.well-known/ai-plugin.json
+  status: 404
+- host: tackle.io
+  path: /.well-known/api-catalog
+  status: 404
+- host: prospect.tackle.io
+  path: /.well-known/openid-configuration
+  status: 403
+- host: prospect.tackle.io
+  path: /.well-known/oauth-authorization-server
+  status: 403

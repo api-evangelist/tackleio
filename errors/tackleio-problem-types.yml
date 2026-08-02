@@ -1,0 +1,152 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/* 4xx/5xx responses + https://developers.tackle.io/reference
+format: custom-json
+notes: 'Not RFC 9457. Envelopes vary: Error/ErrorResponse (co-sell, offers, contracts, platform), MessageError/SearchError
+  (prospect), ScimError (SCIM, RFC 7644), text/plain on some AWS co-sell errors.'
+status_codes:
+- status: '400'
+  title: Bad Request
+  remediation: Validation error in the request body or parameters. Fix the payload and retry.
+  occurrences: 55
+- status: '401'
+  title: Unauthorized
+  remediation: Access token missing, malformed, or expired. Obtain a fresh token from /v1/authenticate.
+  occurrences: 89
+- status: '403'
+  title: Forbidden
+  remediation: Token lacks the RBAC permission required, or the operation is restricted to test vendors.
+  occurrences: 62
+- status: '404'
+  title: Not Found
+  remediation: The resource does not exist for the authenticated vendor.
+  occurrences: 44
+- status: '409'
+  title: Conflict
+  remediation: State conflict, e.g. one-opportunity-per-CRM-ID or an already-accepted offer.
+  occurrences: 10
+- status: '415'
+  title: Unsupported Media Type
+  remediation: Content-Type must be application/scim+json (SCIM) or application/json.
+  occurrences: 1
+- status: '422'
+  title: Error
+  remediation: ''
+  occurrences: 2
+- status: '423'
+  title: Locked
+  remediation: Co-sell resource temporarily locked while a prior cloud operation is in flight; retry after
+    a delay.
+  occurrences: 4
+- status: '500'
+  title: Internal Server Error
+  remediation: Retry idempotent reads after a delay; for writes, poll event history to confirm outcome.
+  occurrences: 55
+envelopes:
+- schema: ScimError
+  media_type: application/scim+json
+  used_by:
+  - scim
+  spec: urn:ietf:params:scim:api:messages:2.0:Error
+- schema: Error / ErrorResponse
+  media_type: application/json
+  used_by:
+  - contracts
+  - offers-aws
+  - offers-msft
+  - cosell-gcp
+  - cosell-msft
+  - platform
+- schema: MessageError / SearchError
+  media_type: application/json
+  used_by:
+  - prospect
+- schema: text/plain
+  media_type: text/plain
+  used_by:
+  - cosell-aws
+per_service:
+  tackleio-contracts-openapi.json:
+    codes:
+      '400': 1
+      '401': 2
+      '404': 1
+      '500': 2
+    content_types:
+    - application/json
+  tackleio-cosell-aws-openapi.json:
+    codes:
+      '400': 6
+      '401': 11
+      '403': 1
+      '404': 4
+      '409': 2
+      '423': 2
+      '500': 11
+    content_types:
+    - text/plain
+  tackleio-cosell-gcp-openapi.json:
+    codes:
+      '400': 5
+      '401': 6
+      '403': 6
+      '404': 2
+      '409': 2
+      '423': 2
+      '500': 6
+    content_types: []
+  tackleio-cosell-msft-openapi.json:
+    codes:
+      '400': 5
+      '401': 7
+      '403': 7
+      '404': 2
+      '409': 2
+      '500': 7
+    content_types: []
+  tackleio-offers-aws-openapi.json:
+    codes:
+      '400': 6
+      '401': 12
+      '403': 12
+      '404': 6
+      '409': 2
+      '500': 2
+    content_types:
+    - application/json
+  tackleio-offers-msft-openapi.json:
+    codes:
+      '400': 8
+      '401': 13
+      '403': 13
+      '404': 8
+      '500': 13
+    content_types: []
+  tackleio-platform-openapi.json:
+    codes:
+      '400': 15
+      '401': 24
+      '403': 9
+      '404': 16
+      '409': 1
+      '422': 2
+    content_types: []
+  tackleio-prospect-openapi.json:
+    codes:
+      '400': 2
+      '401': 2
+      '403': 2
+      '500': 2
+    content_types:
+    - application/json
+  tackleio-scim-openapi.json:
+    codes:
+      '400': 7
+      '401': 12
+      '403': 12
+      '404': 5
+      '409': 1
+      '415': 1
+      '500': 12
+    content_types:
+    - application/json

@@ -1,0 +1,16 @@
+generated: '2026-07-21'
+method: generated
+source: openapi/tackleio-cosell-aws-openapi.json
+overlay: 1.0.0
+info:
+  title: API Evangelist enrichment overlay for Tackle Co-Sell for AWS Partner Central
+  version: 0.1.0
+extends: openapi/tackleio-cosell-aws-openapi.json
+actions:
+- target: $.info
+  update:
+    x-apis-io-enriched: true
+    x-apis-io-provider: tackleio
+    x-tackle-service: cosell-aws
+    x-tackle-marketplace-platform: AWS / Microsoft / Google Cloud cloud marketplace & co-sell
+    x-authentication: OAuth2 client-credentials JWT bearer (POST https://api.tackle.io/v1/authenticate)

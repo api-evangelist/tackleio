@@ -1,0 +1,32 @@
+generated: '2026-07-21'
+method: generated
+source: generated from openapi/* real operationIds
+skills:
+- name: score-buyer-domains
+  file: tackleio-score-buyer-domains.md
+  api: Tackle Prospect API
+  operations:
+  - scoreDomains
+  - searchScoredDomains
+  description: Score a batch of domains for cloud-marketplace buyer-signal propensity and search the scored
+    results.
+- name: create-aws-cosell-opportunity
+  file: tackleio-create-aws-cosell-opportunity.md
+  api: Tackle Co-Sell for AWS Partner Central
+  operations:
+  - listSolutions
+  - createOpportunity
+  - getOpportunity
+  - listOpportunityEvents
+  description: Create and track an AWS Partner Central co-sell opportunity through Tackle.
+- name: create-aws-private-offer
+  file: tackleio-create-aws-private-offer.md
+  api: Tackle Offers for AWS Marketplace
+  operations:
+  - listProducts
+  - getProductPricing
+  - listAllowedCurrencies
+  - createPrivateOffer
+  - marketplaceCreatePrivateOffer
+  - getPrivateOffer
+  description: Assemble and publish an AWS Marketplace private offer via Tackle Offers.

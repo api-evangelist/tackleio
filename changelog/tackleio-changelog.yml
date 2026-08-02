@@ -1,0 +1,13 @@
+generated: '2026-07-21'
+method: searched
+source: https://help.tackle.io/en/collections/11352347-release-notes
+scheme: dated release notes (Tackle help center) + per-service OpenAPI versions
+version_endpoint: GET https://api.tackle.io/v1/version
+release_notes_url: https://help.tackle.io/en/collections/11352347-release-notes
+current_versions:
+  platform: 1.0.0
+  offers-aws: 3.2.0
+  scim: 2.0.0
+entries: []
+notes: Release notes are published as help-center articles; individual dated entries were not enumerated
+  in this pass.

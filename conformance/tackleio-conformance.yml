@@ -1,0 +1,60 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/* + https://auth.tackle.io/.well-known/openid-configuration + docs
+standards:
+- id: scim2
+  conforms: true
+  spec: RFC 7643/7644 SCIM 2.0
+  evidence: scim spec implements /scim/v2 Users, Groups, ServiceProviderConfig, ResourceTypes, Schemas,
+    PATCH, ListResponse, startIndex/count pagination, and scim:api:messages:2.0:Error.
+- id: oauth2
+  conforms: true
+  spec: RFC 6749 (client_credentials)
+  evidence: POST https://api.tackle.io/v1/authenticate with grant_type=client_credentials returns a bearer
+    JWT; platform spec declares an oauth2 clientCredentials scheme.
+- id: oidc
+  conforms: true
+  spec: OpenID Connect Discovery 1.0
+  evidence: https://auth.tackle.io/.well-known/openid-configuration (Auth0, issuer https://auth.tackle.io/).
+- id: oauth2_pkce
+  conforms: true
+  spec: RFC 7636
+  evidence: 'code_challenge_methods_supported: [S256, plain] in OIDC discovery.'
+- id: bearer_jwt
+  conforms: true
+  spec: RFC 6750 / RFC 7519
+  evidence: 'All services accept Authorization: Bearer <JWT>; tokens expire in 5400s.'
+- id: webhooks
+  conforms: true
+  spec: Provider webhook/callback delivery
+  evidence: Platform API manages product/vendor webhooks (POST /v1/webhooks) with New-Order and Private-Offer
+    callbacks per cloud.
+- id: pagination
+  conforms: true
+  spec: Cursor/offset pagination
+  evidence: cursor+limit, offset+next_token, pageSize, and SCIM startIndex+count across services.
+- id: rfc9457
+  conforms: false
+  spec: application/problem+json
+  evidence: Custom JSON error envelopes (Error/ErrorResponse/ScimError/MessageError); no application/problem+json.
+- id: idempotency
+  conforms: false
+  spec: Idempotency-Key header
+  evidence: No Idempotency-Key header; write safety via async 202+poll and per-CRM-ID 409 checks.
+- id: rfc8594
+  conforms: false
+  spec: Sunset/Deprecation headers
+  evidence: Contracts API documents a deprecation-notice policy in prose but declares no Sunset/Deprecation
+    headers.
+- id: json_api
+  conforms: false
+  spec: JSON:API
+- id: odata
+  conforms: false
+  spec: OData
+- id: fhir
+  conforms: false
+  spec: HL7 FHIR
+- id: fapi
+  conforms: false
+  spec: FAPI

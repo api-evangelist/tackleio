@@ -1,27 +1,936 @@
 aid: tackleio
 name: Tackle.io
-description: 'Tackle.io is a company surfaced as a portfolio company of bessemer-venture-partners and
-  added to the API Evangelist network as a stub for enrichment. Sector: cloud. This profile is a lead
-  awaiting the enrichment pipeline.'
+description: 'Tackle.io is the Cloud Marketplace and Co-Sell platform that helps software vendors list,
+  sell, co-sell, and meter through the AWS, Microsoft Azure, and Google Cloud marketplaces. The Tackle
+  developer surface spans nine services: a core Platform API (authentication, webhooks, metering/usage
+  records, products, subscriptions, disbursements, invoices, registrations), a Prospect buyer-signal scoring
+  API, Co-Sell APIs for AWS Partner Central, Microsoft Partner Center, and Google Cloud, Private Offer
+  APIs for the AWS and Microsoft marketplaces, a public Contracts API, and a SCIM 2.0 user-provisioning
+  API. Authentication is OAuth 2.0 client-credentials (machine-to-machine) issuing short-lived JWT bearer
+  tokens gated by fine-grained RBAC permissions.'
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://files.readme.io/f0c77fe-tackle-logo-light_1.png
 url: https://raw.githubusercontent.com/api-evangelist/tackleio/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
 - bessemer-venture-partners
-x-tier: stub
-x-tier-reason: portfolio-lead
+x-tier: profiled
+x-tier-reason: enriched-from-developer-hub
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-21'
 tags:
 - Company
 - Cloud
-apis: []
+- Cloud Marketplace
+- Co-Sell
+- AWS Marketplace
+- Azure Marketplace
+- Google Cloud Marketplace
+- Private Offers
+- Metering
+- SCIM
+- Webhooks
+- B2B SaaS
+apis:
+- aid: tackleio:tackleio-authentication-api
+  name: Tackle.io Authentication API
+  description: Operations for API Authentication
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Authentication
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-authentication-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-contracts-api
+  name: Tackle.io Contracts API
+  description: The Contracts API from Tackle.io — 2 operation(s) for contracts.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Contracts
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-contracts-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-currencies-api
+  name: Tackle.io Currencies API
+  description: Microsoft marketplace currency and conversion helpers.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Currencies
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-currencies-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-customers-api
+  name: Tackle.io Customers API
+  description: >-
+    Look up customer accounts in Microsoft Partner Center before
+
+    creating a referral. Use these endpoints to determine
+
+    `customerProfile.ids` and the `dealSensitivity` value
+
+    (`USFed` vs `None`) you should send.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Customers
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-customers-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-disbursements-api
+  name: Tackle.io Disbursements API
+  description: The Disbursements API from Tackle.io — 1 operation(s) for disbursements.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Disbursements
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-disbursements-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-entitlements-api
+  name: Tackle.io Entitlements API
+  description: Legacy entitlements endpoint - returns flat role objects
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Entitlements
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-entitlements-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-groups-api
+  name: Tackle.io Groups API
+  description: SCIM 2.0 Groups endpoint - returns full Group resources (RFC 7643 §4.2)
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Groups
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-groups-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-invitations-api
+  name: Tackle.io Invitations API
+  description: >-
+    Create (test-environment-only), read, update, and list co-sell
+
+    invitations — AWS-led requests to partner with you on a specific
+
+    opportunity. Use the update operation to accept or reject an
+
+    invitation, and the history endpoint to inspect cloud-side detail.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Invitations
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-invitations-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-invoices-api
+  name: Tackle.io Invoices API
+  description: The Invoices API from Tackle.io — 1 operation(s) for invoices.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Invoices
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-invoices-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-marketplace-api
+  name: Tackle.io Marketplace API
+  description: AWS Marketplace context endpoints used to assemble offers and amendments.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Marketplace
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-marketplace-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-metering-api
+  name: Tackle.io Metering API
+  description: The Metering API from Tackle.io — 2 operation(s) for metering.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Metering
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-metering-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-notifications-api
+  name: Tackle.io Notifications API
+  description: Buyer instruction notification operations.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Notifications
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-notifications-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-opportunities-api
+  name: Tackle.io Opportunities API
+  description: >-
+    Create, read, update, and list co-sell opportunities — the partner-
+
+    originated (Outbound / Partner Referral) and AWS-originated (Inbound
+
+    / AWS Referral) deals tracked in AWS Partner Central. Includes the
+
+    opportunity history endpoint for inspecting cloud-side request and
+
+    response detail.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Opportunities
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-opportunities-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-partners-api
+  name: Tackle.io Partners API
+  description: >-
+    Look up partner organizations in Microsoft Partner Center.
+
+    Use the returned `organizationId` when adding a non-Microsoft
+
+    partner via `inviteContexts`.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Partners
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-partners-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-private-offer-actions-api
+  name: Tackle.io Private Offer Actions API
+  description: Private offer lifecycle actions such as archive, cancel, and sync.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Private Offer Actions
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-private-offer-actions-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-private-offers-api
+  name: Tackle.io Private Offers API
+  description: AWS private-offer lifecycle (create, read, update, cancel, push to marketplace).
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Private Offers
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-private-offers-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-products-api
+  name: Tackle.io Products API
+  description: Microsoft product and plan detail lookup.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Products
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-products-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-public-api
+  name: Tackle.io public API
+  description: The public API from Tackle.io — 7 operation(s) for public.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - public
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-public-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-referrals-api
+  name: Tackle.io Referrals API
+  description: >-
+    Create, read, update, and list events on Microsoft Partner Center co-sell referrals (both outbound
+    and inbound).
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Referrals
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-referrals-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-registrations-api
+  name: Tackle.io Registrations API
+  description: Operations for Order Registrations
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Registrations
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-registrations-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-scores-api
+  name: Tackle.io Scores API
+  description: Score domains and search scored accounts.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Scores
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-scores-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-service-provider-api
+  name: Tackle.io Service Provider API
+  description: Service provider configuration and capabilities
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Service Provider
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-service-provider-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-settings-api
+  name: Tackle.io Settings API
+  description: >-
+    Vendor-level reference data, including the picklist endpoint
+
+    that supplies the acceptable values for opportunity fields.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Settings
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-settings-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-solutions-api
+  name: Tackle.io Solutions API
+  description: >-
+    List the co-sell solutions registered with AWS Partner Central for
+
+    your account. Solution identifiers are referenced by `solutions` on
+
+    opportunities.
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Solutions
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-solutions-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-subscriptions-api
+  name: Tackle.io Subscriptions API
+  description: Operations for Subscriptions
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Subscriptions
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-subscriptions-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-users-api
+  name: Tackle.io Users API
+  description: User management operations
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Users
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-users-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-version-api
+  name: Tackle.io Version API
+  description: Operations for API Versions
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Version
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-version-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
+- aid: tackleio:tackleio-webhooks-api
+  name: Tackle.io Webhooks API
+  description: Operations for Webhooks
+  humanURL: https://developers.tackle.io/reference/v1-get-version
+  baseURL: https://api.tackle.io
+  tags:
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/tackleio-webhooks-api-openapi.yml
+  - type: APIReference
+    url: https://developers.tackle.io/reference/v1-get-version
+  - type: APIReference
+    url: https://developers.tackle.io/reference/scoredomains
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listopportunities-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/createipreferral
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers-1
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listprivateoffers
+  - type: APIReference
+    url: https://developers.tackle.io/reference/listcontracts
+  - type: APIReference
+    url: https://developers.tackle.io/reference/getusers
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: DeveloperPortal
+  url: https://developers.tackle.io/
+- type: Documentation
+  url: https://developers.tackle.io/docs/getting-started
+- type: APIReference
+  url: https://developers.tackle.io/reference
+- type: GettingStarted
+  url: https://developers.tackle.io/docs/getting-started
+- type: Authentication
+  url: authentication/tackleio-authentication.yml
+- type: OAuthScopes
+  url: scopes/tackleio-scopes.yml
+- type: WellKnown
+  url: well-known/tackleio-well-known.yml
+- type: MCPServer
+  url: mcp/tackleio-mcp.yml
+- type: LLMsTxt
+  url: llms/tackleio-llms.txt
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Conventions
+  url: conventions/tackleio-conventions.yml
+- type: ErrorCatalog
+  url: errors/tackleio-problem-types.yml
+- type: Conformance
+  url: conformance/tackleio-conformance.yml
+- type: Compliance
+  url: security/tackleio-trust-center.yml
+- type: TrustCenter
+  url: security/tackleio-trust-center.yml
+- type: DomainSecurity
+  url: security/tackleio-domain-security.yml
+- type: Lifecycle
+  url: lifecycle/tackleio-lifecycle.yml
+- type: Deprecation
+  url: lifecycle/tackleio-lifecycle.yml
+- type: StatusPage
+  url: https://status.tackle.io
+- type: ChangeLog
+  url: changelog/tackleio-changelog.yml
+- type: DataModel
+  url: data-model/tackleio-data-model.yml
+- type: Sandbox
+  url: sandbox/tackleio-sandbox.yml
+- type: Webhooks
+  url: asyncapi/tackleio-webhooks.yml
+- type: Support
+  url: https://help.tackle.io/
+- type: Blog
+  url: https://tackle.io/resources-category/blogs/
+- type: TermsOfService
+  url: https://tackle.io/terms-conditions/
+- type: PrivacyPolicy
+  url: https://tackle.io/privacy-policy-tackle-platform/
 - type: Website
   url: https://tackle.io
+x-enrichment:
+  date: '2026-07-21'
+  status: enriched
+  artifacts_added: 38
+  pass: local-v1
