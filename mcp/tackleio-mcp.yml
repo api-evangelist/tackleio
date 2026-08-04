@@ -1,6 +1,7 @@
 generated: '2026-07-21'
 method: searched
-status: available
+status: published
+status_raw: available
 source: https://developers.tackle.io/mcp
 name: Tackle API MCP Server
 url: https://developers.tackle.io/mcp
