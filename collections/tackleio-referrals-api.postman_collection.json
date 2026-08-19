@@ -1,0 +1,1552 @@
+{
+  "item": [
+    {
+      "id": "52791414-d613-425d-bd2c-d566959bc0b7",
+      "name": "Referrals",
+      "description": {
+        "content": "Create, read, update, and list events on Microsoft Partner Center co-sell referrals (both outbound and inbound).",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "d01e6c1e-7cb3-4379-a19c-9d97e3151a4f",
+          "name": "Create a referral",
+          "request": {
+            "name": "Create a referral",
+            "description": {
+              "content": "Create a co-sell IP referral and submit it to Microsoft\nPartner Center. The shape of the request and the side effect\ndepend on the optional `tackle-operation-id` header (default\n`createIPReferral`); see the header description for the full\nlist of sub-operations and when to use each. Returns\n`202 Accepted` immediately with a Tackle referral ID and a\n`requestId` you can correlate to subsequent events via\n`listReferralEvents`.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "referrals"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "key": "tackle-operation-id",
+                "value": "<string>",
+                "description": ""
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"<string>\",\n  \"mpnId\": \"<string>\",\n  \"dealSensitivity\": \"<string>\",\n  \"team\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"phoneNumber\": \"<string>\",\n      \"email\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"phoneNumber\": \"<string>\",\n      \"email\": \"<string>\"\n    }\n  ],\n  \"customerProfile\": {\n    \"name\": \"<string>\",\n    \"isMatchingComplete\": \"<boolean>\",\n    \"isMaccEligible\": \"<boolean>\",\n    \"ids\": [\n      {\n        \"id\": \"<string>\",\n        \"profileType\": \"<string>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"profileType\": \"<string>\"\n      }\n    ],\n    \"address\": {\n      \"addressLine1\": \"<string>\",\n      \"country\": \"<string>\",\n      \"city\": \"<string>\",\n      \"postalCode\": \"<string>\",\n      \"region\": \"<string>\"\n    },\n    \"team\": [\n      {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"phoneNumber\": \"<string>\",\n        \"email\": \"<string>\"\n      },\n      {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"phoneNumber\": \"<string>\",\n        \"email\": \"<string>\"\n      }\n    ]\n  },\n  \"consent\": {\n    \"consentToShareReferralWithMicrosoftSellers\": \"<boolean>\",\n    \"consentToToShareInfoWithOthers\": \"<boolean>\",\n    \"consentToContact\": \"<boolean>\",\n    \"consentToMicrosoftToContactSpecificPartners\": \"<boolean>\"\n  },\n  \"details\": {\n    \"dealValue\": \"<number>\",\n    \"currency\": \"<string>\",\n    \"closingDateTime\": \"<string>\",\n    \"notes\": \"<string>\",\n    \"requirements\": {\n      \"customerMarketplaceIntent\": \"<string>\",\n      \"solutionArea\": \"<string>\",\n      \"solutionPlay\": \"<string>\",\n      \"solutions\": [\n        {\n          \"type\": \"<string>\",\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"solutionType\": \"<string>\",\n          \"publisherName\": \"<string>\",\n          \"price\": \"<string>\",\n          \"quantity\": \"<integer>\",\n          \"currency\": \"<string>\"\n        },\n        {\n          \"type\": \"<string>\",\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"solutionType\": \"<string>\",\n          \"publisherName\": \"<string>\",\n          \"price\": \"<string>\",\n          \"quantity\": \"<integer>\",\n          \"currency\": \"<string>\"\n        }\n      ]\n    }\n  },\n  \"companyWebsite\": \"<string>\",\n  \"crmId\": \"<string>\",\n  \"crmOrgId\": \"<string>\",\n  \"campaignId\": \"<string>\",\n  \"inviteContexts\": [\n    {\n      \"organizationId\": \"<string>\",\n      \"organizationName\": \"<string>\",\n      \"notes\": \"<string>\",\n      \"team\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"phoneNumber\": \"<string>\",\n          \"email\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"phoneNumber\": \"<string>\",\n          \"email\": \"<string>\"\n        }\n      ],\n      \"assistanceRequestCode\": \"<string>\",\n      \"dealValue\": \"<number>\",\n      \"currency\": \"<string>\",\n      \"closingDateTime\": \"<string>\",\n      \"solutions\": [\n        {\n          \"type\": \"<string>\",\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"solutionType\": \"<string>\",\n          \"publisherName\": \"<string>\",\n          \"price\": \"<string>\",\n          \"quantity\": \"<integer>\",\n          \"currency\": \"<string>\"\n        },\n        {\n          \"type\": \"<string>\",\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"solutionType\": \"<string>\",\n          \"publisherName\": \"<string>\",\n          \"price\": \"<string>\",\n          \"quantity\": \"<integer>\",\n          \"currency\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"organizationId\": \"<string>\",\n      \"organizationName\": \"<string>\",\n      \"notes\": \"<string>\",\n      \"team\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"phoneNumber\": \"<string>\",\n          \"email\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"phoneNumber\": \"<string>\",\n          \"email\": \"<string>\"\n        }\n      ],\n      \"assistanceRequestCode\": \"<string>\",\n      \"dealValue\": \"<number>\",\n      \"currency\": \"<string>\",\n      \"closingDateTime\": \"<string>\",\n      \"solutions\": [\n        {\n          \"type\": \"<string>\",\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"solutionType\": \"<string>\",\n          \"publisherName\": \"<string>\",\n          \"price\": \"<string>\",\n          \"quantity\": \"<integer>\",\n          \"currency\": \"<string>\"\n        },\n        {\n          \"type\": \"<string>\",\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"solutionType\": \"<string>\",\n          \"publisherName\": \"<string>\",\n          \"price\": \"<string>\",\n          \"quantity\": \"<integer>\",\n          \"currency\": \"<string>\"\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "cf2f85d0-64a6-4777-84e3-cb75d354de16",
+              "name": "Accepted",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "key": "tackle-operation-id",
+                    "value": "createIPReferral",
+                    "description": ""
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test Tackle V3 Private Referral\",\n  \"companyWebsite\": \"https://www.example.com\",\n  \"mpnId\": \"1234567\",\n  \"campaignId\": \"someCampaignID\",\n  \"dealSensitivity\": \"None\",\n  \"customerProfile\": {\n    \"name\": \"test\",\n    \"isMatchingComplete\": true,\n    \"isMaccEligible\": false,\n    \"ids\": [\n      {\n        \"id\": \"1234567\",\n        \"profileType\": \"External\"\n      }\n    ],\n    \"address\": {\n      \"addressLine1\": \"1 Microsoft Way\",\n      \"city\": \"Redmond\",\n      \"country\": \"US\"\n    },\n    \"team\": [\n      {\n        \"firstName\": \"Test\",\n        \"lastName\": \"Employee\",\n        \"phoneNumber\": \"555 555-5555\",\n        \"email\": \"test@example.com\"\n      }\n    ]\n  },\n  \"consent\": {\n    \"consentToShareReferralWithMicrosoftSellers\": false,\n    \"consentToToShareInfoWithOthers\": true,\n    \"consentToContact\": true,\n    \"consentToMicrosoftToContactSpecificPartners\": true\n  },\n  \"details\": {\n    \"notes\": \"Here are some test notes.\",\n    \"dealValue\": 500,\n    \"currency\": \"USD\",\n    \"closingDateTime\": \"2025-07-10T05:00:00Z\",\n    \"requirements\": {\n      \"customerMarketplaceIntent\": \"HaveNotDecided\",\n      \"solutionArea\": \"Data and AI\",\n      \"solutionPlay\": \"Data Security\",\n      \"solutions\": [\n        {\n          \"type\": \"Name\",\n          \"id\": \"1234567\",\n          \"name\": \"Test Solution\",\n          \"solutionType\": \"3P\",\n          \"publisherName\": \"example.co\"\n        }\n      ]\n    }\n  },\n  \"team\": [\n    {\n      \"firstName\": \"Cosell\",\n      \"lastName\": \"Tackle\",\n      \"phoneNumber\": \"8888888888\",\n      \"email\": \"cloudcosell@example.com\"\n    }\n  ],\n  \"inviteContexts\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Accepted",
+              "code": 202,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"tackleId\": \"tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3\",\n  \"requestId\": \"2utc0ITX3k7iCBBNh6CqRLs8yGz\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "65f7c1f3-98ae-4d44-b363-35e77b0ad150",
+              "name": "The request was malformed or could not be processed. Returned when the JSON body\ncannot be parsed, when a required field is missing, when an unsupported\n`tackle-operation-id` is supplied, or when a referenced CRM ID is invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "key": "tackle-operation-id",
+                    "value": "createIPReferral",
+                    "description": ""
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test Tackle V3 Private Referral\",\n  \"companyWebsite\": \"https://www.example.com\",\n  \"mpnId\": \"1234567\",\n  \"campaignId\": \"someCampaignID\",\n  \"dealSensitivity\": \"None\",\n  \"customerProfile\": {\n    \"name\": \"test\",\n    \"isMatchingComplete\": true,\n    \"isMaccEligible\": false,\n    \"ids\": [\n      {\n        \"id\": \"1234567\",\n        \"profileType\": \"External\"\n      }\n    ],\n    \"address\": {\n      \"addressLine1\": \"1 Microsoft Way\",\n      \"city\": \"Redmond\",\n      \"country\": \"US\"\n    },\n    \"team\": [\n      {\n        \"firstName\": \"Test\",\n        \"lastName\": \"Employee\",\n        \"phoneNumber\": \"555 555-5555\",\n        \"email\": \"test@example.com\"\n      }\n    ]\n  },\n  \"consent\": {\n    \"consentToShareReferralWithMicrosoftSellers\": false,\n    \"consentToToShareInfoWithOthers\": true,\n    \"consentToContact\": true,\n    \"consentToMicrosoftToContactSpecificPartners\": true\n  },\n  \"details\": {\n    \"notes\": \"Here are some test notes.\",\n    \"dealValue\": 500,\n    \"currency\": \"USD\",\n    \"closingDateTime\": \"2025-07-10T05:00:00Z\",\n    \"requirements\": {\n      \"customerMarketplaceIntent\": \"HaveNotDecided\",\n      \"solutionArea\": \"Data and AI\",\n      \"solutionPlay\": \"Data Security\",\n      \"solutions\": [\n        {\n          \"type\": \"Name\",\n          \"id\": \"1234567\",\n          \"name\": \"Test Solution\",\n          \"solutionType\": \"3P\",\n          \"publisherName\": \"example.co\"\n        }\n      ]\n    }\n  },\n  \"team\": [\n    {\n      \"firstName\": \"Cosell\",\n      \"lastName\": \"Tackle\",\n      \"phoneNumber\": \"8888888888\",\n      \"email\": \"cloudcosell@example.com\"\n    }\n  ],\n  \"inviteContexts\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Your request could not be processed.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "df0fba25-f475-4d3f-89bc-012418bc3e23",
+              "name": "The request did not include a valid Tackle MTM access token, so no principal\ncould be established. The response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "key": "tackle-operation-id",
+                    "value": "createIPReferral",
+                    "description": ""
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test Tackle V3 Private Referral\",\n  \"companyWebsite\": \"https://www.example.com\",\n  \"mpnId\": \"1234567\",\n  \"campaignId\": \"someCampaignID\",\n  \"dealSensitivity\": \"None\",\n  \"customerProfile\": {\n    \"name\": \"test\",\n    \"isMatchingComplete\": true,\n    \"isMaccEligible\": false,\n    \"ids\": [\n      {\n        \"id\": \"1234567\",\n        \"profileType\": \"External\"\n      }\n    ],\n    \"address\": {\n      \"addressLine1\": \"1 Microsoft Way\",\n      \"city\": \"Redmond\",\n      \"country\": \"US\"\n    },\n    \"team\": [\n      {\n        \"firstName\": \"Test\",\n        \"lastName\": \"Employee\",\n        \"phoneNumber\": \"555 555-5555\",\n        \"email\": \"test@example.com\"\n      }\n    ]\n  },\n  \"consent\": {\n    \"consentToShareReferralWithMicrosoftSellers\": false,\n    \"consentToToShareInfoWithOthers\": true,\n    \"consentToContact\": true,\n    \"consentToMicrosoftToContactSpecificPartners\": true\n  },\n  \"details\": {\n    \"notes\": \"Here are some test notes.\",\n    \"dealValue\": 500,\n    \"currency\": \"USD\",\n    \"closingDateTime\": \"2025-07-10T05:00:00Z\",\n    \"requirements\": {\n      \"customerMarketplaceIntent\": \"HaveNotDecided\",\n      \"solutionArea\": \"Data and AI\",\n      \"solutionPlay\": \"Data Security\",\n      \"solutions\": [\n        {\n          \"type\": \"Name\",\n          \"id\": \"1234567\",\n          \"name\": \"Test Solution\",\n          \"solutionType\": \"3P\",\n          \"publisherName\": \"example.co\"\n        }\n      ]\n    }\n  },\n  \"team\": [\n    {\n      \"firstName\": \"Cosell\",\n      \"lastName\": \"Tackle\",\n      \"phoneNumber\": \"8888888888\",\n      \"email\": \"cloudcosell@example.com\"\n    }\n  ],\n  \"inviteContexts\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3956d755-e7ba-4704-8951-2fbffe0d696b",
+              "name": "The authenticated principal does not have permission to perform this operation.\nThe response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "key": "tackle-operation-id",
+                    "value": "createIPReferral",
+                    "description": ""
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test Tackle V3 Private Referral\",\n  \"companyWebsite\": \"https://www.example.com\",\n  \"mpnId\": \"1234567\",\n  \"campaignId\": \"someCampaignID\",\n  \"dealSensitivity\": \"None\",\n  \"customerProfile\": {\n    \"name\": \"test\",\n    \"isMatchingComplete\": true,\n    \"isMaccEligible\": false,\n    \"ids\": [\n      {\n        \"id\": \"1234567\",\n        \"profileType\": \"External\"\n      }\n    ],\n    \"address\": {\n      \"addressLine1\": \"1 Microsoft Way\",\n      \"city\": \"Redmond\",\n      \"country\": \"US\"\n    },\n    \"team\": [\n      {\n        \"firstName\": \"Test\",\n        \"lastName\": \"Employee\",\n        \"phoneNumber\": \"555 555-5555\",\n        \"email\": \"test@example.com\"\n      }\n    ]\n  },\n  \"consent\": {\n    \"consentToShareReferralWithMicrosoftSellers\": false,\n    \"consentToToShareInfoWithOthers\": true,\n    \"consentToContact\": true,\n    \"consentToMicrosoftToContactSpecificPartners\": true\n  },\n  \"details\": {\n    \"notes\": \"Here are some test notes.\",\n    \"dealValue\": 500,\n    \"currency\": \"USD\",\n    \"closingDateTime\": \"2025-07-10T05:00:00Z\",\n    \"requirements\": {\n      \"customerMarketplaceIntent\": \"HaveNotDecided\",\n      \"solutionArea\": \"Data and AI\",\n      \"solutionPlay\": \"Data Security\",\n      \"solutions\": [\n        {\n          \"type\": \"Name\",\n          \"id\": \"1234567\",\n          \"name\": \"Test Solution\",\n          \"solutionType\": \"3P\",\n          \"publisherName\": \"example.co\"\n        }\n      ]\n    }\n  },\n  \"team\": [\n    {\n      \"firstName\": \"Cosell\",\n      \"lastName\": \"Tackle\",\n      \"phoneNumber\": \"8888888888\",\n      \"email\": \"cloudcosell@example.com\"\n    }\n  ],\n  \"inviteContexts\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ed5a2ad9-e732-4858-a38e-287387728999",
+              "name": "The request conflicts with an existing resource. For example, attempting to\ncreate or accept a referral with a CRM ID that is already linked to another\nco-sell opportunity.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "key": "tackle-operation-id",
+                    "value": "createIPReferral",
+                    "description": ""
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test Tackle V3 Private Referral\",\n  \"companyWebsite\": \"https://www.example.com\",\n  \"mpnId\": \"1234567\",\n  \"campaignId\": \"someCampaignID\",\n  \"dealSensitivity\": \"None\",\n  \"customerProfile\": {\n    \"name\": \"test\",\n    \"isMatchingComplete\": true,\n    \"isMaccEligible\": false,\n    \"ids\": [\n      {\n        \"id\": \"1234567\",\n        \"profileType\": \"External\"\n      }\n    ],\n    \"address\": {\n      \"addressLine1\": \"1 Microsoft Way\",\n      \"city\": \"Redmond\",\n      \"country\": \"US\"\n    },\n    \"team\": [\n      {\n        \"firstName\": \"Test\",\n        \"lastName\": \"Employee\",\n        \"phoneNumber\": \"555 555-5555\",\n        \"email\": \"test@example.com\"\n      }\n    ]\n  },\n  \"consent\": {\n    \"consentToShareReferralWithMicrosoftSellers\": false,\n    \"consentToToShareInfoWithOthers\": true,\n    \"consentToContact\": true,\n    \"consentToMicrosoftToContactSpecificPartners\": true\n  },\n  \"details\": {\n    \"notes\": \"Here are some test notes.\",\n    \"dealValue\": 500,\n    \"currency\": \"USD\",\n    \"closingDateTime\": \"2025-07-10T05:00:00Z\",\n    \"requirements\": {\n      \"customerMarketplaceIntent\": \"HaveNotDecided\",\n      \"solutionArea\": \"Data and AI\",\n      \"solutionPlay\": \"Data Security\",\n      \"solutions\": [\n        {\n          \"type\": \"Name\",\n          \"id\": \"1234567\",\n          \"name\": \"Test Solution\",\n          \"solutionType\": \"3P\",\n          \"publisherName\": \"example.co\"\n        }\n      ]\n    }\n  },\n  \"team\": [\n    {\n      \"firstName\": \"Cosell\",\n      \"lastName\": \"Tackle\",\n      \"phoneNumber\": \"8888888888\",\n      \"email\": \"cloudcosell@example.com\"\n    }\n  ],\n  \"inviteContexts\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"A co-sell opportunity already exists for this CRM ID\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "9772b427-2b55-4f72-9661-ee5b7c1794a8",
+              "name": "An unexpected error occurred while processing the request. The response body is\nempty.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "key": "tackle-operation-id",
+                    "value": "createIPReferral",
+                    "description": ""
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test Tackle V3 Private Referral\",\n  \"companyWebsite\": \"https://www.example.com\",\n  \"mpnId\": \"1234567\",\n  \"campaignId\": \"someCampaignID\",\n  \"dealSensitivity\": \"None\",\n  \"customerProfile\": {\n    \"name\": \"test\",\n    \"isMatchingComplete\": true,\n    \"isMaccEligible\": false,\n    \"ids\": [\n      {\n        \"id\": \"1234567\",\n        \"profileType\": \"External\"\n      }\n    ],\n    \"address\": {\n      \"addressLine1\": \"1 Microsoft Way\",\n      \"city\": \"Redmond\",\n      \"country\": \"US\"\n    },\n    \"team\": [\n      {\n        \"firstName\": \"Test\",\n        \"lastName\": \"Employee\",\n        \"phoneNumber\": \"555 555-5555\",\n        \"email\": \"test@example.com\"\n      }\n    ]\n  },\n  \"consent\": {\n    \"consentToShareReferralWithMicrosoftSellers\": false,\n    \"consentToToShareInfoWithOthers\": true,\n    \"consentToContact\": true,\n    \"consentToMicrosoftToContactSpecificPartners\": true\n  },\n  \"details\": {\n    \"notes\": \"Here are some test notes.\",\n    \"dealValue\": 500,\n    \"currency\": \"USD\",\n    \"closingDateTime\": \"2025-07-10T05:00:00Z\",\n    \"requirements\": {\n      \"customerMarketplaceIntent\": \"HaveNotDecided\",\n      \"solutionArea\": \"Data and AI\",\n      \"solutionPlay\": \"Data Security\",\n      \"solutions\": [\n        {\n          \"type\": \"Name\",\n          \"id\": \"1234567\",\n          \"name\": \"Test Solution\",\n          \"solutionType\": \"3P\",\n          \"publisherName\": \"example.co\"\n        }\n      ]\n    }\n  },\n  \"team\": [\n    {\n      \"firstName\": \"Cosell\",\n      \"lastName\": \"Tackle\",\n      \"phoneNumber\": \"8888888888\",\n      \"email\": \"cloudcosell@example.com\"\n    }\n  ],\n  \"inviteContexts\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "401632fa-5cbb-45e5-b333-3b0951ccebda",
+          "name": "Get a referral",
+          "request": {
+            "name": "Get a referral",
+            "description": {
+              "content": "Returns the current state of a co-sell referral by Tackle\nreferral ID, including both the Microsoft Partner Center\npayload (`Referral`) and Tackle-side metadata\n(`ReferralMetadata` -- CRM linkage, sync health, archived\nstate, related referrals). Returns `404 Not Found` when the\nreferral does not exist for the authenticated vendor.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "referrals",
+                ":referral_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "referral_id",
+                  "description": "(Required) The unique identifier for the referral"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "28b92c0a-b162-422f-9829-bf5f84301356",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"472b39ec-634e-433e-afea-8421d95d684c\",\n  \"engagementId\": \"db56246a-5894-442e-80a7-57f18652262c\",\n  \"name\": \"MSFT Test referral\",\n  \"createdDateTime\": \"2025-03-17T12:00:00Z\",\n  \"updatedDateTime\": \"2025-03-17T12:00:00Z\",\n  \"acceptedDateTime\": \"2025-03-17T12:00:00Z\",\n  \"status\": \"Closed\",\n  \"substatus\": \"Won\",\n  \"statusReason\": \"Referral was won\",\n  \"type\": \"Shared\",\n  \"tags\": [\n    \"IPCosell\"\n  ],\n  \"qualification\": \"SalesQualified\",\n  \"customerProfile\": {\n    \"name\": \"Test Customer\",\n    \"isMatchingComplete\": true,\n    \"isMaccEligible\": false,\n    \"address\": {\n      \"addressLine1\": \"1 Microsoft Way\",\n      \"city\": \"Redmond\",\n      \"state\": \"Washington\",\n      \"postalCode\": \"98052\",\n      \"country\": \"US\"\n    },\n    \"team\": [\n      {\n        \"firstName\": \"Test\",\n        \"lastName\": \"Employee\",\n        \"phoneNumber\": \"555 555-5555\",\n        \"email\": \"test@customer.com\",\n        \"emailValidationStatus\": \"None\",\n        \"phoneValidationStatus\": \"None\"\n      }\n    ],\n    \"ids\": [\n      {\n        \"id\": \"9-VZOAOB6G6\",\n        \"profileType\": \"External\"\n      }\n    ]\n  },\n  \"consent\": {\n    \"consentToShareReferralWithMicrosoftSellers\": true,\n    \"consentToToShareInfoWithOthers\": true,\n    \"consentToContact\": true,\n    \"consentToMicrosoftToContactSpecificPartners\": true\n  },\n  \"details\": {\n    \"notes\": \"test notes\",\n    \"dealValue\": 1000,\n    \"currency\": \"USD\",\n    \"closingDateTime\": \"2025-07-10T05:00:00Z\",\n    \"requirements\": {\n      \"industries\": [],\n      \"products\": [],\n      \"services\": [],\n      \"solutions\": [\n        {\n          \"id\": \"d84d9a5b-639f-489d-a95c-100c487def71\",\n          \"name\": \"Tackle Cloud GTM Platform\",\n          \"solutionType\": \"3P\",\n          \"type\": \"Name\",\n          \"publisherName\": \"Tackle.io, Inc.\"\n        }\n      ],\n      \"additionalRequirements\": {\n        \"iot\": {\n          \"azureCertifiedDevice\": false,\n          \"attachServices\": false\n        },\n        \"attributes\": [\n          {\n            \"id\": \"Business Applications\",\n            \"type\": \"SolutionArea\"\n          },\n          {\n            \"id\": \"Accelerate Innovation with Low Code\",\n            \"type\": \"SolutionPlay\"\n          },\n          {\n            \"id\": \"No\",\n            \"type\": \"CustomerMarketplaceIntent\"\n          }\n        ]\n      }\n    }\n  },\n  \"team\": [\n    {\n      \"firstName\": \"Tackle\",\n      \"lastName\": \"Tester\",\n      \"phoneNumber\": \"5555555\",\n      \"email\": \"testerupdated@example.com\",\n      \"emailValidationStatus\": \"None\",\n      \"phoneValidationStatus\": \"None\"\n    }\n  ],\n  \"inviteContext\": {\n    \"notes\": \"Some notes\",\n    \"invitedBy\": {\n      \"organizationId\": \"85ce85b8-faef-4c5f-beaa-e8e704ca6cef\",\n      \"organizationName\": \"Tackle.io, Inc.\"\n    },\n    \"assistanceRequestCode\": \"Unknown\",\n    \"invitedMpnId\": \"5341319\"\n  },\n  \"eTag\": \"\\\\\\\"97003301-0000-0100-0000-67d455d30001\\\\\\\"\",\n  \"target\": [\n    {\n      \"id\": \"d84d9a5b-639f-489d-a95c-100c487def77\",\n      \"type\": \"SolutionProfile\"\n    }\n  ],\n  \"mpnId\": \"5341318\",\n  \"direction\": \"Outgoing\",\n  \"organizationId\": \"85ce85b8-faef-4c5f-beaa-e8e704ca6cef\",\n  \"organizationName\": \"Tackle.io, Inc.\",\n  \"lastModifiedVia\": \"d5e95180-727b-4312-bca9-d46416511ffc\",\n  \"lastRunId\": \"8e797ec8-a0f8-4491-9086-4f1c03bfa7c9\",\n  \"favorite\": false,\n  \"campaignId\": \"testCampaignUpdated\",\n  \"salesStage\": \"60\",\n  \"quality\": \"Unknown\",\n  \"isSpam\": false,\n  \"dealSensitivity\": \"None\",\n  \"createdVia\": \"d5e95180-727b-4312-bca9-d46416511ffc\",\n  \"closedDateTime\": \"2025-03-17T12:00:00Z\",\n  \"registrationStatus\": \"None\",\n  \"links\": {\n    \"relatedReferrals\": {\n      \"uri\": \"https://api.partner.microsoft.com/v1.0/engagements/referrals?$filter=engagementId eq \\\"db56246a-5894-442e-80a7-57f18652262c\\\"\",\n      \"method\": \"GET\"\n    },\n    \"self\": {\n      \"uri\": \"https://api.partner.microsoft.com/v1.0/engagements/referrals/472b39ec-634e-433e-afea-8421d95d684c\",\n      \"method\": \"GET\"\n    }\n  },\n  \"metadata\": {\n    \"tackleId\": \"tackle-referral-2uJY3sgyqBz1EnKzRpx0PNol13A\",\n    \"companyName\": \"Test INC.\",\n    \"companyWebsite\": \"www.testInc.com\",\n    \"createdDate\": \"2025-03-17T12:00:00Z\",\n    \"lastModifiedDate\": \"2025-03-17T12:00:00Z\",\n    \"crmId\": \"006QL00000BahjGYAR\",\n    \"crmOrgId\": \"testOrg\",\n    \"hasCloudErrors\": false,\n    \"hasSalesforceErrors\": false,\n    \"relatedReferrals\": [],\n    \"classification\": \"ip\",\n    \"dealType\": \"coSell\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7aa1da21-f911-4ada-946d-9075eefe24b5",
+              "name": "The request did not include a valid Tackle MTM access token, so no principal\ncould be established. The response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "39bb4af0-0164-4b67-be98-b2d987b78a10",
+              "name": "The authenticated principal does not have permission to perform this operation.\nThe response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "649bbdd2-8bb6-4dc1-9694-3f3da3fda453",
+              "name": "The requested resource was not found.\n\nThe response body shape depends on the operation:\n\n- Read operations (for example `getReferral`) return an empty body\n  (no JSON envelope).\n- Write operations that look up a resource by ID before acting on it\n  (for example `updateIPReferral` with `tackle-operation-id:\n  requestSyncFromSalesforce`) return a JSON envelope of the form\n  `{\"message\": \"Referral not found\"}`.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "1f7e687e-dfe6-4841-9467-7c771fb5f570",
+              "name": "An unexpected error occurred while processing the request. The response body is\nempty.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "ead13c5f-2ba6-494d-89b0-f4c0dabb1d85",
+          "name": "Update a referral",
+          "request": {
+            "name": "Update a referral",
+            "description": {
+              "content": "Update a referral. The behavior of the request depends on the\n`tackle-operation-id` header. Sub-operations that look up the\nreferral by ID -- in particular `requestSyncFromSalesforce` --\nmay return `404 Not Found` when the referral does not exist for\nthe authenticated vendor.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "referrals",
+                ":referral_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "referral_id",
+                  "description": "(Required) The unique identifier for the referral"
+                }
+              ]
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "(Required) ",
+                "key": "tackle-operation-id",
+                "value": "<string>"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"team\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"phoneNumber\": \"<string>\",\n      \"email\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"phoneNumber\": \"<string>\",\n      \"email\": \"<string>\"\n    }\n  ],\n  \"name\": \"<string>\",\n  \"campaignId\": \"<string>\",\n  \"salesStage\": \"<string>\",\n  \"consent\": {\n    \"consentToShareReferralWithMicrosoftSellers\": \"<boolean>\"\n  },\n  \"details\": {\n    \"notes\": \"<string>\",\n    \"dealValue\": \"<number>\",\n    \"currency\": \"<string>\",\n    \"closingDateTime\": \"<string>\",\n    \"requirements\": {\n      \"customerMarketplaceIntent\": \"<string>\",\n      \"solutions\": [\n        {\n          \"type\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"id\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"name\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"solutionType\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"publisherName\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"price\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"quantity\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"currency\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          }\n        },\n        {\n          \"type\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"id\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"name\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"solutionType\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"publisherName\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"price\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"quantity\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"currency\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          }\n        }\n      ]\n    }\n  },\n  \"inviteContexts\": [\n    {\n      \"organizationId\": \"<string>\",\n      \"organizationName\": \"<string>\",\n      \"notes\": \"<string>\",\n      \"team\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"phoneNumber\": \"<string>\",\n          \"email\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"phoneNumber\": \"<string>\",\n          \"email\": \"<string>\"\n        }\n      ],\n      \"assistanceRequestCode\": \"<string>\",\n      \"dealValue\": \"<number>\",\n      \"currency\": \"<string>\",\n      \"closingDateTime\": \"<string>\",\n      \"solutions\": [\n        {\n          \"type\": \"<string>\",\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"solutionType\": \"<string>\",\n          \"publisherName\": \"<string>\",\n          \"price\": \"<string>\",\n          \"quantity\": \"<integer>\",\n          \"currency\": \"<string>\"\n        },\n        {\n          \"type\": \"<string>\",\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"solutionType\": \"<string>\",\n          \"publisherName\": \"<string>\",\n          \"price\": \"<string>\",\n          \"quantity\": \"<integer>\",\n          \"currency\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"organizationId\": \"<string>\",\n      \"organizationName\": \"<string>\",\n      \"notes\": \"<string>\",\n      \"team\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"phoneNumber\": \"<string>\",\n          \"email\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"phoneNumber\": \"<string>\",\n          \"email\": \"<string>\"\n        }\n      ],\n      \"assistanceRequestCode\": \"<string>\",\n      \"dealValue\": \"<number>\",\n      \"currency\": \"<string>\",\n      \"closingDateTime\": \"<string>\",\n      \"solutions\": [\n        {\n          \"type\": \"<string>\",\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"solutionType\": \"<string>\",\n          \"publisherName\": \"<string>\",\n          \"price\": \"<string>\",\n          \"quantity\": \"<integer>\",\n          \"currency\": \"<string>\"\n        },\n        {\n          \"type\": \"<string>\",\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"solutionType\": \"<string>\",\n          \"publisherName\": \"<string>\",\n          \"price\": \"<string>\",\n          \"quantity\": \"<integer>\",\n          \"currency\": \"<string>\"\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "d9c8780c-3576-461e-b65b-09c2f655c8af",
+              "name": "Accepted",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) ",
+                    "key": "tackle-operation-id",
+                    "value": "updateIPReferral"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"statusReason\": \"NotACustomer:This was not our customer\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Accepted",
+              "code": 202,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"tackleId\": \"tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3\",\n  \"requestId\": \"2utc0ITX3k7iCBBNh6CqRLs8yGz\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bb6be0fa-1110-4057-b139-e78b7e04b5f5",
+              "name": "The request was malformed or could not be processed. Returned when the JSON body\ncannot be parsed, when a required field is missing, when an unsupported\n`tackle-operation-id` is supplied, or when a referenced CRM ID is invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) ",
+                    "key": "tackle-operation-id",
+                    "value": "updateIPReferral"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"statusReason\": \"NotACustomer:This was not our customer\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Your request could not be processed.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bb334a55-1f2c-42cc-9c40-410c66add890",
+              "name": "The request did not include a valid Tackle MTM access token, so no principal\ncould be established. The response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) ",
+                    "key": "tackle-operation-id",
+                    "value": "updateIPReferral"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"statusReason\": \"NotACustomer:This was not our customer\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "918439fd-0bb6-4432-8cb7-45ef5e95f0cd",
+              "name": "The authenticated principal does not have permission to perform this operation.\nThe response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) ",
+                    "key": "tackle-operation-id",
+                    "value": "updateIPReferral"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"statusReason\": \"NotACustomer:This was not our customer\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7349faad-f913-4a3f-872e-f2558044b12c",
+              "name": "The requested resource was not found.\n\nThe response body shape depends on the operation:\n\n- Read operations (for example `getReferral`) return an empty body\n  (no JSON envelope).\n- Write operations that look up a resource by ID before acting on it\n  (for example `updateIPReferral` with `tackle-operation-id:\n  requestSyncFromSalesforce`) return a JSON envelope of the form\n  `{\"message\": \"Referral not found\"}`.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) ",
+                    "key": "tackle-operation-id",
+                    "value": "updateIPReferral"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"statusReason\": \"NotACustomer:This was not our customer\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "ff6cc61b-2d60-4450-b2f2-88743abb7454",
+              "name": "The request conflicts with an existing resource. For example, attempting to\ncreate or accept a referral with a CRM ID that is already linked to another\nco-sell opportunity.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) ",
+                    "key": "tackle-operation-id",
+                    "value": "updateIPReferral"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"statusReason\": \"NotACustomer:This was not our customer\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"A co-sell opportunity already exists for this CRM ID\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "12eec89c-4664-4cf0-898e-382279b646a7",
+              "name": "An unexpected error occurred while processing the request. The response body is\nempty.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) ",
+                    "key": "tackle-operation-id",
+                    "value": "updateIPReferral"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"statusReason\": \"NotACustomer:This was not our customer\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "37149113-1422-4fb9-920c-e8c77c5c0e6c",
+          "name": "List referral events",
+          "request": {
+            "name": "List referral events",
+            "description": {
+              "content": "Returns the recorded history of a referral as a paginated list\nof events: client-initiated operations (matching the\n`tackle-operation-id` values), Microsoft Partner Center\nresponses, and CRM-sync history items. Use this to follow up\non a `requestId` returned from `createIPReferral` /\n`updateIPReferral`, audit lifecycle changes, or surface\nrecent activity to end users. Pagination uses an opaque\n`next` cursor.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "referrals",
+                ":referral_id",
+                "events"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "next",
+                  "value": "<string>",
+                  "description": "Pagination cursor returned by a previous call as the `next` field. Omit on the first call."
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "referral_id",
+                  "description": "(Required) The unique identifier for the referral"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "2f1d14c1-59b5-4b6c-a21b-b7532321874a",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id",
+                    "events"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "next",
+                      "value": "re#tackle-cosell-2lsw6vxN7rXsBer0hXABCDEFGH"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"events\": [\n    {\n      \"operation\": \"cloudUpdateEvent\",\n      \"eventId\": \"2lsw8uaIoeMT72IRnlRz19gKxXY\",\n      \"timestamp\": \"2024-09-10T15:25:35Z\",\n      \"cloudRaw\": {\n        \"id\": \"472b39ec-634e-433e-afea-8421d95d684c\",\n        \"engagementId\": \"db56246a-5894-442e-80a7-57f18652262c\",\n        \"name\": \"MSFT Test referral\",\n        \"createdDateTime\": \"2025-03-17T12:00:00Z\",\n        \"updatedDateTime\": \"2025-03-17T12:00:00Z\",\n        \"acceptedDateTime\": \"2025-03-17T12:00:00Z\",\n        \"status\": \"Closed\",\n        \"substatus\": \"Won\",\n        \"statusReason\": \"Referral was won\",\n        \"type\": \"Shared\",\n        \"tags\": [\n          \"IPCosell\"\n        ],\n        \"qualification\": \"SalesQualified\",\n        \"customerProfile\": {\n          \"name\": \"Test Customer\",\n          \"isMaccEligible\": false,\n          \"address\": {\n            \"addressLine1\": \"1 Microsoft Way\",\n            \"city\": \"Redmond\",\n            \"state\": \"Washington\",\n            \"postalCode\": \"98052\",\n            \"country\": \"US\"\n          },\n          \"team\": [\n            {\n              \"firstName\": \"Test\",\n              \"lastName\": \"Employee\",\n              \"phoneNumber\": \"555 555-5555\",\n              \"email\": \"test@customer.com\",\n              \"emailValidationStatus\": \"None\",\n              \"phoneValidationStatus\": \"None\"\n            }\n          ],\n          \"ids\": [\n            {\n              \"id\": \"9-VZOAOB6G6\",\n              \"profileType\": \"External\"\n            }\n          ]\n        },\n        \"consent\": {\n          \"consentToShareReferralWithMicrosoftSellers\": true,\n          \"consentToToShareInfoWithOthers\": true,\n          \"consentToContact\": true,\n          \"consentToMicrosoftToContactSpecificPartners\": true\n        },\n        \"details\": {\n          \"notes\": \"test notes\",\n          \"dealValue\": \"1000\",\n          \"currency\": \"USD\",\n          \"closingDateTime\": \"2025-07-10T05:00:00Z\",\n          \"requirements\": {\n            \"industries\": [],\n            \"products\": [],\n            \"services\": [],\n            \"solutions\": [\n              {\n                \"id\": \"d84d9a5b-639f-489d-a95c-100c487def71\",\n                \"name\": \"Tackle Cloud GTM Platform\",\n                \"solutionType\": \"3P\",\n                \"type\": \"Name\",\n                \"publisherName\": \"Tackle.io, Inc.\"\n              }\n            ],\n            \"additionalRequirements\": {\n              \"iot\": {\n                \"azureCertifiedDevice\": false,\n                \"attachServices\": false\n              },\n              \"attributes\": [\n                {\n                  \"id\": \"Business Applications\",\n                  \"type\": \"SolutionArea\"\n                },\n                {\n                  \"id\": \"Accelerate Innovation with Low Code\",\n                  \"type\": \"SolutionPlay\"\n                },\n                {\n                  \"id\": \"No\",\n                  \"type\": \"CustomerMarketplaceIntent\"\n                }\n              ]\n            }\n          }\n        },\n        \"team\": [\n          {\n            \"firstName\": \"Tackle\",\n            \"lastName\": \"Tester\",\n            \"phoneNumber\": \"5555555\",\n            \"email\": \"testerupdated@example.com\",\n            \"emailValidationStatus\": \"None\",\n            \"phoneValidationStatus\": \"None\"\n          }\n        ],\n        \"inviteContext\": {\n          \"notes\": \"Some notes\",\n          \"invitedBy\": {\n            \"organizationId\": \"85ce85b8-faef-4c5f-beaa-e8e704ca6cef\",\n            \"organizationName\": \"Tackle.io, Inc.\"\n          },\n          \"assistanceRequestCode\": \"Unknown\",\n          \"invitedMpnId\": \"5341319\"\n        },\n        \"eTag\": \"\\\"97003301-0000-0100-0000-67d455d30001\\\"\",\n        \"target\": [\n          {\n            \"id\": \"d84d9a5b-639f-489d-a95c-100c487def77\",\n            \"type\": \"SolutionProfile\"\n          }\n        ],\n        \"mpnId\": \"5341318\",\n        \"direction\": \"Outgoing\",\n        \"organizationId\": \"85ce85b8-faef-4c5f-beaa-e8e704ca6cef\",\n        \"organizationName\": \"Tackle.io, Inc.\",\n        \"lastModifiedVia\": \"d5e95180-727b-4312-bca9-d46416511ffc\",\n        \"lastRunId\": \"8e797ec8-a0f8-4491-9086-4f1c03bfa7c9\",\n        \"favorite\": false,\n        \"campaignId\": \"testCampaignUpdated\",\n        \"salesStage\": \"60\",\n        \"quality\": \"Unknown\",\n        \"isSpam\": false,\n        \"dealSensitivity\": \"None\",\n        \"createdVia\": \"d5e95180-727b-4312-bca9-d46416511ffc\",\n        \"closedDateTime\": \"2025-03-17T12:00:00Z\",\n        \"registrationStatus\": \"None\",\n        \"links\": {\n          \"relatedReferrals\": {\n            \"uri\": \"https://api.partner.microsoft.com/v1.0/engagements/referrals?$filter=engagementId eq \\\"db56246a-5894-442e-80a7-57f18652262c\\\"\",\n            \"method\": \"GET\"\n          },\n          \"self\": {\n            \"uri\": \"https://api.partner.microsoft.com/v1.0/engagements/referrals/472b39ec-634e-433e-afea-8421d95d684c\",\n            \"method\": \"GET\"\n          }\n        }\n      },\n      \"activityDetails\": {\n        \"displayText\": \"Sent full update to Tackle\"\n      }\n    },\n    {\n      \"operation\": \"createIPReferral\",\n      \"eventId\": \"2lsw6raV18Ymy8DBK0ExX5LBP21\",\n      \"timestamp\": \"2024-09-10T15:25:29Z\",\n      \"cloudResponses\": [\n        {\n          \"requestId\": \"example-00123456789ABCDEFGHIJKL\",\n          \"operation\": \"createIPReferral\",\n          \"success\": true,\n          \"timestamp\": \"2024-09-10T15:25:24Z\",\n          \"rawResponse\": {\n            \"id\": \"472b39ec-634e-433e-afea-8421d95d684c\",\n            \"engagementId\": \"db56246a-5894-442e-80a7-57f18652262c\",\n            \"name\": \"MSFT Test referral\",\n            \"createdDateTime\": \"2025-03-17T12:00:00Z\",\n            \"updatedDateTime\": \"2025-03-17T12:00:00Z\",\n            \"acceptedDateTime\": \"2025-03-17T12:00:00Z\",\n            \"status\": \"Closed\",\n            \"substatus\": \"Won\",\n            \"statusReason\": \"Referral was won\",\n            \"type\": \"Shared\",\n            \"tags\": [\n              \"IPCosell\"\n            ],\n            \"qualification\": \"SalesQualified\",\n            \"customerProfile\": {\n              \"name\": \"Test Customer\",\n              \"isMaccEligible\": false,\n              \"address\": {\n                \"addressLine1\": \"1 Microsoft Way\",\n                \"city\": \"Redmond\",\n                \"state\": \"Washington\",\n                \"postalCode\": \"98052\",\n                \"country\": \"US\"\n              },\n              \"team\": [\n                {\n                  \"firstName\": \"Test\",\n                  \"lastName\": \"Employee\",\n                  \"phoneNumber\": \"555 555-5555\",\n                  \"email\": \"test@customer.com\",\n                  \"emailValidationStatus\": \"None\",\n                  \"phoneValidationStatus\": \"None\"\n                }\n              ],\n              \"ids\": [\n                {\n                  \"id\": \"9-VZOAOB6G6\",\n                  \"profileType\": \"External\"\n                }\n              ]\n            },\n            \"consent\": {\n              \"consentToShareReferralWithMicrosoftSellers\": true,\n              \"consentToToShareInfoWithOthers\": true,\n              \"consentToContact\": true,\n              \"consentToMicrosoftToContactSpecificPartners\": true\n            },\n            \"details\": {\n              \"notes\": \"test notes\",\n              \"dealValue\": \"1000\",\n              \"currency\": \"USD\",\n              \"closingDateTime\": \"2025-07-10T05:00:00Z\",\n              \"requirements\": {\n                \"industries\": [],\n                \"products\": [],\n                \"services\": [],\n                \"solutions\": [\n                  {\n                    \"id\": \"d84d9a5b-639f-489d-a95c-100c487def71\",\n                    \"name\": \"Tackle Cloud GTM Platform\",\n                    \"solutionType\": \"3P\",\n                    \"type\": \"Name\",\n                    \"publisherName\": \"Tackle.io, Inc.\"\n                  }\n                ],\n                \"additionalRequirements\": {\n                  \"iot\": {\n                    \"azureCertifiedDevice\": false,\n                    \"attachServices\": false\n                  },\n                  \"attributes\": [\n                    {\n                      \"id\": \"Business Applications\",\n                      \"type\": \"SolutionArea\"\n                    },\n                    {\n                      \"id\": \"Accelerate Innovation with Low Code\",\n                      \"type\": \"SolutionPlay\"\n                    },\n                    {\n                      \"id\": \"No\",\n                      \"type\": \"CustomerMarketplaceIntent\"\n                    }\n                  ]\n                }\n              }\n            },\n            \"team\": [\n              {\n                \"firstName\": \"Tackle\",\n                \"lastName\": \"Tester\",\n                \"phoneNumber\": \"5555555\",\n                \"email\": \"testerupdated@example.com\",\n                \"emailValidationStatus\": \"None\",\n                \"phoneValidationStatus\": \"None\"\n              }\n            ],\n            \"inviteContext\": {\n              \"notes\": \"Some notes\",\n              \"invitedBy\": {\n                \"organizationId\": \"85ce85b8-faef-4c5f-beaa-e8e704ca6cef\",\n                \"organizationName\": \"Tackle.io, Inc.\"\n              },\n              \"assistanceRequestCode\": \"Unknown\",\n              \"invitedMpnId\": \"5341319\"\n            },\n            \"eTag\": \"\\\"97003301-0000-0100-0000-67d455d30001\\\"\",\n            \"target\": [\n              {\n                \"id\": \"d84d9a5b-639f-489d-a95c-100c487def77\",\n                \"type\": \"SolutionProfile\"\n              }\n            ],\n            \"mpnId\": \"5341318\",\n            \"direction\": \"Outgoing\",\n            \"organizationId\": \"85ce85b8-faef-4c5f-beaa-e8e704ca6cef\",\n            \"organizationName\": \"Tackle.io, Inc.\",\n            \"lastModifiedVia\": \"d5e95180-727b-4312-bca9-d46416511ffc\",\n            \"lastRunId\": \"8e797ec8-a0f8-4491-9086-4f1c03bfa7c9\",\n            \"favorite\": false,\n            \"campaignId\": \"testCampaignUpdated\",\n            \"salesStage\": \"60\",\n            \"quality\": \"Unknown\",\n            \"isSpam\": false,\n            \"dealSensitivity\": \"None\",\n            \"createdVia\": \"d5e95180-727b-4312-bca9-d46416511ffc\",\n            \"closedDateTime\": \"2025-03-17T12:00:00Z\",\n            \"registrationStatus\": \"None\",\n            \"links\": {\n              \"relatedReferrals\": {\n                \"uri\": \"https://api.partner.microsoft.com/v1.0/engagements/referrals?$filter=engagementId eq \\\"db56246a-5894-442e-80a7-57f18652262c\\\"\",\n                \"method\": \"GET\"\n              },\n              \"self\": {\n                \"uri\": \"https://api.partner.microsoft.com/v1.0/engagements/referrals/472b39ec-634e-433e-afea-8421d95d684c\",\n                \"method\": \"GET\"\n              }\n            }\n          }\n        }\n      ],\n      \"cloudRequests\": [\n        {\n          \"requestId\": \"example-00123456789ABCDEFGHIJKL\",\n          \"operation\": \"createIPReferral\",\n          \"timestamp\": \"2024-09-10T15:25:20Z\",\n          \"request\": {\n            \"id\": \"472b39ec-634e-433e-afea-8421d95d684c\",\n            \"engagementId\": \"db56246a-5894-442e-80a7-57f18652262c\",\n            \"name\": \"MSFT Test referral\",\n            \"createdDateTime\": \"2025-03-17T12:00:00Z\",\n            \"updatedDateTime\": \"2025-03-17T12:00:00Z\",\n            \"acceptedDateTime\": \"2025-03-17T12:00:00Z\",\n            \"status\": \"Closed\",\n            \"substatus\": \"Won\",\n            \"statusReason\": \"Referral was won\",\n            \"type\": \"Shared\",\n            \"tags\": [\n              \"IPCosell\"\n            ],\n            \"qualification\": \"SalesQualified\",\n            \"customerProfile\": {\n              \"name\": \"Test Customer\",\n              \"isMaccEligible\": false,\n              \"address\": {\n                \"addressLine1\": \"1 Microsoft Way\",\n                \"city\": \"Redmond\",\n                \"state\": \"Washington\",\n                \"postalCode\": \"98052\",\n                \"country\": \"US\"\n              },\n              \"team\": [\n                {\n                  \"firstName\": \"Test\",\n                  \"lastName\": \"Employee\",\n                  \"phoneNumber\": \"555 555-5555\",\n                  \"email\": \"test@customer.com\",\n                  \"emailValidationStatus\": \"None\",\n                  \"phoneValidationStatus\": \"None\"\n                }\n              ],\n              \"ids\": [\n                {\n                  \"id\": \"9-VZOAOB6G6\",\n                  \"profileType\": \"External\"\n                }\n              ]\n            },\n            \"consent\": {\n              \"consentToShareReferralWithMicrosoftSellers\": true,\n              \"consentToToShareInfoWithOthers\": true,\n              \"consentToContact\": true,\n              \"consentToMicrosoftToContactSpecificPartners\": true\n            },\n            \"details\": {\n              \"notes\": \"test notes\",\n              \"dealValue\": \"1000\",\n              \"currency\": \"USD\",\n              \"closingDateTime\": \"2025-07-10T05:00:00Z\",\n              \"requirements\": {\n                \"industries\": [],\n                \"products\": [],\n                \"services\": [],\n                \"solutions\": [\n                  {\n                    \"id\": \"d84d9a5b-639f-489d-a95c-100c487def71\",\n                    \"name\": \"Tackle Cloud GTM Platform\",\n                    \"solutionType\": \"3P\",\n                    \"type\": \"Name\",\n                    \"publisherName\": \"Tackle.io, Inc.\"\n                  }\n                ],\n                \"additionalRequirements\": {\n                  \"iot\": {\n                    \"azureCertifiedDevice\": false,\n                    \"attachServices\": false\n                  },\n                  \"attributes\": [\n                    {\n                      \"id\": \"Business Applications\",\n                      \"type\": \"SolutionArea\"\n                    },\n                    {\n                      \"id\": \"Accelerate Innovation with Low Code\",\n                      \"type\": \"SolutionPlay\"\n                    },\n                    {\n                      \"id\": \"No\",\n                      \"type\": \"CustomerMarketplaceIntent\"\n                    }\n                  ]\n                }\n              }\n            },\n            \"team\": [\n              {\n                \"firstName\": \"Tackle\",\n                \"lastName\": \"Tester\",\n                \"phoneNumber\": \"5555555\",\n                \"email\": \"testerupdated@example.com\",\n                \"emailValidationStatus\": \"None\",\n                \"phoneValidationStatus\": \"None\"\n              }\n            ],\n            \"inviteContext\": {\n              \"notes\": \"Some notes\",\n              \"invitedBy\": {\n                \"organizationId\": \"85ce85b8-faef-4c5f-beaa-e8e704ca6cef\",\n                \"organizationName\": \"Tackle.io, Inc.\"\n              },\n              \"assistanceRequestCode\": \"Unknown\",\n              \"invitedMpnId\": \"5341319\"\n            },\n            \"eTag\": \"\\\"97003301-0000-0100-0000-67d455d30001\\\"\",\n            \"target\": [\n              {\n                \"id\": \"d84d9a5b-639f-489d-a95c-100c487def77\",\n                \"type\": \"SolutionProfile\"\n              }\n            ],\n            \"mpnId\": \"5341318\",\n            \"direction\": \"Outgoing\",\n            \"organizationId\": \"85ce85b8-faef-4c5f-beaa-e8e704ca6cef\",\n            \"organizationName\": \"Tackle.io, Inc.\",\n            \"lastModifiedVia\": \"d5e95180-727b-4312-bca9-d46416511ffc\",\n            \"lastRunId\": \"8e797ec8-a0f8-4491-9086-4f1c03bfa7c9\",\n            \"favorite\": false,\n            \"campaignId\": \"testCampaignUpdated\",\n            \"salesStage\": \"60\",\n            \"quality\": \"Unknown\",\n            \"isSpam\": false,\n            \"dealSensitivity\": \"None\",\n            \"createdVia\": \"d5e95180-727b-4312-bca9-d46416511ffc\",\n            \"closedDateTime\": \"2025-03-17T12:00:00Z\",\n            \"registrationStatus\": \"None\",\n            \"links\": {\n              \"relatedReferrals\": {\n                \"uri\": \"https://api.partner.microsoft.com/v1.0/engagements/referrals?$filter=engagementId eq \\\"db56246a-5894-442e-80a7-57f18652262c\\\"\",\n                \"method\": \"GET\"\n              },\n              \"self\": {\n                \"uri\": \"https://api.partner.microsoft.com/v1.0/engagements/referrals/472b39ec-634e-433e-afea-8421d95d684c\",\n                \"method\": \"GET\"\n              }\n            }\n          }\n        }\n      ],\n      \"rawRequest\": {\n        \"id\": \"472b39ec-634e-433e-afea-8421d95d684c\",\n        \"engagementId\": \"db56246a-5894-442e-80a7-57f18652262c\",\n        \"name\": \"MSFT Test referral\",\n        \"createdDateTime\": \"2025-03-17T12:00:00Z\",\n        \"updatedDateTime\": \"2025-03-17T12:00:00Z\",\n        \"acceptedDateTime\": \"2025-03-17T12:00:00Z\",\n        \"status\": \"Closed\",\n        \"substatus\": \"Won\",\n        \"statusReason\": \"Referral was won\",\n        \"type\": \"Shared\",\n        \"tags\": [\n          \"IPCosell\"\n        ],\n        \"qualification\": \"SalesQualified\",\n        \"customerProfile\": {\n          \"name\": \"Test Customer\",\n          \"isMaccEligible\": false,\n          \"address\": {\n            \"addressLine1\": \"1 Microsoft Way\",\n            \"city\": \"Redmond\",\n            \"state\": \"Washington\",\n            \"postalCode\": \"98052\",\n            \"country\": \"US\"\n          },\n          \"team\": [\n            {\n              \"firstName\": \"Test\",\n              \"lastName\": \"Employee\",\n              \"phoneNumber\": \"555 555-5555\",\n              \"email\": \"test@customer.com\",\n              \"emailValidationStatus\": \"None\",\n              \"phoneValidationStatus\": \"None\"\n            }\n          ],\n          \"ids\": [\n            {\n              \"id\": \"9-VZOAOB6G6\",\n              \"profileType\": \"External\"\n            }\n          ]\n        },\n        \"consent\": {\n          \"consentToShareReferralWithMicrosoftSellers\": true,\n          \"consentToToShareInfoWithOthers\": true,\n          \"consentToContact\": true,\n          \"consentToMicrosoftToContactSpecificPartners\": true\n        },\n        \"details\": {\n          \"notes\": \"test notes\",\n          \"dealValue\": \"1000\",\n          \"currency\": \"USD\",\n          \"closingDateTime\": \"2025-07-10T05:00:00Z\",\n          \"requirements\": {\n            \"industries\": [],\n            \"products\": [],\n            \"services\": [],\n            \"solutions\": [\n              {\n                \"id\": \"d84d9a5b-639f-489d-a95c-100c487def71\",\n                \"name\": \"Tackle Cloud GTM Platform\",\n                \"solutionType\": \"3P\",\n                \"type\": \"Name\",\n                \"publisherName\": \"Tackle.io, Inc.\"\n              }\n            ],\n            \"additionalRequirements\": {\n              \"iot\": {\n                \"azureCertifiedDevice\": false,\n                \"attachServices\": false\n              },\n              \"attributes\": [\n                {\n                  \"id\": \"Business Applications\",\n                  \"type\": \"SolutionArea\"\n                },\n                {\n                  \"id\": \"Accelerate Innovation with Low Code\",\n                  \"type\": \"SolutionPlay\"\n                },\n                {\n                  \"id\": \"No\",\n                  \"type\": \"CustomerMarketplaceIntent\"\n                }\n              ]\n            }\n          }\n        },\n        \"team\": [\n          {\n            \"firstName\": \"Tackle\",\n            \"lastName\": \"Tester\",\n            \"phoneNumber\": \"5555555\",\n            \"email\": \"testerupdated@example.com\",\n            \"emailValidationStatus\": \"None\",\n            \"phoneValidationStatus\": \"None\"\n          }\n        ],\n        \"inviteContext\": {\n          \"notes\": \"Some notes\",\n          \"invitedBy\": {\n            \"organizationId\": \"85ce85b8-faef-4c5f-beaa-e8e704ca6cef\",\n            \"organizationName\": \"Tackle.io, Inc.\"\n          },\n          \"assistanceRequestCode\": \"Unknown\",\n          \"invitedMpnId\": \"5341319\"\n        },\n        \"eTag\": \"\\\"97003301-0000-0100-0000-67d455d30001\\\"\",\n        \"target\": [\n          {\n            \"id\": \"d84d9a5b-639f-489d-a95c-100c487def77\",\n            \"type\": \"SolutionProfile\"\n          }\n        ],\n        \"mpnId\": \"5341318\",\n        \"direction\": \"Outgoing\",\n        \"organizationId\": \"85ce85b8-faef-4c5f-beaa-e8e704ca6cef\",\n        \"organizationName\": \"Tackle.io, Inc.\",\n        \"lastModifiedVia\": \"d5e95180-727b-4312-bca9-d46416511ffc\",\n        \"lastRunId\": \"8e797ec8-a0f8-4491-9086-4f1c03bfa7c9\",\n        \"favorite\": false,\n        \"campaignId\": \"testCampaignUpdated\",\n        \"salesStage\": \"60\",\n        \"quality\": \"Unknown\",\n        \"isSpam\": false,\n        \"dealSensitivity\": \"None\",\n        \"createdVia\": \"d5e95180-727b-4312-bca9-d46416511ffc\",\n        \"closedDateTime\": \"2025-03-17T12:00:00Z\",\n        \"registrationStatus\": \"None\",\n        \"links\": {\n          \"relatedReferrals\": {\n            \"uri\": \"https://api.partner.microsoft.com/v1.0/engagements/referrals?$filter=engagementId eq \\\"db56246a-5894-442e-80a7-57f18652262c\\\"\",\n            \"method\": \"GET\"\n          },\n          \"self\": {\n            \"uri\": \"https://api.partner.microsoft.com/v1.0/engagements/referrals/472b39ec-634e-433e-afea-8421d95d684c\",\n            \"method\": \"GET\"\n          }\n        }\n      },\n      \"activityDetails\": {\n        \"displayText\": \"Referral created\",\n        \"givenName\": \"John\",\n        \"familyName\": \"Doe\",\n        \"pictureUrl\": \"https://tackle.io/\"\n      }\n    }\n  ],\n  \"next\": \"someNextToken\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2428dd9b-f528-486c-b3e2-c8179ec83e3b",
+              "name": "The request did not include a valid Tackle MTM access token, so no principal\ncould be established. The response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id",
+                    "events"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "next",
+                      "value": "re#tackle-cosell-2lsw6vxN7rXsBer0hXABCDEFGH"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "9356705b-79d7-47c5-b567-7cb466739c2a",
+              "name": "The authenticated principal does not have permission to perform this operation.\nThe response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id",
+                    "events"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "next",
+                      "value": "re#tackle-cosell-2lsw6vxN7rXsBer0hXABCDEFGH"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f10181c6-a7ad-4901-8188-73bff6d171f1",
+              "name": "An unexpected error occurred while processing the request. The response body is\nempty.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "referrals",
+                    ":referral_id",
+                    "events"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "next",
+                      "value": "re#tackle-cosell-2lsw6vxN7rXsBer0hXABCDEFGH"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "referral_id",
+                      "description": "(Required) The unique identifier for the referral"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://contracts.tackle.io",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "b1df5206-87c9-43b1-b4f9-fd2be720d76f",
+    "name": "Tackle Public Contracts Authentication Referrals API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n",
+      "type": "text/plain"
+    }
+  }
+}

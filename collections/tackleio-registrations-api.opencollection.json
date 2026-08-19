@@ -1,0 +1,39 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tackle Public Contracts Authentication Registrations API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Registrations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Register an Order",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://contracts.tackle.io/v1/registrations",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Notify Tackle of order modifications or registrations (like when a submission is made on your self-hosted registration page)"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

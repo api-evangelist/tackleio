@@ -1,0 +1,665 @@
+{
+  "item": [
+    {
+      "id": "56c878bc-7604-4547-9b8b-628c179f9dbe",
+      "name": "Scores",
+      "description": {
+        "content": "Score domains and search scored accounts.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "9f92e8b3-34de-492f-ab7d-e151095b4914",
+          "name": "Score domains",
+          "request": {
+            "name": "Score domains",
+            "description": {
+              "content": "Scores a batch of domains for buyer-signal propensity.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "scores"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"domains\": [\n    \"<string>\"\n  ],\n  \"signalType\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "49d3235c-0ac2-4fc5-bef6-99010acb7bcc",
+              "name": "Scores for the requested domains.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "scores"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"domains\": [\n    \"example.com\",\n    \"acme-corp.com\"\n  ],\n  \"signalType\": \"PropensityToBuy-aws\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"domain\": \"example.com\",\n    \"signalType\": \"PropensityToBuy-aws\",\n    \"displayScore\": \"High\",\n    \"demographics\": {\n      \"country\": \"US\",\n      \"state\": \"California\",\n      \"employeeRange\": \"1001-5000\",\n      \"primaryIndustry\": \"Software\",\n      \"revenueRange\": \"$100M-$500M\",\n      \"region\": \"AMER\",\n      \"companyName\": \"Example Co\"\n    }\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "83dd9033-2a21-4c46-b6e9-74b586800393",
+              "name": "The request body is missing required fields or contains invalid values.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "scores"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"domains\": [\n    \"example.com\",\n    \"acme-corp.com\"\n  ],\n  \"signalType\": \"PropensityToBuy-aws\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Invalid request body\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "dac760d8-9ceb-4ed4-86d8-2d3fccbf5147",
+              "name": "The access token is missing, malformed, or expired.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "scores"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"domains\": [\n    \"example.com\",\n    \"acme-corp.com\"\n  ],\n  \"signalType\": \"PropensityToBuy-aws\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b90606be-82f2-45a6-be6d-ef206017282c",
+              "name": "The access token is not authorized for this operation.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "scores"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"domains\": [\n    \"example.com\",\n    \"acme-corp.com\"\n  ],\n  \"signalType\": \"PropensityToBuy-aws\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Forbidden\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1af79647-22ea-49bb-afec-959013d7b3ae",
+              "name": "The request could not be completed.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "scores"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"domains\": [\n    \"example.com\",\n    \"acme-corp.com\"\n  ],\n  \"signalType\": \"PropensityToBuy-aws\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Internal server error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "57faa43a-f01c-4d7c-a846-04ebacaaa957",
+          "name": "Search scored domains",
+          "request": {
+            "name": "Search scored domains",
+            "description": {
+              "content": "Searches scored domains using filters and pagination. When no\nfilters are supplied, the response contains all scored domains\navailable to the calling account, limited by pagination.\n\nPagination uses `page_number` and `records_per_page`. For large\nresult sets, use `metadata.search_after` from one response as the\nnext request's `search_after` value to continue forward.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "scores",
+                "search"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page_number\": 0,\n  \"records_per_page\": 50,\n  \"search_after\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"domain_search_string\": \"<string>\",\n  \"domains\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"filtering_clouds\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"filtering_scores\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"regions\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"revenue_band\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"industries\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"new_high_scores\": \"<boolean>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "a5dc0b47-1648-4020-bd80-7812b09424e7",
+              "name": "Paginated scored domains and pagination metadata.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "scores",
+                    "search"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"page_number\": 0,\n  \"records_per_page\": 50,\n  \"filtering_clouds\": [\n    \"aws\"\n  ],\n  \"filtering_scores\": [\n    \"High\"\n  ],\n  \"domain_search_string\": \"acme\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"domain\": \"example.com\",\n      \"score_aws\": \"High\",\n      \"score_azure\": \"Medium\",\n      \"score_gcp\": \"Low\",\n      \"score_channel_partner\": \"\",\n      \"demographics\": {\n        \"country\": \"US\",\n        \"state\": \"California\",\n        \"employeeRange\": \"1001-5000\",\n        \"primaryIndustry\": \"Software\",\n        \"revenueRange\": \"$100M-$500M\",\n        \"region\": \"AMER\",\n        \"companyName\": \"Example Co\"\n      }\n    }\n  ],\n  \"metadata\": {\n    \"next_page\": \"1\",\n    \"previous_page\": \"\",\n    \"current_page_number\": 0,\n    \"current_page_record_count\": 1,\n    \"total_record_count\": 25,\n    \"search_after\": [\n      \"example.com\"\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "68a47fa8-dc29-48db-aa12-94dcaa113a38",
+              "name": "The request body is missing or contains invalid values.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "scores",
+                    "search"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"page_number\": 0,\n  \"records_per_page\": 50,\n  \"filtering_clouds\": [\n    \"aws\"\n  ],\n  \"filtering_scores\": [\n    \"High\"\n  ],\n  \"domain_search_string\": \"acme\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"Invalid request body\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "79937c4f-c46a-4878-ace8-a810da36deff",
+              "name": "The access token is missing, malformed, or expired.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "scores",
+                    "search"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"page_number\": 0,\n  \"records_per_page\": 50,\n  \"filtering_clouds\": [\n    \"aws\"\n  ],\n  \"filtering_scores\": [\n    \"High\"\n  ],\n  \"domain_search_string\": \"acme\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b8e839cc-64ad-4564-90a5-706304d18091",
+              "name": "The access token is not authorized for this operation.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "scores",
+                    "search"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"page_number\": 0,\n  \"records_per_page\": 50,\n  \"filtering_clouds\": [\n    \"aws\"\n  ],\n  \"filtering_scores\": [\n    \"High\"\n  ],\n  \"domain_search_string\": \"acme\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Forbidden\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7be8591f-e7e4-45db-8d43-3731a533e7a6",
+              "name": "The request could not be completed.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "scores",
+                    "search"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"page_number\": 0,\n  \"records_per_page\": 50,\n  \"filtering_clouds\": [\n    \"aws\"\n  ],\n  \"filtering_scores\": [\n    \"High\"\n  ],\n  \"domain_search_string\": \"acme\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"Internal server error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://contracts.tackle.io",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "0110776c-c3ec-4386-b32a-497c11150faa",
+    "name": "Tackle Public Contracts Authentication Scores API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n",
+      "type": "text/plain"
+    }
+  }
+}

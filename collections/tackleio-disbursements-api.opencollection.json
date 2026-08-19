@@ -1,0 +1,55 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tackle Public Contracts Authentication Disbursements API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Disbursements",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Disbursements",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://contracts.tackle.io/v1/disbursements",
+            "params": [
+              {
+                "name": "start_date",
+                "value": "",
+                "type": "query",
+                "description": "Start date for a query"
+              },
+              {
+                "name": "end_date",
+                "value": "",
+                "type": "query",
+                "description": "End date for a query"
+              },
+              {
+                "name": "cloud",
+                "value": "",
+                "type": "query",
+                "description": "Cloud Marketplace"
+              }
+            ]
+          },
+          "docs": "List disbursements within a date range"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

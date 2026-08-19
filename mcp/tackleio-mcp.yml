@@ -18,3 +18,8 @@ meta_tools:
 - search
 - fetch
 - execute-request
+deployment:
+  mode: remote
+  verified: searched
+  checked: '2026-08-12'
+  source: catalog MCP census

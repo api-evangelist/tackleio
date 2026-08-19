@@ -1,0 +1,118 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tackle Public Contracts Authentication Referrals API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Referrals",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a referral",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://contracts.tackle.io/api/referrals",
+            "headers": [
+              {
+                "name": "tackle-operation-id",
+                "value": "createIPReferral"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create a co-sell IP referral and submit it to Microsoft\nPartner Center. The shape of the request and the side effect\ndepend on the optional `tackle-operation-id` header (default\n`createIPReferral`); see the header description for the full\nlist of sub-operations and when to use each. Returns\n`202 Accepted` immediately with a Tackle referral ID and a\n`requestId` you can correlate to subsequent events via\n`listReferralEvents`."
+        },
+        {
+          "info": {
+            "name": "Get a referral",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://contracts.tackle.io/api/referrals/:referral_id",
+            "params": [
+              {
+                "name": "referral_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the referral"
+              }
+            ]
+          },
+          "docs": "Returns the current state of a co-sell referral by Tackle\nreferral ID, including both the Microsoft Partner Center\npayload (`Referral`) and Tackle-side metadata\n(`ReferralMetadata` -- CRM linkage, sync health, archived\nstate, related referrals). Returns `404 Not Found` when the\nreferral does not exist for the authenticated vendor."
+        },
+        {
+          "info": {
+            "name": "Update a referral",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://contracts.tackle.io/api/referrals/:referral_id",
+            "headers": [
+              {
+                "name": "tackle-operation-id",
+                "value": "updateIPReferral"
+              }
+            ],
+            "params": [
+              {
+                "name": "referral_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the referral"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update a referral. The behavior of the request depends on the\n`tackle-operation-id` header. Sub-operations that look up the\nreferral by ID -- in particular `requestSyncFromSalesforce` --\nmay return `404 Not Found` when the referral does not exist for\nthe authenticated vendor."
+        },
+        {
+          "info": {
+            "name": "List referral events",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://contracts.tackle.io/api/referrals/:referral_id/events",
+            "params": [
+              {
+                "name": "referral_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the referral"
+              },
+              {
+                "name": "next",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor returned by a previous call as the `next` field. Omit on the first call."
+              }
+            ]
+          },
+          "docs": "Returns the recorded history of a referral as a paginated list\nof events: client-initiated operations (matching the\n`tackle-operation-id` values), Microsoft Partner Center\nresponses, and CRM-sync history items. Use this to follow up\non a `requestId` returned from `createIPReferral` /\n`updateIPReferral`, audit lifecycle changes, or surface\nrecent activity to end users. Pagination uses an opaque\n`next` cursor."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

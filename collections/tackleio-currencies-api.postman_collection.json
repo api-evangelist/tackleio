@@ -1,0 +1,632 @@
+{
+  "item": [
+    {
+      "id": "550353dd-c5ee-4e9e-ab06-415fda03fc7c",
+      "name": "Currencies",
+      "description": {
+        "content": "Microsoft marketplace currency and conversion helpers.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "430d1151-c506-451a-86db-13892f7cfa4a",
+          "name": "Get Microsoft market currencies",
+          "request": {
+            "name": "Get Microsoft market currencies",
+            "description": {
+              "content": "Returns accepted currencies and the Microsoft marketplace countries\ngrouped by accepted currency.\n\nRequired RBAC action: `offers:CreateDraftOffer`.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "currencies"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "Optional caller-provided operation ID for request tracing.",
+                "key": "tackle-operation-id",
+                "value": "<string>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [
+            {
+              "id": "5667beaf-58db-41e8-9857-db75e7ba363a",
+              "name": "Market currencies found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "currencies"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"currency_options\": [\n    {\n      \"value\": \"USD\",\n      \"display\": \"United States Dollar | USD ($)\"\n    }\n  ],\n  \"currency_markets\": {\n    \"USD\": [\n      {\n        \"country_name\": \"United States\",\n        \"iso2\": \"US\",\n        \"currency\": \"USD\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b80b3aa4-e8d8-42c2-ba6b-772c4abdf233",
+              "name": "Authentication failed.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "currencies"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "acae3a3a-3f68-4171-848d-a6d4c46eabb7",
+              "name": "Caller is not allowed to perform this action.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "currencies"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"forbidden\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e0f3403b-f4bd-448d-b8b6-d3e3b25a1310",
+              "name": "Internal server error or upstream dependency failure.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "currencies"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"missing id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "f92c290a-54b1-49b0-8f84-60e5892eff99",
+          "name": "Convert currencies",
+          "request": {
+            "name": "Convert currencies",
+            "description": {
+              "content": "Converts one or more amounts from a base currency to a target currency\nusing cached Microsoft foreign exchange rates. Row-level conversion\nerrors are returned in `results[].error` without failing the entire\nrequest.\n\nRequired RBAC action: `offers:CreateDraftOffer`.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "currencies",
+                "convert"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "Optional caller-provided operation ID for request tracing.",
+                "key": "tackle-operation-id",
+                "value": "<string>"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conversions\": [\n    {\n      \"id\": \"<string>\",\n      \"base_currency\": \"<string>\",\n      \"target_currency\": \"<string>\",\n      \"amount\": \"<double>\"\n    }\n  ],\n  \"as_of_date\": \"<date>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "404a93be-aa43-411b-b220-004fb33f858f",
+              "name": "Currency conversion results",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "currencies",
+                    "convert"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"conversions\": [\n    {\n      \"id\": \"<string>\",\n      \"base_currency\": \"USD\",\n      \"target_currency\": \"EUR\",\n      \"amount\": 100\n    }\n  ],\n  \"as_of_date\": \"2026-04-30\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"results\": [\n    {\n      \"id\": \"string\",\n      \"base_currency\": \"string\",\n      \"target_currency\": \"string\",\n      \"original_amount\": 7640.970069878889,\n      \"converted_amount\": 4813.782097797966,\n      \"exchange_rate\": 4055.056774374316,\n      \"rate_source_date\": \"1984-11-19\",\n      \"rate_as_of_date\": \"1987-08-28\",\n      \"error\": {\n        \"code\": \"string\",\n        \"message\": \"string\"\n      }\n    },\n    {\n      \"id\": \"string\",\n      \"base_currency\": \"string\",\n      \"target_currency\": \"string\",\n      \"original_amount\": 4441.9703833110825,\n      \"converted_amount\": 4942.846401162705,\n      \"exchange_rate\": 4578.749159758152,\n      \"rate_source_date\": \"1956-08-27\",\n      \"rate_as_of_date\": \"1959-04-28\",\n      \"error\": {\n        \"code\": \"string\",\n        \"message\": \"string\"\n      }\n    }\n  ],\n  \"success\": true\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4dc79dd9-4e70-4cc1-a0b3-503b404676e9",
+              "name": "Invalid request or unsupported operation.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "currencies",
+                    "convert"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"conversions\": [\n    {\n      \"id\": \"<string>\",\n      \"base_currency\": \"USD\",\n      \"target_currency\": \"EUR\",\n      \"amount\": 100\n    }\n  ],\n  \"as_of_date\": \"2026-04-30\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"missing id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b6f139db-c6b7-4b7a-bd3d-e2868c26192e",
+              "name": "Authentication failed.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "currencies",
+                    "convert"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"conversions\": [\n    {\n      \"id\": \"<string>\",\n      \"base_currency\": \"USD\",\n      \"target_currency\": \"EUR\",\n      \"amount\": 100\n    }\n  ],\n  \"as_of_date\": \"2026-04-30\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "37989837-786c-4ca9-a4c1-792be8ae008f",
+              "name": "Caller is not allowed to perform this action.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "currencies",
+                    "convert"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"conversions\": [\n    {\n      \"id\": \"<string>\",\n      \"base_currency\": \"USD\",\n      \"target_currency\": \"EUR\",\n      \"amount\": 100\n    }\n  ],\n  \"as_of_date\": \"2026-04-30\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"forbidden\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "502f7bbd-060e-4051-9380-a9bf9622a3ae",
+              "name": "Internal server error or upstream dependency failure.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "currencies",
+                    "convert"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"conversions\": [\n    {\n      \"id\": \"<string>\",\n      \"base_currency\": \"USD\",\n      \"target_currency\": \"EUR\",\n      \"amount\": 100\n    }\n  ],\n  \"as_of_date\": \"2026-04-30\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"missing id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://contracts.tackle.io",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "cae2a4e1-eef0-4161-8ae2-90b4fc502c98",
+    "name": "Tackle Public Contracts Authentication Currencies API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n",
+      "type": "text/plain"
+    }
+  }
+}

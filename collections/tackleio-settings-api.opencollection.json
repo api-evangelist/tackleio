@@ -1,0 +1,35 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tackle Public Contracts Authentication Settings API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Settings",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get picklist options for Opportunity fields",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://contracts.tackle.io/api/settings/picklist-options"
+          },
+          "docs": "Returns the acceptable values for enumerable `Opportunity`\nfields, plus reference lists for country, language, and\ncurrency codes. Use this endpoint to populate picklist UI\ncontrols so that the values an integrator surfaces stay in\nstep with the values the API accepts (which can be a subset\nof the corresponding schema enum — see the `PicklistOptions`\nschema for details).\n\nThe response is an object keyed by field path\n(for example `.customerInfo.customerDetails.address.regionCode`);\neach value is"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

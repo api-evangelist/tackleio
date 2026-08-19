@@ -1,0 +1,980 @@
+{
+  "item": [
+    {
+      "id": "34c80f60-df85-473a-a537-b40b25f21876",
+      "name": "Marketplace",
+      "description": {
+        "content": "AWS Marketplace context endpoints used to assemble offers and amendments.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "a3912c46-ef57-482f-932f-d4093dbcef75",
+          "name": "List AWS Marketplace Agreements",
+          "request": {
+            "name": "List AWS Marketplace Agreements",
+            "description": {
+              "content": "Returns the seller's AWS Marketplace agreements (entitlements). Used\nwhen assembling an amendment offer to discover an existing\nbuyer-seller agreement to amend.\n\nEach agreement carries a `public_productid` field which is the AWS\nencrypted product ID and can be passed as the `productId` path\nparameter to `GET /products/{productId}/pricing`.\n\n**Required RBAC permission:** `offers:CreateDraftOffer` (agreement\nlisting is gated on the create permission because it is part of the\noffer-creation flow).\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "agreements"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "buyer_billing_account_ref",
+                  "value": "<string>",
+                  "description": "Filter to agreements for the given 12-digit AWS buyer account."
+                },
+                {
+                  "disabled": false,
+                  "key": "offerid",
+                  "value": "<string>",
+                  "description": "Filter to the agreement produced by the given marketplace offer ID."
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "25",
+                  "description": "Page size."
+                },
+                {
+                  "disabled": false,
+                  "key": "next_token",
+                  "value": "<string>",
+                  "description": "Opaque pagination cursor returned by a previous response."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [
+            {
+              "id": "0417a97e-f442-4483-b149-a8538b26c37d",
+              "name": "List of agreements.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "agreements"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "buyer_billing_account_ref",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "offerid",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "25"
+                    },
+                    {
+                      "key": "next_token",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"entitlements\": [\n    {\n      \"id\": \"string\",\n      \"status\": \"string\",\n      \"productid\": \"string\",\n      \"public_productid\": \"string\",\n      \"product_type\": \"string\",\n      \"offerid\": \"string\",\n      \"buyer_billing_account_ref\": \"string\",\n      \"start_date\": \"2023-12-26T07:29:37.331Z\",\n      \"end_date\": \"2007-06-16T22:11:31.692Z\"\n    },\n    {\n      \"id\": \"string\",\n      \"status\": \"string\",\n      \"productid\": \"string\",\n      \"public_productid\": \"string\",\n      \"product_type\": \"string\",\n      \"offerid\": \"string\",\n      \"buyer_billing_account_ref\": \"string\",\n      \"start_date\": \"2018-12-20T10:26:53.666Z\",\n      \"end_date\": \"1992-11-19T07:13:18.069Z\"\n    }\n  ],\n  \"limit\": 8764,\n  \"next_token\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "be3603ea-c90d-4606-acfc-2262df9e017a",
+              "name": "Request was malformed or failed validation.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "agreements"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "buyer_billing_account_ref",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "offerid",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "25"
+                    },
+                    {
+                      "key": "next_token",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"private offer not found\",\n  \"error\": \"authorization failed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1abde72e-ba71-46ed-a26b-8c48d3064ee6",
+              "name": "Missing or invalid Tackle JWT.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "agreements"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "buyer_billing_account_ref",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "offerid",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "25"
+                    },
+                    {
+                      "key": "next_token",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"private offer not found\",\n  \"error\": \"authorization failed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c6d3c723-3f2a-44b6-9537-728b0a91de41",
+              "name": "Caller is authenticated but not authorized for this resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "agreements"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "buyer_billing_account_ref",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "offerid",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "25"
+                    },
+                    {
+                      "key": "next_token",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"private offer not found\",\n  \"error\": \"authorization failed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "f31fbabf-cbc0-47a6-8625-248a61c31c90",
+          "name": "List Products",
+          "request": {
+            "name": "List Products",
+            "description": {
+              "content": "Returns the AWS Marketplace product listings owned by the authenticated\nseller. Use this to populate a product picker before creating a private\noffer.\n\nEach product object includes two distinct identifiers:\n\n- `productid` -- the **Tackle** product identifier.\n- `encrypted_productid` -- the **AWS Marketplace Catalog API** product\n  identifier. This is the value to pass as the `productId` path\n  parameter on `GET /products/{productId}/pricing`. Passing\n  `productid` instead will result in a `404` because the pricing\n  endpoint is sourced from the AWS Catalog API and only understands\n  the encrypted form.\n\n**Required RBAC permission:** `offers:ListProducts`\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "products"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "listing_type",
+                  "value": "<string>",
+                  "description": "Filter by product listing type (e.g. `saas`, `ami`)."
+                },
+                {
+                  "disabled": false,
+                  "key": "status",
+                  "value": "<string>",
+                  "description": "Filter by product status."
+                },
+                {
+                  "disabled": false,
+                  "key": "registration_hosting",
+                  "value": "<string>",
+                  "description": "Filter by registration hosting type."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [
+            {
+              "id": "3a31edb1-cfc6-4509-90d3-a2fdf4481f74",
+              "name": "List of products owned by the seller.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "products"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "listing_type",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "status",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "registration_hosting",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"cloud\": \"aws\",\n    \"productid\": \"string\",\n    \"vendorid\": \"string\",\n    \"name\": \"string\",\n    \"status\": \"string\",\n    \"productid_internal\": \"string\",\n    \"encrypted_productid\": \"string\",\n    \"listing_type\": \"string\",\n    \"listing_pricing_type\": \"string\",\n    \"registration_hosting\": \"string\"\n  },\n  {\n    \"cloud\": \"aws\",\n    \"productid\": \"string\",\n    \"vendorid\": \"string\",\n    \"name\": \"string\",\n    \"status\": \"string\",\n    \"productid_internal\": \"string\",\n    \"encrypted_productid\": \"string\",\n    \"listing_type\": \"string\",\n    \"listing_pricing_type\": \"string\",\n    \"registration_hosting\": \"string\"\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "21ec023b-9e99-4f4a-a063-cdba6f2da9f5",
+              "name": "Missing or invalid Tackle JWT.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "products"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "listing_type",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "status",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "registration_hosting",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"private offer not found\",\n  \"error\": \"authorization failed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b464c110-6699-457f-abd9-205b8c8c0ec2",
+              "name": "Caller is authenticated but not authorized for this resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "products"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "listing_type",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "status",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "registration_hosting",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"private offer not found\",\n  \"error\": \"authorization failed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "79c1324d-eb8b-425f-af8a-e85ade7a06a2",
+          "name": "Get Product Pricing",
+          "request": {
+            "name": "Get Product Pricing",
+            "description": {
+              "content": "Returns the pricing dimensions, billing terms, and payment-model\ndefaults for an AWS Marketplace product. Use the response to\npre-populate a private-offer creation form with values that match the\nproduct's public listing.\n\n**Required RBAC permission:** `offers:CreateDraftOffer` (gated on the\ncreate permission because pricing is fetched as part of the\noffer-creation flow).\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "products",
+                ":productId",
+                "pricing"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "productId",
+                  "description": "(Required) The **AWS Marketplace Catalog API encrypted product identifier**.\n\nThis is **not** the Tackle product ID. Pass the\n`encrypted_productid` field from a product object returned by\n`GET /products`, or the `public_productid` field from an agreement\nreturned by `GET /agreements`. Passing the Tackle `productid` (or\n`id`) will return `404`.\n"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [
+            {
+              "id": "6b5f2149-c0b8-41bf-a43a-f902e3248868",
+              "name": "Pricing for the product.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "products",
+                    ":productId",
+                    "pricing"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "productId",
+                      "description": "(Required) The **AWS Marketplace Catalog API encrypted product identifier**.\n\nThis is **not** the Tackle product ID. Pass the\n`encrypted_productid` field from a product object returned by\n`GET /products`, or the `public_productid` field from an agreement\nreturned by `GET /agreements`. Passing the Tackle `productid` (or\n`id`) will return `404`.\n"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"show_on_email\": false,\n  \"duration\": \"string\",\n  \"marketplace_fee\": \"string\",\n  \"net_contract_value\": \"string\",\n  \"monthly_contract_value\": \"string\",\n  \"total_contract_value\": \"string\",\n  \"dimensions\": [\n    {\n      \"dimension_value\": \"string\",\n      \"name\": \"string\",\n      \"quantity\": \"string\",\n      \"price\": \"string\",\n      \"api_name\": \"string\",\n      \"aws_discount_percentage\": \"string\"\n    },\n    {\n      \"dimension_value\": \"string\",\n      \"name\": \"string\",\n      \"quantity\": \"string\",\n      \"price\": \"string\",\n      \"api_name\": \"string\",\n      \"aws_discount_percentage\": \"string\"\n    }\n  ],\n  \"usage_dimensions\": [\n    {\n      \"description\": \"string\",\n      \"sku\": \"string\",\n      \"price\": \"string\",\n      \"aws_discount_percentage\": \"string\"\n    },\n    {\n      \"description\": \"string\",\n      \"sku\": \"string\",\n      \"price\": \"string\",\n      \"aws_discount_percentage\": \"string\"\n    }\n  ],\n  \"units\": [\n    {\n      \"unit\": \"string\",\n      \"hourly_price\": \"string\",\n      \"duration_price\": \"string\"\n    },\n    {\n      \"unit\": \"string\",\n      \"hourly_price\": \"string\",\n      \"duration_price\": \"string\"\n    }\n  ],\n  \"currency_code\": \"DQD\",\n  \"version\": \"simple-pricing-v1-aws\",\n  \"schedule\": [\n    {\n      \"invoice_date\": \"1968-05-04\",\n      \"invoice_amount\": \"string\"\n    },\n    {\n      \"invoice_date\": \"2018-04-10\",\n      \"invoice_amount\": \"string\"\n    }\n  ],\n  \"payment_model\": \"one_time\",\n  \"billing_term\": \"3-years\",\n  \"duration_value\": 7838,\n  \"duration_type\": \"string\",\n  \"service_start_at\": \"1976-07-15\",\n  \"service_end_at\": \"2004-04-26\",\n  \"allow_auto_renew\": false\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "9f2c5c04-0b35-4321-904a-76d99ce1c87f",
+              "name": "Missing or invalid Tackle JWT.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "products",
+                    ":productId",
+                    "pricing"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "productId",
+                      "description": "(Required) The **AWS Marketplace Catalog API encrypted product identifier**.\n\nThis is **not** the Tackle product ID. Pass the\n`encrypted_productid` field from a product object returned by\n`GET /products`, or the `public_productid` field from an agreement\nreturned by `GET /agreements`. Passing the Tackle `productid` (or\n`id`) will return `404`.\n"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"private offer not found\",\n  \"error\": \"authorization failed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "182b41d5-4f7d-4514-a6d8-0ada5e2f4ddb",
+              "name": "Caller is authenticated but not authorized for this resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "products",
+                    ":productId",
+                    "pricing"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "productId",
+                      "description": "(Required) The **AWS Marketplace Catalog API encrypted product identifier**.\n\nThis is **not** the Tackle product ID. Pass the\n`encrypted_productid` field from a product object returned by\n`GET /products`, or the `public_productid` field from an agreement\nreturned by `GET /agreements`. Passing the Tackle `productid` (or\n`id`) will return `404`.\n"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"private offer not found\",\n  \"error\": \"authorization failed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1f415bca-961a-44db-bfb3-6493ab7a961a",
+              "name": "Resource does not exist or is not visible to the caller.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "products",
+                    ":productId",
+                    "pricing"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "productId",
+                      "description": "(Required) The **AWS Marketplace Catalog API encrypted product identifier**.\n\nThis is **not** the Tackle product ID. Pass the\n`encrypted_productid` field from a product object returned by\n`GET /products`, or the `public_productid` field from an agreement\nreturned by `GET /agreements`. Passing the Tackle `productid` (or\n`id`) will return `404`.\n"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"private offer not found\",\n  \"error\": \"authorization failed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "85832b04-c0f4-4409-817e-1af925e199dc",
+          "name": "List Allowed Currencies",
+          "request": {
+            "name": "List Allowed Currencies",
+            "description": {
+              "content": "Returns the 3-letter ISO 4217 currency codes the calling seller may\nquote in a private offer. The seller is identified by the vendor ID\nin the bearer token; no path parameter is required.\n\n**Required RBAC permission:** `offers:CreateDraftOffer` (currency\nselection is part of the offer-creation flow).\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "allowed-currencies"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [
+            {
+              "id": "9232a18a-0239-4097-8d7c-81844838467b",
+              "name": "List of allowed currency codes.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "allowed-currencies"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  \"USD\",\n  \"EUR\",\n  \"GBP\"\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "19b2affc-071c-44f5-96cd-445b4d7ba568",
+              "name": "Missing or invalid Tackle JWT.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "allowed-currencies"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"private offer not found\",\n  \"error\": \"authorization failed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d01dfaf2-8c6e-412d-a445-8d75c252d624",
+              "name": "Caller is authenticated but not authorized for this resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "allowed-currencies"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"private offer not found\",\n  \"error\": \"authorization failed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://contracts.tackle.io",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "c78074c3-9d93-4d64-8a45-1e40b1dcb439",
+    "name": "Tackle Public Contracts Authentication Marketplace API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n",
+      "type": "text/plain"
+    }
+  }
+}

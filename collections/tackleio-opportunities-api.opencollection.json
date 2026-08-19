@@ -1,0 +1,312 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tackle Public Contracts Authentication Opportunities API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Opportunities",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List co-sell opportunities",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://contracts.tackle.io/api/opportunities",
+            "params": [
+              {
+                "name": "q",
+                "value": "",
+                "type": "query",
+                "description": "A search query to filter the opportunities."
+              },
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "The starting index of the opportunities to return."
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "The number of opportunities to return per page (minimum 1, maximum 100, default 10)."
+              },
+              {
+                "name": "cloudStatus",
+                "value": "",
+                "type": "query",
+                "description": "Filter opportunities by their AWS Partner Central review status. Accepts\nmultiple values; results match any of the supplied statuses.\n\nStatus values:\n\n- `Pending Submission` — opportunity is drafted but has not yet been\n  submitted to AWS Partner Central for review.\n- `Submitted` — opportunity has been submitted and is awaiting AWS triage.\n- `In review` — AWS is actively reviewing the opportunity.\n- `Approved` — AWS has approved the opportunity.\n- `Rejected` — AWS has rejected the opportunity. See `cloudResponses` on\n  the matching opportunity event for the rejection reason.\n- `Action Required` — AWS requires updates before the review can proceed.\n  See `cloudResponses` on the matching opportunity event for the requested\n  changes."
+              },
+              {
+                "name": "source",
+                "value": "",
+                "type": "query",
+                "description": "Filter opportunities by their Tackle source. `Inbound` corresponds to\nopportunities originated by AWS (AWS Referral); `Outbound` corresponds\nto opportunities originated by the partner (Partner Referral). Accepts\nmultiple values; results match any of the supplied sources."
+              },
+              {
+                "name": "cloudSalesStage",
+                "value": "",
+                "type": "query",
+                "description": "Filter opportunities by the AWS Partner Central sales-stage value.\nAccepts multiple values; results match any of the supplied stages.\nSee `lifeCycle.stage` on `Opportunity` for the documented stage values\n(for example, `Prospect`, `Qualified`, `Technical Validation`,\n`Business Validation`, `Committed`, `Launched`, `Closed Lost`)."
+              },
+              {
+                "name": "startTargetCloseDate",
+                "value": "",
+                "type": "query",
+                "description": "Used to filter opportunities by their target close date. Only opportunities with a target close date on or after this specified date will be retrieved."
+              },
+              {
+                "name": "endTargetCloseDate",
+                "value": "",
+                "type": "query",
+                "description": "Used to filter opportunities based on their target close date. Only opportunities with a target close date on or before this specified date will be retrieved."
+              },
+              {
+                "name": "startCloudCreated",
+                "value": "",
+                "type": "query",
+                "description": "Used to filter opportunities by specifying the earliest creation date. Opportunities created on or after this date will be included in the results."
+              },
+              {
+                "name": "endCloudCreated",
+                "value": "",
+                "type": "query",
+                "description": "Used to filter opportunities by specifying the latest creation date. Opportunities created on or before this date will be included in the results."
+              },
+              {
+                "name": "sortField",
+                "value": "",
+                "type": "query",
+                "description": "The field to sort the opportunities by. Only takes effect when `sortOrder`\nis also supplied; both query parameters must be present together for sorting\nto apply. If only `sortField` is provided, the response uses the default\nordering instead. Note that `cloudProviderID` is case-sensitive: the trailing\n`ID` is uppercase, and sending `cloudProviderId` (lowercase `d`) returns\n`400 Bad Request: Invalid sortField`."
+              },
+              {
+                "name": "sortOrder",
+                "value": "",
+                "type": "query",
+                "description": "Sort direction. Only takes effect when `sortField` is also supplied — both\nquery parameters must be present together. If only `sortOrder` is provided\n(without `sortField`), the response uses the underlying default ordering\ninstead of any sort. There is no implicit ascending default applied when\nonly one of the two parameters is sent."
+              },
+              {
+                "name": "crmId",
+                "value": "",
+                "type": "query",
+                "description": "Filter by the Salesforce CRM identifier of the linked opportunity record.\nFor Salesforce, both 15- and 18-character IDs are accepted. To filter by\na HubSpot Deal ID instead, see the `hubspotCrmId` field on\n`OpportunityMetadata`."
+              },
+              {
+                "name": "hasCloudErrors",
+                "value": "",
+                "type": "query",
+                "description": "Filter opportunities by their AWS Partner Central error state. Set to\n`true` to return only opportunities whose most recent AWS Partner Central\nrequest failed; set to `false` to return only opportunities with no\ncloud-side errors. Omit to disable the filter. Inspect\n`listOpportunityEvents` for the matching opportunity to see the error\ndetail."
+              },
+              {
+                "name": "hasCrmId",
+                "value": "",
+                "type": "query",
+                "description": "Filter opportunities by whether a CRM identifier is linked. Set to `true`\nto return only opportunities that have a `crmId` (Salesforce) or\n`hubspotCrmId` value populated; set to `false` to return only\nopportunities with no CRM identifier linked. Omit to disable the filter."
+              },
+              {
+                "name": "hasSalesforceErrors",
+                "value": "",
+                "type": "query",
+                "description": "Filter opportunities by their Salesforce sync state. Set to `true` to\nreturn only opportunities whose most recent Salesforce sync attempt\nfailed; set to `false` to return only opportunities with no Salesforce\nsync errors. Omit to disable the filter. The error message itself is\navailable on the matching opportunity in the `salesforceSyncError` field."
+              },
+              {
+                "name": "hasAnyError",
+                "value": "",
+                "type": "query",
+                "description": "Filters opportunities by their error state.\n\n- `true` returns only opportunities that currently have at least one\n  cloud-side error or Salesforce-sync error.\n- `false` returns only opportunities that have no cloud-side or\n  Salesforce-sync errors.\n- Omit the parameter to disable this filter entirely.\n\nSee `hasCloudErrors` and `hasSalesforceErrors` to filter on each error\nsource independently."
+              }
+            ]
+          },
+          "docs": "List co-sell opportunities"
+        },
+        {
+          "info": {
+            "name": "Create a co-sell opportunity",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://contracts.tackle.io/api/opportunities",
+            "headers": [
+              {
+                "name": "tackle-operation-id",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Queues a create request against AWS Partner Central. The success response is `202 Accepted`\nwith the Tackle identifier; poll `getOpportunity` to observe the cloud-side outcome.\n\nIf a `crmId` is supplied and your vendor account enforces a one-opportunity-per-CRM-ID\nconstraint, the request is rejected with `409 Conflict` when an existing co-sell\nopportunity already maps to the same CRM identifier. Whether this constraint is enforced\nis configured per vendor; contact your Tackle account team if you"
+        },
+        {
+          "info": {
+            "name": "Get a co-sell opportunity",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://contracts.tackle.io/api/opportunities/:opportunity_id",
+            "params": [
+              {
+                "name": "opportunity_id",
+                "value": "",
+                "type": "path",
+                "description": "The Tackle identifier for the opportunity (for example, `tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3`).\nThis is the value returned in the `id` field of `listOpportunities` rows and in `metadata.id` on\n`getOpportunity`. The cloud-provider identifier (for example, `O123456`, returned in the response\nbody's top-level `id` field) is **not** accepted here."
+              }
+            ]
+          },
+          "docs": "Get a co-sell opportunity"
+        },
+        {
+          "info": {
+            "name": "Update a co-sell opportunity",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://contracts.tackle.io/api/opportunities/:opportunity_id",
+            "headers": [
+              {
+                "name": "tackle-operation-id",
+                "value": "updateOpportunity"
+              }
+            ],
+            "params": [
+              {
+                "name": "opportunity_id",
+                "value": "",
+                "type": "path",
+                "description": "The Tackle identifier for the opportunity (for example, `tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3`).\nThis is the value returned in the `id` field of `listOpportunities` rows and in `metadata.id` on\n`getOpportunity`. The cloud-provider identifier (for example, `O123456`, returned in the response\nbody's top-level `id` field) is **not** accepted here."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Queues a partial update against AWS Partner Central. The exact behavior depends on\nthe value of the `tackle-operation-id` header.\n\n- Production cloud operations: `updateOpportunity` (default), `updateDraftOpportunity`,\n  `updateStartEngagementOpportunity`, `startEngagement`, `closeLostOpportunity`,\n  `launchOpportunity`, `updateOpportunityCRMID`.\n- Test-environment-only: `acceptOpportunity`, `rejectOpportunity`. These simulate\n  AWS-side responses to an incoming engagement invitation/opportunity"
+        },
+        {
+          "info": {
+            "name": "List opportunity events",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://contracts.tackle.io/api/opportunities/:opportunity_id/events",
+            "params": [
+              {
+                "name": "opportunity_id",
+                "value": "",
+                "type": "path",
+                "description": "The Tackle identifier for the opportunity (for example, `tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3`).\nThis is the value returned in the `id` field of `listOpportunities` rows and in `metadata.id` on\n`getOpportunity`. The cloud-provider identifier (for example, `O123456`, returned in the response\nbody's top-level `id` field) is **not** accepted here."
+              },
+              {
+                "name": "next",
+                "value": "",
+                "type": "query",
+                "description": "Cursor token used to resume a paginated history query. When supplied, the\nquery continues from where a previous request left off.\n\n**Note**: this endpoint does not currently emit `next` cursors on responses\n(see the `next` field of the response schema below), so in practice clients\nhave no way to obtain a cursor from the API itself today. This parameter is\ntherefore rarely useful unless a cursor value is already known from another\nsource."
+              }
+            ]
+          },
+          "docs": "List opportunity events"
+        },
+        {
+          "info": {
+            "name": "Get an opportunity by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://contracts.tackle.io/api/opportunities/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "tackle-cosell-2eWPPnWbbSaDFWqMaYoHMeWWY7T",
+                "type": "path",
+                "description": "The Tackle-side opportunity identifier."
+              }
+            ]
+          },
+          "docs": "Returns the full Tackle-shaped opportunity including\n`$tkl-metadata` and the latest cached Cloud Channel payload.\n\nRequires the `cosell:GetOpportunity` permission."
+        },
+        {
+          "info": {
+            "name": "Update an opportunity",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://contracts.tackle.io/api/opportunities/:id",
+            "headers": [
+              {
+                "name": "tackle-operation-id",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "tackle-cosell-2eWPPnWbbSaDFWqMaYoHMeWWY7T",
+                "type": "path",
+                "description": "The Tackle-side opportunity identifier."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Queues a partial update against the Cloud Channel API. The exact\nbehavior depends on `tackle-operation-id`:\n\n- `updateOpportunity` (default): requires `cosell:UpdateOpportunity`.\n  If the resulting state transitions the opportunity to `SUBMITTED`\n  (from anything other than `SUBMITTED`), `cosell:StartEngagement`\n  is additionally required and the effective operation is treated\n  as `submitOpportunity`.\n- `updateDraftOpportunity`: requires\n  `cosell:UpdateOpportunity`.\n- `submitOpportunity`: forc"
+        },
+        {
+          "info": {
+            "name": "List the event history for an opportunity",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://contracts.tackle.io/api/opportunities/:id/events",
+            "params": [
+              {
+                "name": "id",
+                "value": "tackle-cosell-2eWPPnWbbSaDFWqMaYoHMeWWY7T",
+                "type": "path",
+                "description": "The Tackle-side opportunity identifier."
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of events to return. Values above 25 are\nsilently clamped to 25. When omitted (or `0`), the server does\nnot apply a per-page item limit; the page is bounded only by an internal response size limit and may include many\nmore than 25 events. Pass an explicit `limit` for predictable\npage sizes and use the returned `next` token to paginate."
+              },
+              {
+                "name": "next",
+                "value": "",
+                "type": "query",
+                "description": "Opaque continuation token returned by a previous call.\nPass it back unmodified to fetch the next page. The token\nis opaque; do not rely on its internal format (malformed\ntokens surface as `500 Internal Server Error` rather than\n`400 Bad Request`, so always pass back the token from a\nprior response unmodified)."
+              }
+            ]
+          },
+          "docs": "Returns a page of history events for an opportunity. Each event\nhas an `operation` field identifying what produced it; the\ndocumented operations include the values an integrator can\nsubmit on the `tackle-operation-id` header, plus two\nservice-emitted operations (`internalUpdateEvent`,\n`cloudUpdateEvent`) — see `HistoryOperationId` for the full\ncatalog. Treat the field as a free-form string and fall back to\na default branch when displaying an unknown value.\n\nUnknown opportunity IDs return `200` w"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

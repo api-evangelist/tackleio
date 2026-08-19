@@ -1,0 +1,651 @@
+{
+  "item": [
+    {
+      "id": "da63e153-2cd3-47e9-b93e-7c21ee3245e0",
+      "name": "Customers",
+      "description": {
+        "content": "Look up customer accounts in Microsoft Partner Center before\ncreating a referral. Use these endpoints to determine\n`customerProfile.ids` and the `dealSensitivity` value\n(`USFed` vs `None`) you should send.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "673999a9-079d-443b-ac49-643968a5a2bb",
+          "name": "Lookup customer info to determine if they are a US federal customer.",
+          "request": {
+            "name": "Lookup customer info to determine if they are a US federal customer.",
+            "description": {
+              "content": "Looks up the customer in Microsoft Partner Center by company\nname and reports whether Microsoft has tagged the account as a\nUS federal customer. Use this before creating a referral so\nyou can populate `dealSensitivity` correctly (`USFed` for US\nfederal customers, `None` otherwise). Returns an empty\n`customerInfo` array when no match is found.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "customerInfo"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyName\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "9ffec3ef-555e-42dc-9233-acf3dd0399cc",
+              "name": "Response containing info if the customer is a US federal customer.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "customerInfo"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"companyName\": \"Example Corporation\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 1,\n  \"customerInfo\": [\n    {\n      \"microsoftCRMId\": \"900002408\",\n      \"customerName\": \"Example Corporation\",\n      \"dunsId\": \"123456789\",\n      \"type\": \"USFed\"\n    },\n    {\n      \"microsoftCRMId\": \"900002408\",\n      \"customerName\": \"Example Corporation\",\n      \"dunsId\": \"123456789\",\n      \"type\": \"USFed\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "564cd846-3644-4f62-90ce-fb4623160b76",
+              "name": "The request was malformed or could not be processed. Returned when the JSON body\ncannot be parsed, when a required field is missing, when an unsupported\n`tackle-operation-id` is supplied, or when a referenced CRM ID is invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "customerInfo"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"companyName\": \"Example Corporation\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Your request could not be processed.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ec430d22-1cad-494c-8180-17285ad10e67",
+              "name": "The request did not include a valid Tackle MTM access token, so no principal\ncould be established. The response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "customerInfo"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"companyName\": \"Example Corporation\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c4c6b6b4-c6da-40c2-b9c2-9235606575cf",
+              "name": "The authenticated principal does not have permission to perform this operation.\nThe response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "customerInfo"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"companyName\": \"Example Corporation\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e3d7a2b5-1245-4a94-a206-ee279a1566ca",
+              "name": "An unexpected error occurred while processing the request. The response body is\nempty.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "customerInfo"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"companyName\": \"Example Corporation\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "9c164005-a3e3-403b-afdc-446324a50d30",
+          "name": "Lookup customer details in Partner Center.",
+          "request": {
+            "name": "Lookup customer details in Partner Center.",
+            "description": {
+              "content": "Searches Microsoft Partner Center for matching customer\naccounts by company name plus country, returning managed,\nunmanaged, and Microsoft-account matches. Use this to populate\n`customerProfile.ids` and `customerProfile.address` on a\nsubsequent `createIPReferral` call. The full Partner Center\nlookup payload is accepted so callers can forward the same\nbody the Partner Center UI would, but only `companyName` and\n`address.country` materially affect matching; other fields\nare ignored.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "customerLookup"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyName\": \"<string>\",\n  \"address\": {\n    \"country\": \"<string>\",\n    \"addressLine1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\"\n  },\n  \"contact\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"phoneNumber\": \"<string>\",\n    \"email\": \"<string>\",\n    \"title\": \"<string>\",\n    \"phoneValidationStatus\": \"<string>\",\n    \"emailValidationStatus\": \"<string>\"\n  },\n  \"crmCustomerUniqueID\": \"<string>\",\n  \"microsoftAccountId\": \"<string>\",\n  \"bestMatchOnly\": \"<boolean>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "4d1aa344-98c8-4932-98f7-ed6223000ac7",
+              "name": "Response containing the results of the customer lookup",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "customerLookup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"companyName\": \"Example Corporation\",\n  \"address\": {\n    \"country\": \"<string>\",\n    \"addressLine1\": \"1 Example Way\",\n    \"city\": \"Redmond\",\n    \"state\": \"Washington\"\n  },\n  \"contact\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"phoneNumber\": \"<string>\",\n    \"email\": \"<string>\",\n    \"title\": \"<string>\",\n    \"phoneValidationStatus\": \"None\",\n    \"emailValidationStatus\": \"None\"\n  },\n  \"crmCustomerUniqueID\": \"006QL00000BahjXXX\",\n  \"microsoftAccountId\": \"user@domain.com\",\n  \"bestMatchOnly\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"managedAccounts\": [\n    {\n      \"childAccounts\": [],\n      \"customerAccountDetails\": {\n        \"name\": \"Example Company\",\n        \"msp_accountnumber\": \"9-ABCD12345\",\n        \"msp_mssalesid\": \"11111111-aaaa-2222-bbbb-333333333333\",\n        \"address1_country\": \"United States\",\n        \"address1_city\": \"Boston\",\n        \"msp_mstopparentid\": \"12345678\",\n        \"msp_endcustomersegmentcode\": \"Major Commercial\",\n        \"msp_endcustomersubsegmentcode\": \"Major - Commercial Other\",\n        \"address1_line1\": \"123 Example AVE SUITE 3D\",\n        \"territoryidname\": \"SDP.010.DN.100\",\n        \"matchscore\": 24.84912,\n        \"msp_customermacceligibility\": \"No\",\n        \"msp_verticalcode\": \"Other - Unsegmented\",\n        \"msp_subverticalcode\": \"Other - Unsegmented\"\n      }\n    }\n  ],\n  \"unManagedAccounts\": [\n    {\n      \"childAccounts\": [],\n      \"customerAccountDetails\": {\n        \"name\": \"Example Corporation 2\",\n        \"msp_accountnumber\": \"9-ABCD98765\",\n        \"msp_mssalesid\": \"22222222-aaaa-2222-bbbb-333333333333\",\n        \"address1_country\": \"United States\",\n        \"address1_city\": \"New York\",\n        \"msp_mstopparentid\": \"87654321\",\n        \"msp_endcustomersegmentcode\": \"Major Commercial\",\n        \"msp_endcustomersubsegmentcode\": \"Major - Commercial Other\",\n        \"address1_line1\": \"987 Example AVE SUITE 3D\",\n        \"territoryidname\": \"SDP.010.DN.100\",\n        \"matchscore\": 24.84912,\n        \"msp_customermacceligibility\": \"No\",\n        \"msp_verticalcode\": \"Other - Unsegmented\",\n        \"msp_subverticalcode\": \"Other - Unsegmented\"\n      }\n    }\n  ],\n  \"microsoftAccountMatch\": {\n    \"childAccounts\": [],\n    \"customerAccountDetails\": {\n      \"name\": \"Example Company\",\n      \"msp_accountnumber\": \"9-ABCD12345\",\n      \"msp_mssalesid\": \"11111111-aaaa-2222-bbbb-333333333333\",\n      \"address1_country\": \"United States\",\n      \"address1_city\": \"Boston\",\n      \"msp_mstopparentid\": \"12345678\",\n      \"msp_endcustomersegmentcode\": \"Major Commercial\",\n      \"msp_endcustomersubsegmentcode\": \"Major - Commercial Other\",\n      \"address1_line1\": \"123 Example AVE SUITE 3D\",\n      \"territoryidname\": \"SDP.010.DN.100\",\n      \"matchscore\": 24.84912,\n      \"msp_customermacceligibility\": \"No\",\n      \"msp_verticalcode\": \"Other - Unsegmented\",\n      \"msp_subverticalcode\": \"Other - Unsegmented\"\n    },\n    \"managed\": true\n  },\n  \"crmUniqueIdentifierMatch\": {\n    \"childAccounts\": [],\n    \"customerAccountDetails\": {\n      \"name\": \"Example Company\",\n      \"msp_accountnumber\": \"9-ABCD12345\",\n      \"msp_mssalesid\": \"11111111-aaaa-2222-bbbb-333333333333\",\n      \"address1_country\": \"United States\",\n      \"address1_city\": \"Boston\",\n      \"msp_mstopparentid\": \"12345678\",\n      \"msp_endcustomersegmentcode\": \"Major Commercial\",\n      \"msp_endcustomersubsegmentcode\": \"Major - Commercial Other\",\n      \"address1_line1\": \"123 Example AVE SUITE 3D\",\n      \"territoryidname\": \"SDP.010.DN.100\",\n      \"matchscore\": 24.84912,\n      \"msp_customermacceligibility\": \"No\",\n      \"msp_verticalcode\": \"Other - Unsegmented\",\n      \"msp_subverticalcode\": \"Other - Unsegmented\"\n    },\n    \"managed\": true,\n    \"referralId\": \"006QL00000BahjGYAR\",\n    \"name\": \"Example Referral\",\n    \"direction\": \"Outgoing\",\n    \"isvStatus\": \"Active\",\n    \"isvSubStatus\": \"Pending\",\n    \"microsoftStatus\": \"Active\",\n    \"microsoftSubStatus\": \"Accepted\",\n    \"isvAcceptedDateTime\": \"2025-07-10T05:00:00Z\",\n    \"isvClosedDateTime\": \"2025-08-10T05:00:00Z\",\n    \"microsoftAcceptedDateTime\": \"2025-07-10T05:00:00Z\",\n    \"microsoftClosedDateTime\": \"2025-08-10T05:00:00Z\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "419c2074-3a5c-4859-b8b7-45c61e24cede",
+              "name": "The request was malformed or could not be processed. Returned when the JSON body\ncannot be parsed, when a required field is missing, when an unsupported\n`tackle-operation-id` is supplied, or when a referenced CRM ID is invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "customerLookup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"companyName\": \"Example Corporation\",\n  \"address\": {\n    \"country\": \"<string>\",\n    \"addressLine1\": \"1 Example Way\",\n    \"city\": \"Redmond\",\n    \"state\": \"Washington\"\n  },\n  \"contact\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"phoneNumber\": \"<string>\",\n    \"email\": \"<string>\",\n    \"title\": \"<string>\",\n    \"phoneValidationStatus\": \"None\",\n    \"emailValidationStatus\": \"None\"\n  },\n  \"crmCustomerUniqueID\": \"006QL00000BahjXXX\",\n  \"microsoftAccountId\": \"user@domain.com\",\n  \"bestMatchOnly\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Your request could not be processed.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "61fadc2e-f98c-492c-bf82-90ebd004fe88",
+              "name": "The request did not include a valid Tackle MTM access token, so no principal\ncould be established. The response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "customerLookup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"companyName\": \"Example Corporation\",\n  \"address\": {\n    \"country\": \"<string>\",\n    \"addressLine1\": \"1 Example Way\",\n    \"city\": \"Redmond\",\n    \"state\": \"Washington\"\n  },\n  \"contact\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"phoneNumber\": \"<string>\",\n    \"email\": \"<string>\",\n    \"title\": \"<string>\",\n    \"phoneValidationStatus\": \"None\",\n    \"emailValidationStatus\": \"None\"\n  },\n  \"crmCustomerUniqueID\": \"006QL00000BahjXXX\",\n  \"microsoftAccountId\": \"user@domain.com\",\n  \"bestMatchOnly\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "80afea27-39ee-42f5-aba4-b5db56ba4320",
+              "name": "The authenticated principal does not have permission to perform this operation.\nThe response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "customerLookup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"companyName\": \"Example Corporation\",\n  \"address\": {\n    \"country\": \"<string>\",\n    \"addressLine1\": \"1 Example Way\",\n    \"city\": \"Redmond\",\n    \"state\": \"Washington\"\n  },\n  \"contact\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"phoneNumber\": \"<string>\",\n    \"email\": \"<string>\",\n    \"title\": \"<string>\",\n    \"phoneValidationStatus\": \"None\",\n    \"emailValidationStatus\": \"None\"\n  },\n  \"crmCustomerUniqueID\": \"006QL00000BahjXXX\",\n  \"microsoftAccountId\": \"user@domain.com\",\n  \"bestMatchOnly\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a33c6b18-0514-4e09-ac10-7bcac30999d2",
+              "name": "An unexpected error occurred while processing the request. The response body is\nempty.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "customerLookup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"companyName\": \"Example Corporation\",\n  \"address\": {\n    \"country\": \"<string>\",\n    \"addressLine1\": \"1 Example Way\",\n    \"city\": \"Redmond\",\n    \"state\": \"Washington\"\n  },\n  \"contact\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"phoneNumber\": \"<string>\",\n    \"email\": \"<string>\",\n    \"title\": \"<string>\",\n    \"phoneValidationStatus\": \"None\",\n    \"emailValidationStatus\": \"None\"\n  },\n  \"crmCustomerUniqueID\": \"006QL00000BahjXXX\",\n  \"microsoftAccountId\": \"user@domain.com\",\n  \"bestMatchOnly\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://contracts.tackle.io",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "daa87795-1285-45e1-bfc2-33935c348493",
+    "name": "Tackle Public Contracts Authentication Customers API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n",
+      "type": "text/plain"
+    }
+  }
+}

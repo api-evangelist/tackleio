@@ -1,0 +1,509 @@
+{
+  "item": [
+    {
+      "id": "adb61ccd-546a-4e62-b567-af863bb7750e",
+      "name": "Partners",
+      "description": {
+        "content": "Look up partner organizations in Microsoft Partner Center.\nUse the returned `organizationId` when adding a non-Microsoft\npartner via `inviteContexts`.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "c2465cb3-4686-4fb1-8329-cd13b00afa90",
+          "name": "Lookup partner details in Partner Center.",
+          "request": {
+            "name": "Lookup partner details in Partner Center.",
+            "description": {
+              "content": "Searches Microsoft Partner Center for partner organizations\nmatching the supplied search text. Use the returned\n`organizationId` when adding a non-Microsoft partner to a\nreferral via `inviteContexts`. Returns an empty `partners`\narray when no matches are found.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "partnerLookup"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"searchText\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "eea1231b-d524-4177-bbf8-f026670badc5",
+              "name": "Response containing the results of the partner lookup",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "partnerLookup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"searchText\": \"Example Corporation\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 1,\n  \"partners\": [\n    {\n      \"organizationId\": \"26adabec-cc1c-42ed-a63b-849dbf47b95d\",\n      \"name\": \"Example Corporation\",\n      \"address\": {\n        \"addressLine1\": \"1 Example Way\",\n        \"addressLine2\": \"string\",\n        \"city\": \"Redmond\",\n        \"state\": \"Washington\",\n        \"postalCode\": \"98053\",\n        \"region\": \"United States\",\n        \"country\": \"US\"\n      }\n    },\n    {\n      \"organizationId\": \"26adabec-cc1c-42ed-a63b-849dbf47b95d\",\n      \"name\": \"Example Corporation\",\n      \"address\": {\n        \"addressLine1\": \"1 Example Way\",\n        \"addressLine2\": \"string\",\n        \"city\": \"Redmond\",\n        \"state\": \"Washington\",\n        \"postalCode\": \"98053\",\n        \"region\": \"United States\",\n        \"country\": \"US\"\n      }\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "026b75d3-2e6b-492a-883a-5015f64c1111",
+              "name": "The request was malformed or could not be processed. Returned when the JSON body\ncannot be parsed, when a required field is missing, when an unsupported\n`tackle-operation-id` is supplied, or when a referenced CRM ID is invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "partnerLookup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"searchText\": \"Example Corporation\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Your request could not be processed.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "00def982-520d-442d-8579-2c19fc40439a",
+              "name": "The request did not include a valid Tackle MTM access token, so no principal\ncould be established. The response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "partnerLookup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"searchText\": \"Example Corporation\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "fba80e84-afc4-438d-b7c0-b417127829be",
+              "name": "The authenticated principal does not have permission to perform this operation.\nThe response body is `{}` — the `message` field is omitted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "partnerLookup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"searchText\": \"Example Corporation\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "adaf760a-f12b-4a2d-9db9-39a40ded00f6",
+              "name": "An unexpected error occurred while processing the request. The response body is\nempty.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "partnerLookup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"searchText\": \"Example Corporation\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "cf31cff9-dc92-4284-9ce0-610dc29713b0",
+          "name": "List AWS Marketplace Partners",
+          "request": {
+            "name": "List AWS Marketplace Partners",
+            "description": {
+              "content": "Returns a curated list of AWS Marketplace resale partners with their\ncompany names and AWS account IDs. Use this list to populate a\npartner picker when creating a partner (resale) private offer.\n\n**Required RBAC permission:** `offers:CreateDraftOffer`\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "partners"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [
+            {
+              "id": "42dd4d22-5b5f-48f8-a427-06adaabf2fd7",
+              "name": "List of AWS Marketplace partners.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "partners"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"awsAccountId\": \"977757234053\",\n    \"name\": \"RiskQ, Inc,\"\n  },\n  {\n    \"awsAccountId\": \"977757234053\",\n    \"name\": \"RiskQ, Inc,\"\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "94a8c498-599c-4b00-b747-e7cf7b896b9a",
+              "name": "Missing or invalid Tackle JWT.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "partners"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"private offer not found\",\n  \"error\": \"authorization failed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "112b34be-7ae3-4c74-896f-12ff35892361",
+              "name": "Caller is authenticated but not authorized for this resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "partners"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"private offer not found\",\n  \"error\": \"authorization failed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://contracts.tackle.io",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "f8747e37-c9ec-459e-8d8e-329c7df3b078",
+    "name": "Tackle Public Contracts Authentication Partners API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n",
+      "type": "text/plain"
+    }
+  }
+}

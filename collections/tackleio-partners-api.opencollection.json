@@ -1,0 +1,50 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tackle Public Contracts Authentication Partners API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Partners",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Lookup partner details in Partner Center.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://contracts.tackle.io/api/partnerLookup",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Searches Microsoft Partner Center for partner organizations\nmatching the supplied search text. Use the returned\n`organizationId` when adding a non-Microsoft partner to a\nreferral via `inviteContexts`. Returns an empty `partners`\narray when no matches are found."
+        },
+        {
+          "info": {
+            "name": "List AWS Marketplace Partners",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://contracts.tackle.io/partners"
+          },
+          "docs": "Returns a curated list of AWS Marketplace resale partners with their\ncompany names and AWS account IDs. Use this list to populate a\npartner picker when creating a partner (resale) private offer.\n\n**Required RBAC permission:** `offers:CreateDraftOffer`\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

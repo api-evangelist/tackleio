@@ -1,0 +1,277 @@
+{
+  "item": [
+    {
+      "id": "061e935f-7db0-48e4-9ed7-e5b3db153197",
+      "name": "Solutions",
+      "description": {
+        "content": "List the co-sell solutions registered with AWS Partner Central for\nyour account. Solution identifiers are referenced by `solutions` on\nopportunities.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "eb6757d1-de77-4cae-b33f-b56568fb2061",
+          "name": "List co-sell solutions",
+          "request": {
+            "name": "List co-sell solutions",
+            "description": {
+              "content": "Returns the active co-sell solutions registered with AWS Partner Central for the\nauthenticated vendor.\n\nFor vendor accounts provisioned for use in a test environment, this endpoint\nreturns a fixed three-solution fixture; the `q`, `from`, `pageSize`, and\n`all` query parameters are **ignored** for these vendors and the response\nbody is the same fixture set regardless of what the client sends. Production\nvendor accounts receive vendor-specific results that honor every query\nparameter.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "solutions"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "q",
+                  "value": "<string>",
+                  "description": "A search query to filter the solutions."
+                },
+                {
+                  "disabled": false,
+                  "key": "from",
+                  "value": "<integer>",
+                  "description": "The starting index of the solutions to return."
+                },
+                {
+                  "disabled": false,
+                  "key": "pageSize",
+                  "value": "10",
+                  "description": "The number of solutions to return per page (minimum 1, maximum 100, default 10)."
+                },
+                {
+                  "disabled": false,
+                  "key": "all",
+                  "value": "<boolean>",
+                  "description": "Set to `true` to return solutions in any status, including inactive ones.\nDefaults to `false` (only active solutions are returned)."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "a2b71db3-03c6-4574-afd2-4e18b8b9c9cf",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "solutions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "Example"
+                    },
+                    {
+                      "key": "from",
+                      "value": "10"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "10"
+                    },
+                    {
+                      "key": "all",
+                      "value": "false"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"solutions\": [\n    {\n      \"id\": \"tackle-solution-2lFAiYiiVZZabcdefgh7dPNWXWm\",\n      \"cloudProviderId\": \"S-0050456\",\n      \"name\": \"Tackle AI\",\n      \"status\": \"Active\",\n      \"category\": \"Software Product\",\n      \"created\": \"2024-08-27T13:32:58Z\",\n      \"lastSynced\": \"2024-08-27T13:32:58Z\"\n    },\n    {\n      \"id\": \"tackle-solution-2lFAieUdS1PKs6abcdefghbCktS\",\n      \"cloudProviderId\": \"S-0050123\",\n      \"name\": \"Tackle Cloud Sync\",\n      \"status\": \"Active\",\n      \"category\": \"Software Product\",\n      \"created\": \"2024-08-27T13:32:58Z\",\n      \"lastSynced\": \"2024-08-27T13:32:58Z\"\n    }\n  ],\n  \"total\": 5,\n  \"currentPageCount\": 2,\n  \"isNextPage\": true,\n  \"nextIndex\": 2\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d6833906-5924-471a-a16b-58655377a489",
+              "name": "Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the\nauthenticated principal could not be resolved.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "solutions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "Example"
+                    },
+                    {
+                      "key": "from",
+                      "value": "10"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "10"
+                    },
+                    {
+                      "key": "all",
+                      "value": "false"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "39b1af1e-b884-49d5-95b4-b70f5f611031",
+              "name": "Internal Server Error. An unexpected error occurred while processing the request. Response\nbodies for 5xx errors may be empty.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "solutions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "Example"
+                    },
+                    {
+                      "key": "from",
+                      "value": "10"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "10"
+                    },
+                    {
+                      "key": "all",
+                      "value": "false"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://contracts.tackle.io",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "09840506-a087-49ea-8603-47e0abb0c43a",
+    "name": "Tackle Public Contracts Authentication Solutions API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n",
+      "type": "text/plain"
+    }
+  }
+}

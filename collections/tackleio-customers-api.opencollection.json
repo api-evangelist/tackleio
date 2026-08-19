@@ -1,0 +1,54 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tackle Public Contracts Authentication Customers API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Customers",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Lookup customer info to determine if they are a US federal customer.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://contracts.tackle.io/api/customerInfo",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Looks up the customer in Microsoft Partner Center by company\nname and reports whether Microsoft has tagged the account as a\nUS federal customer. Use this before creating a referral so\nyou can populate `dealSensitivity` correctly (`USFed` for US\nfederal customers, `None` otherwise). Returns an empty\n`customerInfo` array when no match is found."
+        },
+        {
+          "info": {
+            "name": "Lookup customer details in Partner Center.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://contracts.tackle.io/api/customerLookup",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Searches Microsoft Partner Center for matching customer\naccounts by company name plus country, returning managed,\nunmanaged, and Microsoft-account matches. Use this to populate\n`customerProfile.ids` and `customerProfile.address` on a\nsubsequent `createIPReferral` call. The full Partner Center\nlookup payload is accepted so callers can forward the same\nbody the Partner Center UI would, but only `companyName` and\n`address.country` materially affect matching; other fields\nare ignored."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

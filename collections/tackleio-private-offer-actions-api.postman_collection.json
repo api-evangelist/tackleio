@@ -1,0 +1,1722 @@
+{
+  "item": [
+    {
+      "id": "028414a2-94fe-4655-aef0-a78436caccaa",
+      "name": "Private Offer Actions",
+      "description": {
+        "content": "Private offer lifecycle actions such as archive, cancel, and sync.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "b4a36ab4-0118-439f-b52c-2f8877b4fdb0",
+          "name": "Archive an offer",
+          "request": {
+            "name": "Archive an offer",
+            "description": {
+              "content": "Marks an offer as archived and records an archive activity without\nchanging the offer state or status.\n\nRequired RBAC action: `offers:UpdateOffer`.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "private-offers",
+                ":id",
+                "archive"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) Tackle private offer ID."
+                }
+              ]
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "Optional caller-provided operation ID for request tracing.",
+                "key": "tackle-operation-id",
+                "value": "<string>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST"
+          },
+          "response": [
+            {
+              "id": "cfa7cf45-15e0-4f0e-aa0b-92b5bc95ee18",
+              "name": "Offer archived",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "archive"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"po_id\": \"string\",\n  \"accepted_at\": \"1971-04-09T22:01:28.848Z\",\n  \"accepted_source\": \"string\",\n  \"archived_at\": \"1977-11-12T06:46:25.128Z\",\n  \"created_at\": \"1948-08-17T18:04:28.619Z\",\n  \"cancelled_at\": \"2003-02-18T05:14:55.629Z\",\n  \"last_modified_at\": \"2011-06-30T05:34:51.708Z\",\n  \"last_update_source\": \"string\",\n  \"viewed_offer_at\": null,\n  \"sent_at\": null,\n  \"submitted_at\": null,\n  \"opened_instructions_at\": \"1954-05-29T07:46:14.508Z\",\n  \"subscribed_at\": null,\n  \"partner_marked_up_at\": null,\n  \"marketplace_acceptance_link\": \"http://eSPIkIkOBX.tzlrAi59kH0zWk3IHmc7Nz2EGUMjrX5DGo4Ug\",\n  \"salesforce\": {\n    \"created_at\": \"1988-01-31T06:39:18.988Z\",\n    \"custom_object_id\": \"string\",\n    \"opportunity_id\": \"string\"\n  },\n  \"vendor_id\": \"string\",\n  \"vendor_name\": \"string\",\n  \"product_contact_email\": \"AXz4iWwrmpMAWs@iiYyDnUJhvfJVdLKsawZGTQmNWwESQ.tsq\",\n  \"state\": \"deleted_in_cloud\",\n  \"status\": \"deleted\",\n  \"offer_type\": \"partner\",\n  \"marketplace_fee\": 9008.61257233978,\n  \"activities\": [\n    {\n      \"slug\": \"created-draft-offer\",\n      \"user_id\": \"string\",\n      \"created_at\": \"2019-03-13T22:35:24.258Z\",\n      \"metadata\": null,\n      \"user\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"email\": \"nyq01T2b7oHvwzS@UkS.yjc\",\n        \"principal_type\": \"string\"\n      }\n    },\n    {\n      \"slug\": \"created-draft-offer\",\n      \"user_id\": null,\n      \"created_at\": \"1969-02-22T09:31:05.395Z\",\n      \"metadata\": null,\n      \"user\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"email\": \"uLgBrSwBENU@dceUirLNddgnQtpZab.yveq\",\n        \"principal_type\": \"string\"\n      }\n    }\n  ],\n  \"archived\": true,\n  \"version\": \"string\",\n  \"product_id\": \"string\",\n  \"product_name\": \"string\",\n  \"source\": \"tackle\",\n  \"marketplace_created_at\": null,\n  \"clone\": {\n    \"source\": \"microsoft\",\n    \"originating_offer_id\": \"string\"\n  },\n  \"metadata\": {\n    \"key_0\": \"string\",\n    \"key_1\": \"string\"\n  },\n  \"product_type\": \"professional_services\",\n  \"errors\": [\n    {\n      \"source\": \"string\",\n      \"type\": \"string\",\n      \"message\": \"string\"\n    },\n    {\n      \"source\": \"string\",\n      \"type\": \"string\",\n      \"message\": \"string\"\n    }\n  ],\n  \"pre_registration_details\": {\n    \"company_website\": \"https://rqqVtOEbgsdgKaaZWgYdgbbXMfdzQWSnE.ezKEUFXvgHnlQ2S+J3SiaF\",\n    \"details\": {\n      \"key_0\": \"string\",\n      \"key_1\": \"string\"\n    }\n  },\n  \"ui_state\": \"submitted_in_cloud\",\n  \"partner\": {\n    \"partner_name\": \"string\",\n    \"partner_seller_id\": \"string\"\n  },\n  \"total_contract_value_gross_amount\": 6929.4244795691775,\n  \"total_contract_value_net_amount\": 6909.472218557333,\n  \"est_min_total_contract_value_gross_amount\": 5911.499505048753,\n  \"est_min_total_contract_value_net_amount\": 5010.633397514186,\n  \"est_max_total_contract_value_gross_amount\": 4767.137934228882,\n  \"est_max_total_contract_value_net_amount\": 9634.751910661542,\n  \"name\": null,\n  \"description\": null,\n  \"buyer_details\": {\n    \"company_name\": \"string\",\n    \"billing_account_id\": \"string\",\n    \"buyers\": [\n      {\n        \"full_name\": \"string\",\n        \"email_address\": \"BNvTAzZ8z@nMpZs.tibf\",\n        \"title\": \"string\"\n      },\n      {\n        \"full_name\": \"string\",\n        \"email_address\": \"z7AsB9wxc@zUGeBwFIVuJjYSHQdzwakkJBPupng.ddju\",\n        \"title\": \"string\"\n      }\n    ]\n  },\n  \"renewal\": false,\n  \"eula\": {\n    \"type\": \"standard\",\n    \"document_urns\": [\n      \"string\",\n      \"string\"\n    ],\n    \"merged_urn\": null,\n    \"presigned_url\": \"http://ZOGRfjGFtnYximASPkbWEeSipvBDTC.wumsjMScceG18XA7w0sQ8SffVPaqOe5y50uRJ9Hb5b\"\n  },\n  \"product_ref\": \"string\",\n  \"users_to_notify\": [\n    {\n      \"contact_type\": \"string\",\n      \"value\": null,\n      \"first_name\": \"string\",\n      \"last_name\": \"string\",\n      \"email\": \"nw7FkX1@azEsLEyMNnJwMkNMbIcTWyWl.sg\"\n    },\n    {\n      \"contact_type\": \"string\",\n      \"value\": null,\n      \"first_name\": \"string\",\n      \"last_name\": \"string\",\n      \"email\": \"zaA-t@QvFOkJUmzqFKLXxNlvNYe.sqy\"\n    }\n  ],\n  \"pricing\": {\n    \"plan_ref\": \"string\",\n    \"plan_name\": \"string\",\n    \"description\": \"string\",\n    \"contract_duration\": {\n      \"type\": \"month\",\n      \"frequency\": 12\n    },\n    \"payment_model\": \"OneTime\",\n    \"payment_installments\": {\n      \"price_per_payment_in_usd\": 5077.729711160486\n    },\n    \"payment_schedule\": {\n      \"initial_charge\": {\n        \"price_per_payment_in_usd\": 4207.159189708397,\n        \"note\": \"string\"\n      },\n      \"payment_schedule\": [\n        {\n          \"charge_date\": \"2024-02-10\",\n          \"price_per_payment_in_usd\": null,\n          \"note\": \"string\"\n        },\n        {\n          \"charge_date\": null,\n          \"price_per_payment_in_usd\": null,\n          \"note\": \"string\"\n        }\n      ]\n    },\n    \"pricing_type\": \"per_user\",\n    \"user_limits\": {\n      \"min\": 4713,\n      \"max\": 6427\n    },\n    \"dimensions\": {\n      \"key_0\": {\n        \"enabled\": true,\n        \"id\": \"string\",\n        \"unit_of_measure\": \"string\",\n        \"price_per_unit_in_usd\": 5228.614609305547,\n        \"included_quantities\": [\n          {\n            \"dimension_term\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"unlimited_quantity\": false,\n            \"quantity\": 5544.627554731332\n          },\n          {\n            \"dimension_term\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"unlimited_quantity\": false,\n            \"quantity\": 7425.845047325578\n          }\n        ]\n      },\n      \"key_1\": {\n        \"enabled\": false,\n        \"id\": \"string\",\n        \"unit_of_measure\": \"string\",\n        \"price_per_unit_in_usd\": 9422.838056924586,\n        \"included_quantities\": [\n          {\n            \"dimension_term\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"unlimited_quantity\": false,\n            \"quantity\": 5062.474002222471\n          },\n          {\n            \"dimension_term\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"unlimited_quantity\": true,\n            \"quantity\": 7859.47117870168\n          }\n        ]\n      },\n      \"key_2\": {\n        \"enabled\": false,\n        \"id\": \"string\",\n        \"unit_of_measure\": \"string\",\n        \"price_per_unit_in_usd\": 563.6288702131064,\n        \"included_quantities\": [\n          {\n            \"dimension_term\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"unlimited_quantity\": true,\n            \"quantity\": 5602.711018291982\n          },\n          {\n            \"dimension_term\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"unlimited_quantity\": true,\n            \"quantity\": 9379.350394468394\n          }\n        ]\n      }\n    }\n  },\n  \"preparer_email\": \"21J42L6NtsEN@mtjEdlSKXKgfEBhfmeKNPTaCMMFdIa.lvn\",\n  \"start_on\": \"custom\",\n  \"start_date\": \"1957-07-20\",\n  \"end_date\": \"1953-09-06\",\n  \"accept_by_date\": \"2014-03-23\",\n  \"offer_ref\": null,\n  \"plan_template\": {\n    \"ref\": \"string\",\n    \"display\": \"string\"\n  },\n  \"plan_ref\": null,\n  \"subscription_ref\": \"string\",\n  \"notes\": null,\n  \"offer_state\": {\n    \"draft\": {\n      \"raw_message\": \"string\"\n    },\n    \"submitted\": {\n      \"raw_message\": \"string\"\n    },\n    \"accepted\": {\n      \"raw_message\": \"string\"\n    },\n    \"current_cloud\": {\n      \"raw_message\": \"string\"\n    },\n    \"last_modified\": \"1969-04-30T21:59:21.794Z\"\n  },\n  \"msft_response\": {\n    \"job_id\": \"string\",\n    \"offer_id\": \"string\",\n    \"resource_uri\": null,\n    \"raw_response\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "49442cd5-ec71-4c67-ae6a-221eb7ea2f74",
+              "name": "Invalid request or unsupported operation.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "archive"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"missing id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bb96df59-71a4-47e1-b7f5-7e84023fab62",
+              "name": "Authentication failed.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "archive"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "34d193ca-428b-43d8-b499-ae8b2dd41cea",
+              "name": "Caller is not allowed to perform this action.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "archive"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"forbidden\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5779a368-ef78-42a2-a0a8-59e8eb344c27",
+              "name": "Requested offer or resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "archive"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"not found\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "385e1f6e-bfc2-4285-8f4d-87a4a8884543",
+              "name": "Internal server error or upstream dependency failure.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "archive"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"missing id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "75007af4-8d45-4ce8-bbc7-e5b78a8b80d0",
+          "name": "Unarchive an offer",
+          "request": {
+            "name": "Unarchive an offer",
+            "description": {
+              "content": "Clears an offer's archived flag and records an unarchive activity without\nchanging the offer state or status.\n\nRequired RBAC action: `offers:UpdateOffer`.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "private-offers",
+                ":id",
+                "unarchive"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) Tackle private offer ID."
+                }
+              ]
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "Optional caller-provided operation ID for request tracing.",
+                "key": "tackle-operation-id",
+                "value": "<string>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST"
+          },
+          "response": [
+            {
+              "id": "6a24df6b-9a61-4362-95bc-af14600cbb78",
+              "name": "Offer unarchived",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "unarchive"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"po_id\": \"string\",\n  \"accepted_at\": null,\n  \"accepted_source\": null,\n  \"archived_at\": null,\n  \"created_at\": \"2000-09-03T13:53:40.723Z\",\n  \"cancelled_at\": null,\n  \"last_modified_at\": \"2025-01-10T18:23:29.924Z\",\n  \"last_update_source\": null,\n  \"viewed_offer_at\": \"2002-05-16T07:46:12.894Z\",\n  \"sent_at\": null,\n  \"submitted_at\": null,\n  \"opened_instructions_at\": \"1953-03-17T17:08:27.788Z\",\n  \"subscribed_at\": \"1946-09-07T10:48:43.496Z\",\n  \"partner_marked_up_at\": \"1990-10-28T05:31:17.005Z\",\n  \"marketplace_acceptance_link\": null,\n  \"salesforce\": {\n    \"created_at\": null,\n    \"custom_object_id\": \"string\",\n    \"opportunity_id\": \"string\"\n  },\n  \"vendor_id\": \"string\",\n  \"vendor_name\": \"string\",\n  \"product_contact_email\": \"Z8cDu6ZQr@mLxBbEQwhzItbSVZQhzWbXxwOlaCLy.qu\",\n  \"state\": \"accepted\",\n  \"status\": \"subscribed\",\n  \"offer_type\": \"partner\",\n  \"marketplace_fee\": 3150.847685530268,\n  \"activities\": [\n    {\n      \"slug\": \"created-draft-offer\",\n      \"user_id\": null,\n      \"created_at\": \"2021-07-02T18:13:24.079Z\",\n      \"metadata\": null,\n      \"user\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"email\": \"eqv@rleLvDSwUTmCDWdJZsEDSSGT.lo\",\n        \"principal_type\": \"string\"\n      }\n    },\n    {\n      \"slug\": \"created-draft-offer\",\n      \"user_id\": null,\n      \"created_at\": \"1996-01-24T00:20:37.297Z\",\n      \"metadata\": {\n        \"key_0\": 7677.425177014655,\n        \"key_1\": \"string\"\n      },\n      \"user\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"email\": \"ekiJsaCQLlu@razQBePi.psdu\",\n        \"principal_type\": \"string\"\n      }\n    }\n  ],\n  \"archived\": false,\n  \"version\": \"string\",\n  \"product_id\": \"string\",\n  \"product_name\": \"string\",\n  \"source\": \"tackle\",\n  \"marketplace_created_at\": null,\n  \"clone\": {\n    \"source\": \"tackle\",\n    \"originating_offer_id\": \"string\"\n  },\n  \"metadata\": {\n    \"key_0\": \"string\",\n    \"key_1\": \"string\"\n  },\n  \"product_type\": \"professional_services\",\n  \"errors\": [\n    {\n      \"source\": \"string\",\n      \"type\": \"string\",\n      \"message\": \"string\"\n    },\n    {\n      \"source\": \"string\",\n      \"type\": \"string\",\n      \"message\": \"string\"\n    }\n  ],\n  \"pre_registration_details\": {\n    \"company_website\": null,\n    \"details\": {\n      \"key_0\": \"string\"\n    }\n  },\n  \"ui_state\": \"attention_needed\",\n  \"partner\": {\n    \"partner_name\": null,\n    \"partner_seller_id\": \"string\"\n  },\n  \"total_contract_value_gross_amount\": 8346.89191409404,\n  \"total_contract_value_net_amount\": 6145.10977398483,\n  \"est_min_total_contract_value_gross_amount\": 6698.687754645264,\n  \"est_min_total_contract_value_net_amount\": 7525.246414443864,\n  \"est_max_total_contract_value_gross_amount\": 7145.571065940017,\n  \"est_max_total_contract_value_net_amount\": 2607.87560373585,\n  \"name\": null,\n  \"description\": \"string\",\n  \"buyer_details\": {\n    \"company_name\": \"string\",\n    \"billing_account_id\": \"string\",\n    \"buyers\": [\n      {\n        \"full_name\": \"string\",\n        \"email_address\": \"W3TtU1qAvUI64eD@tfA.opmi\",\n        \"title\": \"string\"\n      },\n      {\n        \"full_name\": \"string\",\n        \"email_address\": \"qFchZ@SVzxMH.xcrm\",\n        \"title\": \"string\"\n      }\n    ]\n  },\n  \"renewal\": true,\n  \"eula\": {\n    \"type\": \"standard\",\n    \"document_urns\": [\n      \"string\",\n      \"string\"\n    ],\n    \"merged_urn\": null,\n    \"presigned_url\": \"http://BOKVSzdbaqIhqUCDakMtHYxacIn.zqRK81kKG\"\n  },\n  \"product_ref\": \"string\",\n  \"users_to_notify\": [\n    {\n      \"contact_type\": \"string\",\n      \"value\": null,\n      \"first_name\": \"string\",\n      \"last_name\": \"string\",\n      \"email\": \"UOaQHJiO19mjs@xQhPSYRpDXPJAEMWV.wmr\"\n    },\n    {\n      \"contact_type\": \"string\",\n      \"value\": \"string\",\n      \"first_name\": \"string\",\n      \"last_name\": \"string\",\n      \"email\": \"NGhHs2rM3XVfsc@vdlDRKGhkyTbTHA.futu\"\n    }\n  ],\n  \"pricing\": {\n    \"plan_ref\": \"string\",\n    \"plan_name\": \"string\",\n    \"description\": \"string\",\n    \"contract_duration\": {\n      \"type\": \"month\",\n      \"frequency\": 12\n    },\n    \"payment_model\": \"PerYear\",\n    \"payment_installments\": {\n      \"price_per_payment_in_usd\": 699.1962374286487\n    },\n    \"payment_schedule\": {\n      \"initial_charge\": {\n        \"price_per_payment_in_usd\": 1156.7188292789954,\n        \"note\": null\n      },\n      \"payment_schedule\": [\n        {\n          \"charge_date\": \"2012-02-17\",\n          \"price_per_payment_in_usd\": null,\n          \"note\": \"string\"\n        },\n        {\n          \"charge_date\": null,\n          \"price_per_payment_in_usd\": null,\n          \"note\": \"string\"\n        }\n      ]\n    },\n    \"pricing_type\": \"flat_rate\",\n    \"user_limits\": {\n      \"min\": 2159,\n      \"max\": 3670\n    },\n    \"dimensions\": {\n      \"key_0\": {\n        \"enabled\": true,\n        \"id\": \"string\",\n        \"unit_of_measure\": \"string\",\n        \"price_per_unit_in_usd\": 3227.9967204270874,\n        \"included_quantities\": [\n          {\n            \"dimension_term\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"unlimited_quantity\": false,\n            \"quantity\": 6143.579084783587\n          },\n          {\n            \"dimension_term\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"unlimited_quantity\": false,\n            \"quantity\": 2114.6911454983874\n          }\n        ]\n      }\n    }\n  },\n  \"preparer_email\": \"bupNb@YgEOuyWTRuLAIJUzU.lej\",\n  \"start_on\": \"acceptance\",\n  \"start_date\": \"1980-11-01\",\n  \"end_date\": \"1962-08-24\",\n  \"accept_by_date\": \"1961-11-06\",\n  \"offer_ref\": null,\n  \"plan_template\": {\n    \"ref\": \"string\",\n    \"display\": \"string\"\n  },\n  \"plan_ref\": null,\n  \"subscription_ref\": \"string\",\n  \"notes\": null,\n  \"offer_state\": {\n    \"draft\": {\n      \"raw_message\": \"string\"\n    },\n    \"submitted\": {\n      \"raw_message\": \"string\"\n    },\n    \"accepted\": {\n      \"raw_message\": \"string\"\n    },\n    \"current_cloud\": {\n      \"raw_message\": \"string\"\n    },\n    \"last_modified\": \"1991-05-31T22:35:08.915Z\"\n  },\n  \"msft_response\": {\n    \"job_id\": \"string\",\n    \"offer_id\": \"string\",\n    \"resource_uri\": \"string\",\n    \"raw_response\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3e33c4a8-d364-4891-94c0-a606c6b4079b",
+              "name": "Invalid request or unsupported operation.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "unarchive"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"missing id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "6ecbc1af-d6e8-49f8-a7d8-2c92d021be5d",
+              "name": "Authentication failed.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "unarchive"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ac9e8248-04ed-447c-b4b2-47ef1396d0f4",
+              "name": "Caller is not allowed to perform this action.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "unarchive"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"forbidden\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "052d326c-e0eb-44a1-8a32-3bdb97f13c61",
+              "name": "Requested offer or resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "unarchive"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"not found\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f100fadf-c2f8-40d9-afd6-4e6181a5be35",
+              "name": "Internal server error or upstream dependency failure.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "unarchive"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"missing id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "8de75c05-7dc0-44ec-a65d-229c0f3c5f92",
+          "name": "Cancel an offer",
+          "request": {
+            "name": "Cancel an offer",
+            "description": {
+              "content": "Cancels an offer. Accepted offers cannot be canceled. Offers that have\nalready been created in Microsoft are moved to pending cancellation,\nwhile offers that have not reached Microsoft are marked canceled.\n\nRequired RBAC action: `offers:UpdateOffer`.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "private-offers",
+                ":id",
+                "cancel"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) Tackle private offer ID."
+                }
+              ]
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "Optional caller-provided operation ID for request tracing.",
+                "key": "tackle-operation-id",
+                "value": "<string>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST"
+          },
+          "response": [
+            {
+              "id": "f3e63f69-e13f-42ee-9994-3383e5b29e09",
+              "name": "Offer canceled or cancellation requested",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "cancel"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"po_id\": \"string\",\n  \"accepted_at\": null,\n  \"accepted_source\": null,\n  \"archived_at\": null,\n  \"created_at\": \"2000-09-03T13:53:40.723Z\",\n  \"cancelled_at\": null,\n  \"last_modified_at\": \"2025-01-10T18:23:29.924Z\",\n  \"last_update_source\": null,\n  \"viewed_offer_at\": \"2002-05-16T07:46:12.894Z\",\n  \"sent_at\": null,\n  \"submitted_at\": null,\n  \"opened_instructions_at\": \"1953-03-17T17:08:27.788Z\",\n  \"subscribed_at\": \"1946-09-07T10:48:43.496Z\",\n  \"partner_marked_up_at\": \"1990-10-28T05:31:17.005Z\",\n  \"marketplace_acceptance_link\": null,\n  \"salesforce\": {\n    \"created_at\": null,\n    \"custom_object_id\": \"string\",\n    \"opportunity_id\": \"string\"\n  },\n  \"vendor_id\": \"string\",\n  \"vendor_name\": \"string\",\n  \"product_contact_email\": \"Z8cDu6ZQr@mLxBbEQwhzItbSVZQhzWbXxwOlaCLy.qu\",\n  \"state\": \"accepted\",\n  \"status\": \"subscribed\",\n  \"offer_type\": \"partner\",\n  \"marketplace_fee\": 3150.847685530268,\n  \"activities\": [\n    {\n      \"slug\": \"created-draft-offer\",\n      \"user_id\": null,\n      \"created_at\": \"2021-07-02T18:13:24.079Z\",\n      \"metadata\": null,\n      \"user\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"email\": \"eqv@rleLvDSwUTmCDWdJZsEDSSGT.lo\",\n        \"principal_type\": \"string\"\n      }\n    },\n    {\n      \"slug\": \"created-draft-offer\",\n      \"user_id\": null,\n      \"created_at\": \"1996-01-24T00:20:37.297Z\",\n      \"metadata\": {\n        \"key_0\": 7677.425177014655,\n        \"key_1\": \"string\"\n      },\n      \"user\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"email\": \"ekiJsaCQLlu@razQBePi.psdu\",\n        \"principal_type\": \"string\"\n      }\n    }\n  ],\n  \"archived\": false,\n  \"version\": \"string\",\n  \"product_id\": \"string\",\n  \"product_name\": \"string\",\n  \"source\": \"tackle\",\n  \"marketplace_created_at\": null,\n  \"clone\": {\n    \"source\": \"tackle\",\n    \"originating_offer_id\": \"string\"\n  },\n  \"metadata\": {\n    \"key_0\": \"string\",\n    \"key_1\": \"string\"\n  },\n  \"product_type\": \"professional_services\",\n  \"errors\": [\n    {\n      \"source\": \"string\",\n      \"type\": \"string\",\n      \"message\": \"string\"\n    },\n    {\n      \"source\": \"string\",\n      \"type\": \"string\",\n      \"message\": \"string\"\n    }\n  ],\n  \"pre_registration_details\": {\n    \"company_website\": null,\n    \"details\": {\n      \"key_0\": \"string\"\n    }\n  },\n  \"ui_state\": \"attention_needed\",\n  \"partner\": {\n    \"partner_name\": null,\n    \"partner_seller_id\": \"string\"\n  },\n  \"total_contract_value_gross_amount\": 8346.89191409404,\n  \"total_contract_value_net_amount\": 6145.10977398483,\n  \"est_min_total_contract_value_gross_amount\": 6698.687754645264,\n  \"est_min_total_contract_value_net_amount\": 7525.246414443864,\n  \"est_max_total_contract_value_gross_amount\": 7145.571065940017,\n  \"est_max_total_contract_value_net_amount\": 2607.87560373585,\n  \"name\": null,\n  \"description\": \"string\",\n  \"buyer_details\": {\n    \"company_name\": \"string\",\n    \"billing_account_id\": \"string\",\n    \"buyers\": [\n      {\n        \"full_name\": \"string\",\n        \"email_address\": \"W3TtU1qAvUI64eD@tfA.opmi\",\n        \"title\": \"string\"\n      },\n      {\n        \"full_name\": \"string\",\n        \"email_address\": \"qFchZ@SVzxMH.xcrm\",\n        \"title\": \"string\"\n      }\n    ]\n  },\n  \"renewal\": true,\n  \"eula\": {\n    \"type\": \"standard\",\n    \"document_urns\": [\n      \"string\",\n      \"string\"\n    ],\n    \"merged_urn\": null,\n    \"presigned_url\": \"http://BOKVSzdbaqIhqUCDakMtHYxacIn.zqRK81kKG\"\n  },\n  \"product_ref\": \"string\",\n  \"users_to_notify\": [\n    {\n      \"contact_type\": \"string\",\n      \"value\": null,\n      \"first_name\": \"string\",\n      \"last_name\": \"string\",\n      \"email\": \"UOaQHJiO19mjs@xQhPSYRpDXPJAEMWV.wmr\"\n    },\n    {\n      \"contact_type\": \"string\",\n      \"value\": \"string\",\n      \"first_name\": \"string\",\n      \"last_name\": \"string\",\n      \"email\": \"NGhHs2rM3XVfsc@vdlDRKGhkyTbTHA.futu\"\n    }\n  ],\n  \"pricing\": {\n    \"plan_ref\": \"string\",\n    \"plan_name\": \"string\",\n    \"description\": \"string\",\n    \"contract_duration\": {\n      \"type\": \"month\",\n      \"frequency\": 12\n    },\n    \"payment_model\": \"PerYear\",\n    \"payment_installments\": {\n      \"price_per_payment_in_usd\": 699.1962374286487\n    },\n    \"payment_schedule\": {\n      \"initial_charge\": {\n        \"price_per_payment_in_usd\": 1156.7188292789954,\n        \"note\": null\n      },\n      \"payment_schedule\": [\n        {\n          \"charge_date\": \"2012-02-17\",\n          \"price_per_payment_in_usd\": null,\n          \"note\": \"string\"\n        },\n        {\n          \"charge_date\": null,\n          \"price_per_payment_in_usd\": null,\n          \"note\": \"string\"\n        }\n      ]\n    },\n    \"pricing_type\": \"flat_rate\",\n    \"user_limits\": {\n      \"min\": 2159,\n      \"max\": 3670\n    },\n    \"dimensions\": {\n      \"key_0\": {\n        \"enabled\": true,\n        \"id\": \"string\",\n        \"unit_of_measure\": \"string\",\n        \"price_per_unit_in_usd\": 3227.9967204270874,\n        \"included_quantities\": [\n          {\n            \"dimension_term\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"unlimited_quantity\": false,\n            \"quantity\": 6143.579084783587\n          },\n          {\n            \"dimension_term\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"unlimited_quantity\": false,\n            \"quantity\": 2114.6911454983874\n          }\n        ]\n      }\n    }\n  },\n  \"preparer_email\": \"bupNb@YgEOuyWTRuLAIJUzU.lej\",\n  \"start_on\": \"acceptance\",\n  \"start_date\": \"1980-11-01\",\n  \"end_date\": \"1962-08-24\",\n  \"accept_by_date\": \"1961-11-06\",\n  \"offer_ref\": null,\n  \"plan_template\": {\n    \"ref\": \"string\",\n    \"display\": \"string\"\n  },\n  \"plan_ref\": null,\n  \"subscription_ref\": \"string\",\n  \"notes\": null,\n  \"offer_state\": {\n    \"draft\": {\n      \"raw_message\": \"string\"\n    },\n    \"submitted\": {\n      \"raw_message\": \"string\"\n    },\n    \"accepted\": {\n      \"raw_message\": \"string\"\n    },\n    \"current_cloud\": {\n      \"raw_message\": \"string\"\n    },\n    \"last_modified\": \"1991-05-31T22:35:08.915Z\"\n  },\n  \"msft_response\": {\n    \"job_id\": \"string\",\n    \"offer_id\": \"string\",\n    \"resource_uri\": \"string\",\n    \"raw_response\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "6859f435-4c54-42c5-a1f1-4dfbbda3749e",
+              "name": "Invalid request or unsupported operation.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "cancel"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"missing id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ba795079-6163-4aba-b1f2-0d11b25e4fe3",
+              "name": "Authentication failed.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "cancel"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "fd6ed793-dead-4145-84a0-e7f312909e6c",
+              "name": "Caller is not allowed to perform this action.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "cancel"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"forbidden\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "312d7bee-cdb8-4348-b507-2305ca73015e",
+              "name": "Requested offer or resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "cancel"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"not found\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3835f4a1-ef79-4ec4-a0e8-62dbd676f9a4",
+              "name": "Internal server error or upstream dependency failure.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "cancel"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"missing id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "a1bcc7b5-bb15-4275-a63d-9b4ef42e0208",
+          "name": "Sync an offer from Microsoft",
+          "request": {
+            "name": "Sync an offer from Microsoft",
+            "description": {
+              "content": "Synchronizes the stored Tackle offer from Microsoft. The offer must\nalready be associated to a Microsoft offer reference.\n\nRequired RBAC action: `offers:GetOffer`.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "private-offers",
+                ":id",
+                "sync"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "update_docs",
+                  "value": "false",
+                  "description": "Whether the manual sync should refresh associated documents."
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) Tackle private offer ID."
+                }
+              ]
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "Optional caller-provided operation ID for request tracing.",
+                "key": "tackle-operation-id",
+                "value": "<string>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST"
+          },
+          "response": [
+            {
+              "id": "f6d981df-243a-4366-8b9a-62278070a6e1",
+              "name": "Offer synchronized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "sync"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "update_docs",
+                      "value": "true"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"po_id\": \"string\",\n  \"accepted_at\": null,\n  \"accepted_source\": null,\n  \"archived_at\": null,\n  \"created_at\": \"2000-09-03T13:53:40.723Z\",\n  \"cancelled_at\": null,\n  \"last_modified_at\": \"2025-01-10T18:23:29.924Z\",\n  \"last_update_source\": null,\n  \"viewed_offer_at\": \"2002-05-16T07:46:12.894Z\",\n  \"sent_at\": null,\n  \"submitted_at\": null,\n  \"opened_instructions_at\": \"1953-03-17T17:08:27.788Z\",\n  \"subscribed_at\": \"1946-09-07T10:48:43.496Z\",\n  \"partner_marked_up_at\": \"1990-10-28T05:31:17.005Z\",\n  \"marketplace_acceptance_link\": null,\n  \"salesforce\": {\n    \"created_at\": null,\n    \"custom_object_id\": \"string\",\n    \"opportunity_id\": \"string\"\n  },\n  \"vendor_id\": \"string\",\n  \"vendor_name\": \"string\",\n  \"product_contact_email\": \"Z8cDu6ZQr@mLxBbEQwhzItbSVZQhzWbXxwOlaCLy.qu\",\n  \"state\": \"accepted\",\n  \"status\": \"subscribed\",\n  \"offer_type\": \"partner\",\n  \"marketplace_fee\": 3150.847685530268,\n  \"activities\": [\n    {\n      \"slug\": \"created-draft-offer\",\n      \"user_id\": null,\n      \"created_at\": \"2021-07-02T18:13:24.079Z\",\n      \"metadata\": null,\n      \"user\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"email\": \"eqv@rleLvDSwUTmCDWdJZsEDSSGT.lo\",\n        \"principal_type\": \"string\"\n      }\n    },\n    {\n      \"slug\": \"created-draft-offer\",\n      \"user_id\": null,\n      \"created_at\": \"1996-01-24T00:20:37.297Z\",\n      \"metadata\": {\n        \"key_0\": 7677.425177014655,\n        \"key_1\": \"string\"\n      },\n      \"user\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"email\": \"ekiJsaCQLlu@razQBePi.psdu\",\n        \"principal_type\": \"string\"\n      }\n    }\n  ],\n  \"archived\": false,\n  \"version\": \"string\",\n  \"product_id\": \"string\",\n  \"product_name\": \"string\",\n  \"source\": \"tackle\",\n  \"marketplace_created_at\": null,\n  \"clone\": {\n    \"source\": \"tackle\",\n    \"originating_offer_id\": \"string\"\n  },\n  \"metadata\": {\n    \"key_0\": \"string\",\n    \"key_1\": \"string\"\n  },\n  \"product_type\": \"professional_services\",\n  \"errors\": [\n    {\n      \"source\": \"string\",\n      \"type\": \"string\",\n      \"message\": \"string\"\n    },\n    {\n      \"source\": \"string\",\n      \"type\": \"string\",\n      \"message\": \"string\"\n    }\n  ],\n  \"pre_registration_details\": {\n    \"company_website\": null,\n    \"details\": {\n      \"key_0\": \"string\"\n    }\n  },\n  \"ui_state\": \"attention_needed\",\n  \"partner\": {\n    \"partner_name\": null,\n    \"partner_seller_id\": \"string\"\n  },\n  \"total_contract_value_gross_amount\": 8346.89191409404,\n  \"total_contract_value_net_amount\": 6145.10977398483,\n  \"est_min_total_contract_value_gross_amount\": 6698.687754645264,\n  \"est_min_total_contract_value_net_amount\": 7525.246414443864,\n  \"est_max_total_contract_value_gross_amount\": 7145.571065940017,\n  \"est_max_total_contract_value_net_amount\": 2607.87560373585,\n  \"name\": null,\n  \"description\": \"string\",\n  \"buyer_details\": {\n    \"company_name\": \"string\",\n    \"billing_account_id\": \"string\",\n    \"buyers\": [\n      {\n        \"full_name\": \"string\",\n        \"email_address\": \"W3TtU1qAvUI64eD@tfA.opmi\",\n        \"title\": \"string\"\n      },\n      {\n        \"full_name\": \"string\",\n        \"email_address\": \"qFchZ@SVzxMH.xcrm\",\n        \"title\": \"string\"\n      }\n    ]\n  },\n  \"renewal\": true,\n  \"eula\": {\n    \"type\": \"standard\",\n    \"document_urns\": [\n      \"string\",\n      \"string\"\n    ],\n    \"merged_urn\": null,\n    \"presigned_url\": \"http://BOKVSzdbaqIhqUCDakMtHYxacIn.zqRK81kKG\"\n  },\n  \"product_ref\": \"string\",\n  \"users_to_notify\": [\n    {\n      \"contact_type\": \"string\",\n      \"value\": null,\n      \"first_name\": \"string\",\n      \"last_name\": \"string\",\n      \"email\": \"UOaQHJiO19mjs@xQhPSYRpDXPJAEMWV.wmr\"\n    },\n    {\n      \"contact_type\": \"string\",\n      \"value\": \"string\",\n      \"first_name\": \"string\",\n      \"last_name\": \"string\",\n      \"email\": \"NGhHs2rM3XVfsc@vdlDRKGhkyTbTHA.futu\"\n    }\n  ],\n  \"pricing\": {\n    \"plan_ref\": \"string\",\n    \"plan_name\": \"string\",\n    \"description\": \"string\",\n    \"contract_duration\": {\n      \"type\": \"month\",\n      \"frequency\": 12\n    },\n    \"payment_model\": \"PerYear\",\n    \"payment_installments\": {\n      \"price_per_payment_in_usd\": 699.1962374286487\n    },\n    \"payment_schedule\": {\n      \"initial_charge\": {\n        \"price_per_payment_in_usd\": 1156.7188292789954,\n        \"note\": null\n      },\n      \"payment_schedule\": [\n        {\n          \"charge_date\": \"2012-02-17\",\n          \"price_per_payment_in_usd\": null,\n          \"note\": \"string\"\n        },\n        {\n          \"charge_date\": null,\n          \"price_per_payment_in_usd\": null,\n          \"note\": \"string\"\n        }\n      ]\n    },\n    \"pricing_type\": \"flat_rate\",\n    \"user_limits\": {\n      \"min\": 2159,\n      \"max\": 3670\n    },\n    \"dimensions\": {\n      \"key_0\": {\n        \"enabled\": true,\n        \"id\": \"string\",\n        \"unit_of_measure\": \"string\",\n        \"price_per_unit_in_usd\": 3227.9967204270874,\n        \"included_quantities\": [\n          {\n            \"dimension_term\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"unlimited_quantity\": false,\n            \"quantity\": 6143.579084783587\n          },\n          {\n            \"dimension_term\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"unlimited_quantity\": false,\n            \"quantity\": 2114.6911454983874\n          }\n        ]\n      }\n    }\n  },\n  \"preparer_email\": \"bupNb@YgEOuyWTRuLAIJUzU.lej\",\n  \"start_on\": \"acceptance\",\n  \"start_date\": \"1980-11-01\",\n  \"end_date\": \"1962-08-24\",\n  \"accept_by_date\": \"1961-11-06\",\n  \"offer_ref\": null,\n  \"plan_template\": {\n    \"ref\": \"string\",\n    \"display\": \"string\"\n  },\n  \"plan_ref\": null,\n  \"subscription_ref\": \"string\",\n  \"notes\": null,\n  \"offer_state\": {\n    \"draft\": {\n      \"raw_message\": \"string\"\n    },\n    \"submitted\": {\n      \"raw_message\": \"string\"\n    },\n    \"accepted\": {\n      \"raw_message\": \"string\"\n    },\n    \"current_cloud\": {\n      \"raw_message\": \"string\"\n    },\n    \"last_modified\": \"1991-05-31T22:35:08.915Z\"\n  },\n  \"msft_response\": {\n    \"job_id\": \"string\",\n    \"offer_id\": \"string\",\n    \"resource_uri\": \"string\",\n    \"raw_response\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f404278b-a517-44f2-8ad7-2c8def200497",
+              "name": "Invalid request or unsupported operation.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "sync"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "update_docs",
+                      "value": "true"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"missing id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c3be759a-34f3-4d1c-8e6f-0894bead1a7f",
+              "name": "Authentication failed.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "sync"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "update_docs",
+                      "value": "true"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a578ff4c-3d30-44a1-a6e9-f94fcef6a68c",
+              "name": "Caller is not allowed to perform this action.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "sync"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "update_docs",
+                      "value": "true"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"forbidden\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "430dc1d1-0bcc-4d82-b94d-620ecb979de6",
+              "name": "Requested offer or resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "sync"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "update_docs",
+                      "value": "true"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"not found\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1da98848-591b-4f4e-9d60-79a3b9a7d173",
+              "name": "Internal server error or upstream dependency failure.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "private-offers",
+                    ":id",
+                    "sync"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "update_docs",
+                      "value": "true"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Tackle private offer ID."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional caller-provided operation ID for request tracing.",
+                    "key": "tackle-operation-id",
+                    "value": "018f01ec-3f2b-7a70-b81e-4fc3d6a69f42"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"missing id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://contracts.tackle.io",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "45c45fb8-5b11-47be-ba27-d270ed3dcfcb",
+    "name": "Tackle Public Contracts Authentication Private Offer Actions API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n",
+      "type": "text/plain"
+    }
+  }
+}

@@ -1,0 +1,258 @@
+{
+  "item": [
+    {
+      "id": "65164983-33ef-482d-821b-3e1586cf594a",
+      "name": "Settings",
+      "description": {
+        "content": "Vendor-level reference data, including the picklist endpoint\nthat supplies the acceptable values for opportunity fields.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "1b59799d-2193-4172-b872-4995a310f2ba",
+          "name": "Get picklist options for Opportunity fields",
+          "request": {
+            "name": "Get picklist options for Opportunity fields",
+            "description": {
+              "content": "Returns the acceptable values for enumerable `Opportunity`\nfields, plus reference lists for country, language, and\ncurrency codes. Use this endpoint to populate picklist UI\ncontrols so that the values an integrator surfaces stay in\nstep with the values the API accepts (which can be a subset\nof the corresponding schema enum — see the `PicklistOptions`\nschema for details).\n\nThe response is an object keyed by field path\n(for example `.customerInfo.customerDetails.address.regionCode`);\neach value is the array of acceptable\n`{ display, value }` options for that field.\n\nThe response also contains a `.dataMapper.stage` key. This key\nis a curated subset of the `Stage` enum used by Tackle's Data\nMapper feature when importing opportunity data from external\nsystems. It does not correspond to any field on the\n`Opportunity` payload, and most integrators using this API\ndirectly can ignore it.\n\nRequires the `cosell:GetPicklistOptions` permission.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "settings",
+                "picklist-options"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "5cc3041a-3492-4499-8370-9d309986d080",
+              "name": "Picklist options keyed by field path.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "settings",
+                    "picklist-options"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \".qualificationInfo.budget\": [\n    {\n      \"display\": \"Exact budget given\",\n      \"value\": \"EXACT_BUDGET_GIVEN\"\n    },\n    {\n      \"display\": \"Confirmed no budget\",\n      \"value\": \"CONFIRMED_NO_BUDGET\"\n    }\n  ],\n  \".customerInfo.customerDetails.address.regionCode\": [\n    {\n      \"display\": \"United States (US)\",\n      \"value\": \"US\"\n    }\n  ],\n  \".dataMapper.stage\": [\n    {\n      \"display\": \"Qualify\",\n      \"value\": \"QUALIFY\"\n    },\n    {\n      \"display\": \"Refine\",\n      \"value\": \"REFINE\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c93500eb-6fae-4ee3-92ee-7999cbcbeaf2",
+              "name": "Missing or invalid authentication.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "settings",
+                    "picklist-options"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "553cdc1e-6125-4e7f-be8f-6689a8f71512",
+              "name": "The caller is not authorized to perform this action.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "settings",
+                    "picklist-options"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "9b145973-3cf4-4cc7-954f-5981827a8df8",
+              "name": "An unexpected error occurred while processing the request.\nRetry idempotent reads after a short delay; for writes, check\nthe opportunity history (`GET /api/opportunities/{id}/events`)\nbefore retrying to confirm whether the prior request was\napplied.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "settings",
+                    "picklist-options"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://contracts.tackle.io",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "74fb6000-8767-4468-9e66-d369730519de",
+    "name": "Tackle Public Contracts Authentication Settings API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n",
+      "type": "text/plain"
+    }
+  }
+}
