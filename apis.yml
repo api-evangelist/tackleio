@@ -42,6 +42,19 @@ tags:
 - Private Offers
 - Metering
 - SCIM
+- Webhook
+- B2B SaaS
+tags_raw:
+- Company
+- Cloud
+- Cloud Marketplace
+- Co-Sell
+- AWS Marketplace
+- Azure Marketplace
+- Google Cloud Marketplace
+- Private Offers
+- Metering
+- SCIM
 - Webhooks
 - B2B SaaS
 apis:
@@ -107,6 +120,8 @@ apis:
   humanURL: https://developers.tackle.io/reference/v1-get-version
   baseURL: https://api.tackle.io
   tags:
+  - Currency
+  tags_raw:
   - Currencies
   properties:
   - type: OpenAPI
@@ -226,6 +241,8 @@ apis:
   humanURL: https://developers.tackle.io/reference/v1-get-version
   baseURL: https://api.tackle.io
   tags:
+  - Group
+  tags_raw:
   - Groups
   properties:
   - type: OpenAPI
@@ -373,6 +390,8 @@ apis:
   humanURL: https://developers.tackle.io/reference/v1-get-version
   baseURL: https://api.tackle.io
   tags:
+  - Notification
+  tags_raw:
   - Notifications
   properties:
   - type: OpenAPI
@@ -527,6 +546,8 @@ apis:
   humanURL: https://developers.tackle.io/reference/v1-get-version
   baseURL: https://api.tackle.io
   tags:
+  - Product
+  tags_raw:
   - Products
   properties:
   - type: OpenAPI
@@ -555,6 +576,8 @@ apis:
   humanURL: https://developers.tackle.io/reference/v1-get-version
   baseURL: https://api.tackle.io
   tags:
+  - Public
+  tags_raw:
   - public
   properties:
   - type: OpenAPI
@@ -761,6 +784,8 @@ apis:
   humanURL: https://developers.tackle.io/reference/v1-get-version
   baseURL: https://api.tackle.io
   tags:
+  - Subscription
+  tags_raw:
   - Subscriptions
   properties:
   - type: OpenAPI
@@ -789,6 +814,8 @@ apis:
   humanURL: https://developers.tackle.io/reference/v1-get-version
   baseURL: https://api.tackle.io
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI
@@ -845,6 +872,8 @@ apis:
   humanURL: https://developers.tackle.io/reference/v1-get-version
   baseURL: https://api.tackle.io
   tags:
+  - Webhook
+  tags_raw:
   - Webhooks
   properties:
   - type: OpenAPI
