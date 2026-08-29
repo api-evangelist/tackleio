@@ -8,6 +8,18 @@ description: 'Tackle.io is the Cloud Marketplace and Co-Sell platform that helps
   APIs for the AWS and Microsoft marketplaces, a public Contracts API, and a SCIM 2.0 user-provisioning
   API. Authentication is OAuth 2.0 client-credentials (machine-to-machine) issuing short-lived JWT bearer
   tokens gated by fine-grained RBAC permissions.'
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: unknown
   onboarding: self-serve
