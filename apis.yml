@@ -914,6 +914,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/tackleio-capability-edges.yml
+  name: Tackle.io Business Capability Map
 - type: Overlay
   url: overlays/tackleio-contracts-overlay.yaml
 - type: DeveloperPortal
