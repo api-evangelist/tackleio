@@ -582,36 +582,6 @@ apis:
     url: https://developers.tackle.io/reference/listcontracts
   - type: APIReference
     url: https://developers.tackle.io/reference/getusers
-- aid: tackleio:tackleio-public-api
-  name: Tackle.io public API
-  description: The public API from Tackle.io — 7 operation(s) for public.
-  humanURL: https://developers.tackle.io/reference/v1-get-version
-  baseURL: https://api.tackle.io
-  tags:
-  - Public
-  tags_raw:
-  - public
-  properties:
-  - type: OpenAPI
-    url: openapi/tackleio-public-api-openapi.yml
-  - type: APIReference
-    url: https://developers.tackle.io/reference/v1-get-version
-  - type: APIReference
-    url: https://developers.tackle.io/reference/scoredomains
-  - type: APIReference
-    url: https://developers.tackle.io/reference/listopportunities
-  - type: APIReference
-    url: https://developers.tackle.io/reference/listopportunities-1
-  - type: APIReference
-    url: https://developers.tackle.io/reference/createipreferral
-  - type: APIReference
-    url: https://developers.tackle.io/reference/listprivateoffers-1
-  - type: APIReference
-    url: https://developers.tackle.io/reference/listprivateoffers
-  - type: APIReference
-    url: https://developers.tackle.io/reference/listcontracts
-  - type: APIReference
-    url: https://developers.tackle.io/reference/getusers
 - aid: tackleio:tackleio-referrals-api
   name: Tackle.io Referrals API
   description: >-
