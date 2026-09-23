@@ -1,13 +1,17 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Tackle Public Contracts Authentication Currencies API
-  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
+  title: Offers MSFT Currencies API
+  description: 'The Offers MSFT API manages Microsoft private offers in Tackle. It includes externally consumable endpoints authenticated by Tackle user or machine-to-machine bearer tokens and authorized through Tackle RBAC.
+
+
+    Clients may include the optional `tackle-operation-id` header for request tracing. API Gateway rate limiting and throttling are configured per environment.'
   version: 1.0.0
+  license:
+    name: Proprietary
+    url: https://www.tackle.io/
 servers:
-- url: https://contracts.tackle.io
-  description: Production
-security:
-- tackleJwt: []
+- url: https://msft.offers.tackle.io
+  description: MSFT Offers Service
 tags:
 - name: Currencies
   description: Microsoft marketplace currency and conversion helpers.
@@ -22,9 +26,7 @@ paths:
         grouped by accepted currency.
 
 
-        Required RBAC action: `offers:CreateDraftOffer`.
-
-        '
+        Required RBAC action: `offers:CreateDraftOffer`.'
       operationId: getMarketCurrencies
       security:
       - bearerAuth: []
@@ -57,9 +59,7 @@ paths:
         request.
 
 
-        Required RBAC action: `offers:CreateDraftOffer`.
-
-        '
+        Required RBAC action: `offers:CreateDraftOffer`.'
       operationId: convertCurrencies
       security:
       - bearerAuth: []
@@ -88,32 +88,69 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
-    CurrencyConversionError:
+    CurrencyOption:
       type: object
       properties:
-        code:
-          type: string
-        message:
-          type: string
-    MarketCurrency:
-      type: object
-      properties:
-        country_name:
-          type: string
-        iso2:
-          type: string
-          description: ISO 3166-1 alpha-2 country code.
-          example: US
-        currency:
+        value:
           type: string
           description: ISO 4217 currency code.
           example: USD
-        notes:
+        display:
           type: string
-        source:
+          example: United States Dollar | USD ($)
+    CurrencyConversionPayload:
+      type: object
+      required:
+      - id
+      - base_currency
+      - target_currency
+      - amount
+      properties:
+        id:
           type: string
-        source_revision:
+          description: Caller-provided row ID echoed in the response.
+        base_currency:
           type: string
+          example: USD
+        target_currency:
+          type: string
+          example: EUR
+        amount:
+          type: number
+          format: double
+          example: 100
+    MarketCurrenciesResponse:
+      type: object
+      properties:
+        currency_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrencyOption'
+        currency_markets:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/MarketCurrency'
+      example:
+        currency_options:
+        - value: USD
+          display: United States Dollar | USD ($)
+        currency_markets:
+          USD:
+          - country_name: United States
+            iso2: US
+            currency: USD
+    CurrencyConversionResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrencyConversionResult'
+        success:
+          type: boolean
+          example: true
     CurrencyConversionResult:
       type: object
       properties:
@@ -142,25 +179,6 @@ components:
           oneOf:
           - $ref: '#/components/schemas/CurrencyConversionError'
           - type: 'null'
-    CurrencyOption:
-      type: object
-      properties:
-        value:
-          type: string
-          description: ISO 4217 currency code.
-          example: USD
-        display:
-          type: string
-          example: United States Dollar | USD ($)
-    ErrorResponse:
-      type: object
-      required:
-      - message
-      properties:
-        message:
-          type: string
-          description: Human-readable error message.
-          example: missing id
     CurrencyConversionRequest:
       type: object
       required:
@@ -176,66 +194,42 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/CurrencyConversionPayload'
-    MarketCurrenciesResponse:
-      type: object
-      properties:
-        currency_options:
-          type: array
-          items:
-            $ref: '#/components/schemas/CurrencyOption'
-        currency_markets:
-          type: object
-          additionalProperties:
-            type: array
-            items:
-              $ref: '#/components/schemas/MarketCurrency'
-      example:
-        currency_options:
-        - value: USD
-          display: United States Dollar | USD ($)
-        currency_markets:
-          USD:
-          - country_name: United States
-            iso2: US
-            currency: USD
-    CurrencyConversionPayload:
+    ErrorResponse:
       type: object
       required:
-      - id
-      - base_currency
-      - target_currency
-      - amount
+      - message
       properties:
-        id:
+        message:
           type: string
-          description: Caller-provided row ID echoed in the response.
-        base_currency:
-          type: string
-          example: USD
-        target_currency:
-          type: string
-          example: EUR
-        amount:
-          type: number
-          format: double
-          example: 100
-    CurrencyConversionResponse:
+          description: Human-readable error message.
+          example: missing id
+    CurrencyConversionError:
       type: object
       properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/CurrencyConversionResult'
-        success:
-          type: boolean
-          example: true
+        code:
+          type: string
+        message:
+          type: string
+    MarketCurrency:
+      type: object
+      properties:
+        country_name:
+          type: string
+        iso2:
+          type: string
+          description: ISO 3166-1 alpha-2 country code.
+          example: US
+        currency:
+          type: string
+          description: ISO 4217 currency code.
+          example: USD
+        notes:
+          type: string
+        source:
+          type: string
+        source_revision:
+          type: string
   responses:
-    InternalServerError:
-      description: Internal server error or upstream dependency failure.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
     ForbiddenError:
       description: Caller is not allowed to perform this action.
       content:
@@ -260,6 +254,12 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
           example:
             message: missing id
+    InternalServerError:
+      description: Internal server error or upstream dependency failure.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   parameters:
     TackleOperationId:
       name: tackle-operation-id
@@ -270,8 +270,8 @@ components:
         type: string
       example: 018f01ec-3f2b-7a70-b81e-4fc3d6a69f42
   securitySchemes:
-    tackleJwt:
+    bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Tackle-issued JWT (interactive user or MTM token).
+      description: Tackle bearer token checked by RBAC for the operation action.

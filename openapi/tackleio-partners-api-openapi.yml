@@ -1,13 +1,13 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Tackle Public Contracts Authentication Partners API
-  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
-  version: 1.0.0
+  title: Tackleio Partners API
+  version: '1.0'
+  description: 'Operations tagged Partners across 2 of this provider''s published API definitions: tackleio-cosell-msft-openapi.json, tackleio-offers-aws-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
-- url: https://contracts.tackle.io
-  description: Production
-security:
-- tackleJwt: []
+- url: https://msft.cosell.tackle.io
+  description: Microsoft Co-Sell production endpoint
+- url: https://aws.offers.tackle.io/api
+  description: AWS Offers Service
 tags:
 - name: Partners
   description: 'Look up partner organizations in Microsoft Partner Center.
@@ -19,7 +19,7 @@ paths:
   /api/partnerLookup:
     post:
       operationId: partnerLookup
-      summary: Lookup partner details in Partner Center.
+      summary: Lookup partner details in Partner Center
       description: 'Searches Microsoft Partner Center for partner organizations
 
         matching the supplied search text. Use the returned
@@ -68,6 +68,11 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://msft.cosell.tackle.io
+      description: Microsoft Co-Sell production endpoint
   /partners:
     get:
       summary: List AWS Marketplace Partners
@@ -78,9 +83,7 @@ paths:
         partner picker when creating a partner (resale) private offer.
 
 
-        **Required RBAC permission:** `offers:CreateDraftOffer`
-
-        '
+        **Required RBAC permission:** `offers:CreateDraftOffer`'
       operationId: listPartners
       tags:
       - Partners
@@ -99,8 +102,25 @@ paths:
           $ref: '#/components/responses/Unauthorized_2'
         '403':
           $ref: '#/components/responses/Forbidden_2'
+    servers:
+    - url: https://aws.offers.tackle.io/api
+      description: AWS Offers Service
 components:
   schemas:
+    Error:
+      type: object
+      description: 'Standard error envelope returned by this API. The `message` field is included
+
+        for most 4xx responses raised by request validation. For 401, 403, and 500
+
+        responses (and for `GET /api/referrals/{referral_id}` 404 responses) the body is
+
+        either `{}` or omitted entirely.'
+      properties:
+        message:
+          type: string
+          description: Human-readable description of the error condition.
+          example: Your request could not be processed.
     Partner:
       type: object
       properties:
@@ -172,34 +192,20 @@ components:
           type: string
           description: Error message (Partners endpoint).
           example: authorization failed
-    Error:
-      type: object
-      description: 'Standard error envelope returned by this API. The `message` field is included
-
-        for most 4xx responses raised by request validation. For 401, 403, and 500
-
-        responses (and for `GET /api/referrals/{referral_id}` 404 responses) the body is
-
-        either `{}` or omitted entirely.'
-      properties:
-        message:
-          type: string
-          description: Human-readable description of the error condition.
-          example: Your request could not be processed.
   responses:
-    InternalServerError:
-      description: 'An unexpected error occurred while processing the request. The response body is
+    Forbidden:
+      description: 'The authenticated principal does not have permission to perform this operation.
 
-        empty.'
-    Unauthorized:
-      description: 'The request did not include a valid Tackle MTM access token, so no principal
-
-        could be established. The response body is `{}` — the `message` field is omitted.'
+        The response body is `{}` — the `message` field is omitted.'
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
           example: {}
+    InternalServerError:
+      description: 'An unexpected error occurred while processing the request. The response body is
+
+        empty.'
     BadRequest:
       description: 'The request was malformed or could not be processed. Returned when the JSON body
 
@@ -212,10 +218,10 @@ components:
             $ref: '#/components/schemas/Error'
           example:
             message: Your request could not be processed.
-    Forbidden:
-      description: 'The authenticated principal does not have permission to perform this operation.
+    Unauthorized:
+      description: 'The request did not include a valid Tackle MTM access token, so no principal
 
-        The response body is `{}` — the `message` field is omitted.'
+        could be established. The response body is `{}` — the `message` field is omitted.'
       content:
         application/json:
           schema:
@@ -234,8 +240,24 @@ components:
           schema:
             $ref: '#/components/schemas/Error_2'
   securitySchemes:
-    tackleJwt:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: MTM JWT
+      description: 'Tackle machine-to-machine access token sent as `Authorization: Bearer <access_token>`.'
+    TackleJwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Tackle-issued JWT (interactive user or MTM token).
+      description: 'Tackle-issued JWT bearer token. Pass as
+
+        `Authorization: Bearer <jwt>`. The token must include a vendor ID
+
+        claim and the principal must hold the per-endpoint RBAC permission
+
+        listed in each operation''s description.
+
+        '
+x-refined-from:
+- tackleio-cosell-msft-openapi.json
+- tackleio-offers-aws-openapi.json

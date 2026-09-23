@@ -1,13 +1,17 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Tackle Public Contracts Authentication Invitations API
-  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
-  version: 1.0.0
+  title: Tackle Co-Sell for AWS Partner Central Invitations API
+  description: 'This API lets you create and manage co-sell opportunities and invitations
+
+    in AWS Partner Central — formerly known as the AWS Partner Network Customer
+
+    Engagement (ACE) program.'
+  version: '1.0'
 servers:
-- url: https://contracts.tackle.io
-  description: Production
+- url: https://aws.cosell.tackle.io
+  description: AWS Co-Sell Service
 security:
-- tackleJwt: []
+- bearerAuth: []
 tags:
 - name: Invitations
   description: 'Create (test-environment-only), read, update, and list co-sell
@@ -599,149 +603,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
-    InvitationReceiver:
-      type: object
-      properties:
-        alias:
-          type: string
-        awsAccountId:
-          type: string
-    ListInvitationEvents:
-      type: object
-      required:
-      - operation
-      - eventID
-      - timestamp
-      properties:
-        operation:
-          type: string
-          description: 'The operation recorded for this invitation history event. This is a free-form
-
-            string, intentionally not enumerated. Common values include
-
-            `acceptInvitation`, `rejectInvitation`, and synthetic system events such as
-
-            `internalUpdateEvent` and `cloudUpdateEvent`. History records may also include
-
-            CRM-sync and partner-system operations beyond this list; clients should treat
-
-            the value as an opaque string and surface unknown values verbatim rather than
-
-            rejecting them.'
-        eventID:
-          type: string
-          example: 2lsw6rdFuCz0d7cVNCubTYGSznY
-        timestamp:
-          type: string
-          example: '2024-09-10T15:25:19Z'
-        cloudRaw:
-          type: object
-          additionalProperties: true
-          description: 'Raw cloud-provider snapshot associated with this history event. Present
-
-            only when the recorded event captured a non-empty cloud-side snapshot;
-
-            omitted on events without one. For AWS, this corresponds to the serialized
-
-            engagement-invitation payload returned by AWS Partner Central at the time
-
-            the event was recorded; clients should treat the contents as opaque
-
-            diagnostic data, since the shape varies by cloud provider and operation.'
-        rawRequest:
-          type: object
-          properties:
-            operation:
-              type: string
-          additionalProperties: true
-        cloudResponses:
-          description: 'Per-request results from AWS Partner Central for the operations recorded
-
-            in this event. On success, each entry''s `response` object contains the
-
-            AWS payload and `success` is `true`. On failure, `response` is `null`,
-
-            `success` is `false`, and one of `errorType`, `errorResponse`, or
-
-            `errorResponses` is populated with the AWS error detail.'
-          type: array
-          items:
-            type: object
-            properties:
-              requestID:
-                type: string
-              success:
-                type: boolean
-              timestamp:
-                type: string
-              response:
-                type: object
-                additionalProperties: true
-              errorType:
-                type: string
-              errorResponse:
-                type: string
-              errorResponses:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    fieldName:
-                      type: string
-                    errorMessage:
-                      type: string
-        cloudRequests:
-          type: array
-          items:
-            type: object
-            properties:
-              operation:
-                type: string
-              requestID:
-                type: string
-              timestamp:
-                type: string
-              request:
-                type: object
-                additionalProperties: true
-        activityDetails:
-          type: object
-          description: 'Details about the principal that performed the operation. The full set of
-
-            principal fields (`id`, `type`, `email`, `givenName`, `familyName`,
-
-            `pictureUrl`) appears alongside `displayText`.'
-          properties:
-            displayText:
-              type: string
-              description: A human-readable summary of the action that produced this event.
-            id:
-              type: string
-              description: "Identifier for the principal that performed the action.\n\n- For events caused by a person, this is the Tackle user ID.\n- For events caused by an M2M client, this is the machine principal ID.\n- For system-generated events, this is one of the reserved identifiers\n  `tackle-internal-update` (Tackle-initiated background updates) or\n  `aws-update` (updates that originated from AWS Partner Central).\n\nTreat any unrecognized identifier as an opaque string."
-            type:
-              type: string
-              description: 'Principal type. Common values include `user` and `otkuser` for actions taken
-
-                by a person, `machine` for actions taken by an M2M client, and
-
-                `tackle-automation` for actions taken by Tackle on the integrator''s behalf
-
-                (for example, scheduled retries or background reconciliation). Additional
-
-                system-generated principal types may appear over time as new automated
-
-                sources are introduced; clients should treat any unrecognized value as an
-
-                opaque string and surface it verbatim rather than rejecting the event.'
-            email:
-              type: string
-              description: Email of the principal, when known.
-            givenName:
-              type: string
-            familyName:
-              type: string
-            pictureUrl:
-              type: string
     InvitationProject:
       type: object
       properties:
@@ -960,6 +821,149 @@ components:
                         type: string
                       phone:
                         type: string
+    InvitationReceiver:
+      type: object
+      properties:
+        alias:
+          type: string
+        awsAccountId:
+          type: string
+    ListInvitationEvents:
+      type: object
+      required:
+      - operation
+      - eventID
+      - timestamp
+      properties:
+        operation:
+          type: string
+          description: 'The operation recorded for this invitation history event. This is a free-form
+
+            string, intentionally not enumerated. Common values include
+
+            `acceptInvitation`, `rejectInvitation`, and synthetic system events such as
+
+            `internalUpdateEvent` and `cloudUpdateEvent`. History records may also include
+
+            CRM-sync and partner-system operations beyond this list; clients should treat
+
+            the value as an opaque string and surface unknown values verbatim rather than
+
+            rejecting them.'
+        eventID:
+          type: string
+          example: 2lsw6rdFuCz0d7cVNCubTYGSznY
+        timestamp:
+          type: string
+          example: '2024-09-10T15:25:19Z'
+        cloudRaw:
+          type: object
+          additionalProperties: true
+          description: 'Raw cloud-provider snapshot associated with this history event. Present
+
+            only when the recorded event captured a non-empty cloud-side snapshot;
+
+            omitted on events without one. For AWS, this corresponds to the serialized
+
+            engagement-invitation payload returned by AWS Partner Central at the time
+
+            the event was recorded; clients should treat the contents as opaque
+
+            diagnostic data, since the shape varies by cloud provider and operation.'
+        rawRequest:
+          type: object
+          properties:
+            operation:
+              type: string
+          additionalProperties: true
+        cloudResponses:
+          description: 'Per-request results from AWS Partner Central for the operations recorded
+
+            in this event. On success, each entry''s `response` object contains the
+
+            AWS payload and `success` is `true`. On failure, `response` is `null`,
+
+            `success` is `false`, and one of `errorType`, `errorResponse`, or
+
+            `errorResponses` is populated with the AWS error detail.'
+          type: array
+          items:
+            type: object
+            properties:
+              requestID:
+                type: string
+              success:
+                type: boolean
+              timestamp:
+                type: string
+              response:
+                type: object
+                additionalProperties: true
+              errorType:
+                type: string
+              errorResponse:
+                type: string
+              errorResponses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    fieldName:
+                      type: string
+                    errorMessage:
+                      type: string
+        cloudRequests:
+          type: array
+          items:
+            type: object
+            properties:
+              operation:
+                type: string
+              requestID:
+                type: string
+              timestamp:
+                type: string
+              request:
+                type: object
+                additionalProperties: true
+        activityDetails:
+          type: object
+          description: 'Details about the principal that performed the operation. The full set of
+
+            principal fields (`id`, `type`, `email`, `givenName`, `familyName`,
+
+            `pictureUrl`) appears alongside `displayText`.'
+          properties:
+            displayText:
+              type: string
+              description: A human-readable summary of the action that produced this event.
+            id:
+              type: string
+              description: "Identifier for the principal that performed the action.\n\n- For events caused by a person, this is the Tackle user ID.\n- For events caused by an M2M client, this is the machine principal ID.\n- For system-generated events, this is one of the reserved identifiers\n  `tackle-internal-update` (Tackle-initiated background updates) or\n  `aws-update` (updates that originated from AWS Partner Central).\n\nTreat any unrecognized identifier as an opaque string."
+            type:
+              type: string
+              description: 'Principal type. Common values include `user` and `otkuser` for actions taken
+
+                by a person, `machine` for actions taken by an M2M client, and
+
+                `tackle-automation` for actions taken by Tackle on the integrator''s behalf
+
+                (for example, scheduled retries or background reconciliation). Additional
+
+                system-generated principal types may appear over time as new automated
+
+                sources are introduced; clients should treat any unrecognized value as an
+
+                opaque string and surface it verbatim rather than rejecting the event.'
+            email:
+              type: string
+              description: Email of the principal, when known.
+            givenName:
+              type: string
+            familyName:
+              type: string
+            pictureUrl:
+              type: string
     ListInvitationsResponse:
       type: object
       properties:
@@ -980,27 +984,18 @@ components:
           description: The starting index to use for fetching the next page of invitations. Only present when `isNextPage` is `true`.
           type: integer
           example: 10
-    InvitationMetadata:
+    Error:
       type: object
-      properties:
-        id:
-          type: string
-          example: tackle-invitation-2jhD8b41CurTOqEsG2Soinub123
-        tackleOpportunityId:
-          type: string
-          example: tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3
-        crmId:
-          type: string
-          example: 006QL00000BahjLSKO
-        hasSalesforceErrors:
-          type: boolean
-          example: false
-        salesforceSyncError:
-          type: string
-          description: 'Most recent Salesforce sync error message, when the last sync attempt
+      description: 'Error envelope returned for typed error responses. Some 4xx and 5xx responses
 
-            failed. Absent on invitations where the last sync attempt succeeded.'
-          example: 'INVALID_FIELD_FOR_INSERT_UPDATE: TackleCoSell__c: bad field names on insert/update call'
+        (such as direct `Unauthorized` and `Internal Server Error` responses) may instead
+
+        return an empty body; consumers should be tolerant of that.'
+      properties:
+        message:
+          type: string
+          description: A short, human-readable description of the error.
+          example: Opportunity not found
     ListInvitationsResponseItem:
       type: object
       properties:
@@ -1121,31 +1116,28 @@ components:
           - EXPIRED
         metadata:
           $ref: '#/components/schemas/InvitationMetadata'
-    Error:
+    InvitationMetadata:
       type: object
-      description: 'Error envelope returned for typed error responses. Some 4xx and 5xx responses
-
-        (such as direct `Unauthorized` and `Internal Server Error` responses) may instead
-
-        return an empty body; consumers should be tolerant of that.'
       properties:
-        message:
+        id:
           type: string
-          description: A short, human-readable description of the error.
-          example: Opportunity not found
+          example: tackle-invitation-2jhD8b41CurTOqEsG2Soinub123
+        tackleOpportunityId:
+          type: string
+          example: tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3
+        crmId:
+          type: string
+          example: 006QL00000BahjLSKO
+        hasSalesforceErrors:
+          type: boolean
+          example: false
+        salesforceSyncError:
+          type: string
+          description: 'Most recent Salesforce sync error message, when the last sync attempt
+
+            failed. Absent on invitations where the last sync attempt succeeded.'
+          example: 'INVALID_FIELD_FOR_INSERT_UPDATE: TackleCoSell__c: bad field names on insert/update call'
   responses:
-    Locked:
-      description: 'Locked. The request was rejected because the vendor is currently in a mid-reset state
-
-        (for example, while the vendor''s AWS Partner Central connection is being re-established).
-
-        Retry the request once the vendor''s reset has completed.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Locked
     BadRequest:
       description: 'Bad Request. The request was malformed or failed validation (for example, an invalid
 
@@ -1158,14 +1150,18 @@ components:
             $ref: '#/components/schemas/Error'
           example:
             message: Invalid sortField
-    Unauthorized:
-      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
+    Locked:
+      description: 'Locked. The request was rejected because the vendor is currently in a mid-reset state
 
-        authenticated principal could not be resolved.'
-    InternalServerError:
-      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
+        (for example, while the vendor''s AWS Partner Central connection is being re-established).
 
-        bodies for 5xx errors may be empty.'
+        Retry the request once the vendor''s reset has completed.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Locked
     NotFound:
       description: Not Found. No resource exists at the requested path for the authenticated vendor.
       content:
@@ -1174,6 +1170,14 @@ components:
             $ref: '#/components/schemas/Error'
           example:
             message: Opportunity not found
+    InternalServerError:
+      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
+
+        bodies for 5xx errors may be empty.'
+    Unauthorized:
+      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
+
+        authenticated principal could not be resolved.'
   parameters:
     invitation_id:
       name: invitation_id
@@ -1190,8 +1194,11 @@ components:
         type: string
         example: tackle-invitation-2sKlF3xSRGx8M724Oy3fprAX51q
   securitySchemes:
-    tackleJwt:
+    bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT
-      description: Tackle-issued JWT (interactive user or MTM token).
+      bearerFormat: MTM JWT
+      description: 'Tackle machine-to-machine access token sent as `Authorization: Bearer <access_token>`.'
+externalDocs:
+  description: Tackle Developer Portal
+  url: https://developers.tackle.io

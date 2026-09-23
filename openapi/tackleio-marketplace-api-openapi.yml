@@ -1,13 +1,13 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Tackle Public Contracts Authentication Marketplace API
-  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
-  version: 1.0.0
+  title: Offers AWS Marketplace API
+  description: 'Customer-facing API for managing AWS Marketplace private offers on
+
+    `aws.offers.tackle.io`.'
+  version: 3.2.0
 servers:
-- url: https://contracts.tackle.io
-  description: Production
-security:
-- tackleJwt: []
+- url: https://aws.offers.tackle.io/api
+  description: AWS Offers Service
 tags:
 - name: Marketplace
   description: AWS Marketplace context endpoints used to assemble offers and amendments.
@@ -33,9 +33,7 @@ paths:
 
         listing is gated on the create permission because it is part of the
 
-        offer-creation flow).
-
-        '
+        offer-creation flow).'
       operationId: listAgreements
       tags:
       - Marketplace
@@ -85,7 +83,32 @@ paths:
   /products:
     get:
       summary: List Products
-      description: "Returns the AWS Marketplace product listings owned by the authenticated\nseller. Use this to populate a product picker before creating a private\noffer.\n\nEach product object includes two distinct identifiers:\n\n- `productid` -- the **Tackle** product identifier.\n- `encrypted_productid` -- the **AWS Marketplace Catalog API** product\n  identifier. This is the value to pass as the `productId` path\n  parameter on `GET /products/{productId}/pricing`. Passing\n  `productid` instead will result in a `404` because the pricing\n  endpoint is sourced from the AWS Catalog API and only understands\n  the encrypted form.\n\n**Required RBAC permission:** `offers:ListProducts`\n"
+      description: 'Returns the AWS Marketplace product listings owned by the authenticated
+
+        seller. Use this to populate a product picker before creating a private
+
+        offer.
+
+
+        Each product object includes two distinct identifiers:
+
+
+        - `productid` -- the **Tackle** product identifier.
+
+        - `encrypted_productid` -- the **AWS Marketplace Catalog API** product
+
+        identifier. This is the value to pass as the `productId` path
+
+        parameter on `GET /products/{productId}/pricing`. Passing
+
+        `productid` instead will result in a `404` because the pricing
+
+        endpoint is sourced from the AWS Catalog API and only understands
+
+        the encrypted form.
+
+
+        **Required RBAC permission:** `offers:ListProducts`'
       operationId: listProducts
       tags:
       - Marketplace
@@ -160,9 +183,7 @@ paths:
 
         create permission because pricing is fetched as part of the
 
-        offer-creation flow).
-
-        '
+        offer-creation flow).'
       operationId: getProductPricing
       tags:
       - Marketplace
@@ -193,9 +214,7 @@ paths:
 
         **Required RBAC permission:** `offers:CreateDraftOffer` (currency
 
-        selection is part of the offer-creation flow).
-
-        '
+        selection is part of the offer-creation flow).'
       operationId: listAllowedCurrencies
       tags:
       - Marketplace
@@ -221,6 +240,154 @@ paths:
           $ref: '#/components/responses/Forbidden'
 components:
   schemas:
+    Error:
+      type: object
+      description: 'Error response. Endpoints in the **Private Offers** and **Marketplace**
+
+        tags return the error in a `message` field. The **Partners** endpoint
+
+        returns the error in an `error` field. At least one of the two will
+
+        always be populated.
+
+        '
+      properties:
+        message:
+          type: string
+          description: Error message (Private Offers and Marketplace endpoints).
+          example: private offer not found
+        error:
+          type: string
+          description: Error message (Partners endpoint).
+          example: authorization failed
+    ProductPricing:
+      type: object
+      description: 'Pricing dimensions, billing term defaults, and payment model defaults
+
+        for an AWS Marketplace product. Use the response to pre-populate a
+
+        private-offer creation form. Field semantics match the `Pricing`
+
+        schema -- see that schema for full descriptions.
+
+        '
+      properties:
+        show_on_email:
+          type:
+          - boolean
+          - 'null'
+        duration:
+          type:
+          - string
+          - 'null'
+        marketplace_fee:
+          type:
+          - string
+          - 'null'
+        net_contract_value:
+          type:
+          - string
+          - 'null'
+        monthly_contract_value:
+          type:
+          - string
+          - 'null'
+        total_contract_value:
+          type:
+          - string
+          - 'null'
+        dimensions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PricingDimension'
+        usage_dimensions:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsageDimension'
+        units:
+          type: array
+          items:
+            $ref: '#/components/schemas/PricingUnit'
+        currency_code:
+          type:
+          - string
+          - 'null'
+          pattern: ^[A-Z]{3}$
+        version:
+          type:
+          - string
+          - 'null'
+          enum:
+          - simple-pricing-v1-aws
+        schedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduledPayment'
+        payment_model:
+          type:
+          - string
+          - 'null'
+          enum:
+          - payment_schedule
+          - per_product
+          - one_time
+          - per_month
+          - per_year
+          - saas_subscription
+        billing_term:
+          type:
+          - string
+          - 'null'
+          enum:
+          - future_dated
+          - custom
+          - 1-month
+          - 1-year
+          - 2-years
+          - 3-years
+        duration_value:
+          type:
+          - integer
+          - 'null'
+        duration_type:
+          type:
+          - string
+          - 'null'
+        service_start_at:
+          type:
+          - string
+          - 'null'
+          format: date
+        service_end_at:
+          type:
+          - string
+          - 'null'
+          format: date
+        allow_auto_renew:
+          type: boolean
+    UsageDimension:
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+          description: Human-friendly name of the usage dimension.
+        sku:
+          type:
+          - string
+          - 'null'
+          description: API identifier of the usage dimension in AWS Marketplace.
+        price:
+          type:
+          - string
+          - 'null'
+          description: Price per unit.
+        aws_discount_percentage:
+          type:
+          - string
+          - 'null'
+          description: Display-only discount percentage.
     AgreementList:
       type: object
       description: Paginated list of agreements.
@@ -232,11 +399,59 @@ components:
         limit:
           type: integer
         next_token:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Opaque cursor for the next page; absent on the last page.
       required:
       - entitlements
+    PricingDimension:
+      type: object
+      properties:
+        dimension_value:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+        name:
+          type:
+          - string
+          - 'null'
+          description: User-friendly name of the dimension. Defaults to `api_name` if omitted.
+        quantity:
+          type:
+          - string
+          - 'null'
+          description: 'Quantity of the dimension the buyer is purchasing. Only applicable
+
+            when `payment_model` is `payment_schedule`.
+
+            '
+        price:
+          type:
+          - string
+          - 'null'
+          description: 'Price per unit of the dimension. Only applicable when
+
+            `payment_model` is `per_product`.
+
+            '
+        api_name:
+          type:
+          - string
+          - 'null'
+          description: 'API identifier of the dimension in AWS Marketplace. If `name`
+
+            does not match an existing dimension, a new custom dimension is
+
+            added to the product listing (limit 100).
+
+            '
+        aws_discount_percentage:
+          type:
+          - string
+          - 'null'
+          description: Display-only discount percentage.
     Product:
       type: object
       description: 'An AWS Marketplace product owned by the calling seller. The fields
@@ -293,146 +508,31 @@ components:
       description: AMI-only pricing unit.
       properties:
         unit:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
         hourly_price:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
         duration_price:
-          type: string
-          nullable: true
-    PricingDimension:
+          type:
+          - string
+          - 'null'
+    ScheduledPayment:
       type: object
       properties:
-        dimension_value:
-          type: string
-          nullable: true
-          readOnly: true
-        name:
-          type: string
-          nullable: true
-          description: User-friendly name of the dimension. Defaults to `api_name` if omitted.
-        quantity:
-          type: string
-          nullable: true
-          description: 'Quantity of the dimension the buyer is purchasing. Only applicable
-
-            when `payment_model` is `payment_schedule`.
-
-            '
-        price:
-          type: string
-          nullable: true
-          description: 'Price per unit of the dimension. Only applicable when
-
-            `payment_model` is `per_product`.
-
-            '
-        api_name:
-          type: string
-          nullable: true
-          description: 'API identifier of the dimension in AWS Marketplace. If `name`
-
-            does not match an existing dimension, a new custom dimension is
-
-            added to the product listing (limit 100).
-
-            '
-        aws_discount_percentage:
-          type: string
-          nullable: true
-          description: Display-only discount percentage.
-    ProductPricing:
-      type: object
-      description: 'Pricing dimensions, billing term defaults, and payment model defaults
-
-        for an AWS Marketplace product. Use the response to pre-populate a
-
-        private-offer creation form. Field semantics match the `Pricing`
-
-        schema -- see that schema for full descriptions.
-
-        '
-      properties:
-        show_on_email:
-          type: boolean
-          nullable: true
-        duration:
-          type: string
-          nullable: true
-        marketplace_fee:
-          type: string
-          nullable: true
-        net_contract_value:
-          type: string
-          nullable: true
-        monthly_contract_value:
-          type: string
-          nullable: true
-        total_contract_value:
-          type: string
-          nullable: true
-        dimensions:
-          type: array
-          items:
-            $ref: '#/components/schemas/PricingDimension'
-        usage_dimensions:
-          type: array
-          items:
-            $ref: '#/components/schemas/UsageDimension'
-        units:
-          type: array
-          items:
-            $ref: '#/components/schemas/PricingUnit'
-        currency_code:
-          type: string
-          nullable: true
-          pattern: ^[A-Z]{3}$
-        version:
-          type: string
-          nullable: true
-          enum:
-          - simple-pricing-v1-aws
-        schedule:
-          type: array
-          items:
-            $ref: '#/components/schemas/ScheduledPayment'
-        payment_model:
-          type: string
-          nullable: true
-          enum:
-          - payment_schedule
-          - per_product
-          - one_time
-          - per_month
-          - per_year
-          - saas_subscription
-        billing_term:
-          type: string
-          nullable: true
-          enum:
-          - future_dated
-          - custom
-          - 1-month
-          - 1-year
-          - 2-years
-          - 3-years
-        duration_value:
-          type: integer
-          nullable: true
-        duration_type:
-          type: string
-          nullable: true
-        service_start_at:
-          type: string
+        invoice_date:
+          type:
+          - string
+          - 'null'
           format: date
-          nullable: true
-        service_end_at:
-          type: string
-          format: date
-          nullable: true
-        allow_auto_renew:
-          type: boolean
+          description: Date the buyer should be invoiced for this scheduled payment.
+        invoice_amount:
+          type:
+          - string
+          - 'null'
+          description: Amount the buyer should be invoiced.
     Agreement:
       type: object
       description: 'A marketplace agreement (entitlement) between a seller and a buyer for
@@ -472,9 +572,10 @@ components:
           type: string
           format: date-time
         end_date:
-          type: string
+          type:
+          - string
+          - 'null'
           format: date-time
-          nullable: true
           description: AWS pay-as-you-go agreements do not have an end date.
       required:
       - id
@@ -485,66 +586,9 @@ components:
       - offerid
       - buyer_billing_account_ref
       - start_date
-    ScheduledPayment:
-      type: object
-      properties:
-        invoice_date:
-          type: string
-          format: date
-          nullable: true
-          description: Date the buyer should be invoiced for this scheduled payment.
-        invoice_amount:
-          type: string
-          nullable: true
-          description: Amount the buyer should be invoiced.
-    Error:
-      type: object
-      description: 'Error response. Endpoints in the **Private Offers** and **Marketplace**
-
-        tags return the error in a `message` field. The **Partners** endpoint
-
-        returns the error in an `error` field. At least one of the two will
-
-        always be populated.
-
-        '
-      properties:
-        message:
-          type: string
-          description: Error message (Private Offers and Marketplace endpoints).
-          example: private offer not found
-        error:
-          type: string
-          description: Error message (Partners endpoint).
-          example: authorization failed
-    UsageDimension:
-      type: object
-      properties:
-        description:
-          type: string
-          nullable: true
-          description: Human-friendly name of the usage dimension.
-        sku:
-          type: string
-          nullable: true
-          description: API identifier of the usage dimension in AWS Marketplace.
-        price:
-          type: string
-          nullable: true
-          description: Price per unit.
-        aws_discount_percentage:
-          type: string
-          nullable: true
-          description: Display-only discount percentage.
   responses:
-    Unauthorized:
-      description: Missing or invalid Tackle JWT.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Request was malformed or failed validation.
+    Forbidden:
+      description: Caller is authenticated but not authorized for this resource.
       content:
         application/json:
           schema:
@@ -555,15 +599,32 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    Forbidden:
-      description: Caller is authenticated but not authorized for this resource.
+    BadRequest:
+      description: Request was malformed or failed validation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid Tackle JWT.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
   securitySchemes:
-    tackleJwt:
+    TackleJwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Tackle-issued JWT (interactive user or MTM token).
+      description: 'Tackle-issued JWT bearer token. Pass as
+
+        `Authorization: Bearer <jwt>`. The token must include a vendor ID
+
+        claim and the principal must hold the per-endpoint RBAC permission
+
+        listed in each operation''s description.
+
+        '
+externalDocs:
+  description: Tackle Developer Documentation
+  url: https://developers.tackle.io/

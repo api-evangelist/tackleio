@@ -1,13 +1,14 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Tackle Public Contracts Authentication Metering API
-  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
+  title: Tackle Metering API
+  description: Authenticated programmatic access to Tackle's webhooks, metering, and more.
   version: 1.0.0
+  contact:
+    name: Tackle Support
+    email: support@tackle.io
+    url: https://tackle.io
 servers:
-- url: https://contracts.tackle.io
-  description: Production
-security:
-- tackleJwt: []
+- url: https://api.tackle.io
 tags:
 - name: Metering
 paths:
@@ -264,290 +265,6 @@ paths:
       - BearerAuth: []
 components:
   schemas:
-    UsageRecordTest:
-      title: UsageRecordTest
-      enum:
-      - accepted
-      - rejected
-      - not-operable
-      type: string
-      default: null
-      description: Specifies if the Usage Record is a test. When NOT null, the record is a test and is not sent to the marketplace
-      nullable: true
-    AwsDimension:
-      type: object
-      description: Product Dimension
-      example:
-        name: metering-test-sku-from-vendor-123
-        quantity: 1
-      properties:
-        name:
-          type: string
-          example: metering-test-sku-from-vendor-123
-          minLength: 0
-        quantity:
-          type: integer
-          example: 1
-        usage_allocations:
-          type: array
-          items:
-            type: object
-            properties:
-              allocated_usage_quantity:
-                type: integer
-                example: 1
-              tags:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    key:
-                      type: string
-                      minLength: 0
-                      example: test_tag
-                    value:
-                      type: string
-                      minLength: 0
-                      example: '1'
-        dry_run:
-          type: boolean
-          description: When true, sends a test/dry run to aws to verify configuration
-          example: false
-      required:
-      - name
-      - quantity
-    AzureCustomerId:
-      type: string
-      description: Azure Subscription ID
-      example: 1b3gs3f4-2794-abcd-3fa3-063ga0s3t3re
-      minLength: 0
-    AwsProductId:
-      type: string
-      description: AWS Product Code
-      example: 1test1a2b3c4d5e6f7g8h9ijk
-      minLength: 0
-    UsageRecord:
-      title: UsageRecord
-      type: object
-      description: Metering Usage Record
-      properties:
-        id:
-          type: string
-          example: bd577c26-8a3e-42d2-8efc-4c0defaa758c
-        product_id:
-          $ref: '#/components/schemas/ProductId'
-        customer_id:
-          $ref: '#/components/schemas/CustomerId'
-        subscription_id:
-          $ref: '#/components/schemas/SubscriptionId'
-        cloud:
-          $ref: '#/components/schemas/Clouds'
-        dimension:
-          anyOf:
-          - $ref: '#/components/schemas/AwsDimension'
-          - $ref: '#/components/schemas/GcpDimension'
-        start_time:
-          $ref: '#/components/schemas/TimestampZeroUtcOffset'
-        end_time:
-          $ref: '#/components/schemas/TimestampZeroUtcOffsetOptional'
-        created_at:
-          $ref: '#/components/schemas/TimestampZeroUtcOffset'
-        updated_at:
-          $ref: '#/components/schemas/TimestampZeroUtcOffset'
-        deleted_at:
-          $ref: '#/components/schemas/TimestampZeroUtcOffsetOptional'
-        scheduled_at:
-          $ref: '#/components/schemas/TimestampZeroUtcOffsetOptional'
-        status:
-          $ref: '#/components/schemas/UsageRecordStatus'
-        reason:
-          $ref: '#/components/schemas/UsageRecordReason'
-        test:
-          $ref: '#/components/schemas/UsageRecordTest'
-    UsageRecordLink:
-      type: string
-      title: UsageRecordLink
-      description: Url for one or more metering usage records
-      format: uri
-    UsageRecordDelete:
-      title: UsageRecordDeleteResponse
-      type: object
-      description: Delete Usage Record Response
-      properties:
-        data:
-          $ref: '#/components/schemas/UsageRecord'
-    GcpUsageRecordRequestBySubscription:
-      title: By Subscription
-      type: object
-      properties:
-        cloud:
-          $ref: '#/components/schemas/GcpCloud'
-        subscription_id:
-          $ref: '#/components/schemas/SubscriptionId'
-        dimension:
-          $ref: '#/components/schemas/GcpDimension'
-        start_time:
-          $ref: '#/components/schemas/TimestampNotNull'
-        end_time:
-          $ref: '#/components/schemas/TimestampNotNull'
-        scheduled_at:
-          $ref: '#/components/schemas/Timestamp'
-        test:
-          $ref: '#/components/schemas/UsageRecordTest'
-      required:
-      - cloud
-      - subscription_id
-      - start_time
-      - end_time
-    NextPageToken:
-      title: NextPageToken
-      type: string
-      description: A page token to fetch the next page of results using the associated "page" query parameter
-    AzureProductId:
-      type: string
-      description: Azure Offer ID
-      example: tackle-azure-platform
-      minLength: 0
-    AwsMeteringSubscriptionId:
-      type: string
-      description: Agreement ID, License ID or License ARN
-      example: agmt-1234567890abcdefghijklmno
-      minLength: 0
-      nullable: true
-    RedHatProductId:
-      type: string
-      description: Red Hat Product Id
-      example: d7a149a199100ad8a9931f14ea95cd00
-      minLength: 0
-    GcpCustomerId:
-      type: string
-      description: GCP External Account ID
-      example: E-ABC2-D330-E2FG-H2Q2
-      minLength: 0
-    Error:
-      title: ErrorResponse
-      type: object
-      properties:
-        code:
-          type: string
-          description: Error code
-          minLength: 0
-        error:
-          type: string
-          description: Error response
-          minLength: 0
-        errors:
-          description: Error details
-          type: array
-          items: {}
-        error_type:
-          type: string
-          enum:
-          - service_exception
-          - client_exception
-      required:
-      - code
-      - error
-      - errors
-    AwsMeteringProductId:
-      type: string
-      description: AWS Product Code
-      example: 1test1a2b3c4d5e6f7g8h9ijk
-      minLength: 0
-    RedHatCustomerId:
-      type: string
-      description: Red Hat Customer Id
-      example: 615334398743ac63d55cc4db
-      minLength: 0
-    AzureDimension:
-      type: object
-      description: Product Dimension
-      example:
-        name: metering-test-sku-from-vendor-123
-        quantity: 1
-      properties:
-        name:
-          type: string
-          example: metering-test-sku-from-vendor-123
-          minLength: 0
-        quantity:
-          type: integer
-          example: 1
-      required:
-      - name
-      - quantity
-    UsageRecordMetadata:
-      title: UsageRecordMetadata
-      type: object
-      description: Usage Record Metadata
-      properties:
-        link:
-          $ref: '#/components/schemas/UsageRecordLink'
-    UsageRecordStatus:
-      type: string
-      description: Status of usage record
-      enum:
-      - idle
-      - in-progress
-      - accepted
-      - rejected
-    UsageRecordsMetadata:
-      title: UsageRecordsMetadata
-      type: object
-      description: Usage Record Metadata
-      properties:
-        link:
-          $ref: '#/components/schemas/UsageRecordLink'
-        nextPageToken:
-          $ref: '#/components/schemas/NextPageToken'
-    Uuid:
-      type: string
-      description: UUID
-      format: uuid
-      example: 8361e0bf-9d6a-466c-974a-36b73168527a
-    TimestampZeroUtcOffset:
-      type: string
-      description: ISO format timestamp with zero UTC offset
-      example: '2021-10-25T21:38:20.865Z'
-      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d*)?Z$
-      format: date-time
-    ProductId:
-      description: Cloud Marketplace issued ID for a product
-      example: abcd-1234-efgh-5678
-      anyOf:
-      - $ref: '#/components/schemas/AwsProductId'
-      - $ref: '#/components/schemas/GcpProductId'
-      - $ref: '#/components/schemas/AzureProductId'
-      - $ref: '#/components/schemas/RedHatProductId'
-    AwsCloud:
-      type: string
-      description: AWS Cloud
-      default: aws
-      enum:
-      - aws
-      example: aws
-    UsageRecordReason:
-      title: UsageRecordReason
-      type: string
-      description: Explanation of Status
-      enum:
-      - external-service-error
-      - external-too-many-requests
-      - external-access-denied
-      - invalid-usage-dimension
-      - customer-not-entitled
-      - duplicate-request
-      - invalid-product-code
-      - invalid-usage-allocation
-      - unrecognized-exception
-      - deleted
-    TimestampZeroUtcOffsetOptional:
-      type: string
-      description: Optional ISO format timestamp with zero UTC offset
-      example: '2021-10-25T21:38:20.865Z'
-      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d*)?Z$
-      format: date-time
-      nullable: true
     AzureCloud:
       type: string
       description: Azure Cloud
@@ -555,18 +272,22 @@ components:
       enum:
       - azure
       example: azure
+    UsageRecordListResponse:
+      title: UsageRecordListResponse
+      type: object
+      description: Get All Usage Records Response
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsageRecord'
+        metadata:
+          $ref: '#/components/schemas/UsageRecordsMetadata'
     AwsUsageRecordRequest:
       anyOf:
       - $ref: '#/components/schemas/AwsUsageRecordRequestByProductAndCustomer'
       - $ref: '#/components/schemas/AwsUsageRecordRequestBySubscription'
       title: Aws Usage Record Request
-    RedHatCloud:
-      type: string
-      description: Red Hat Cloud
-      default: redhat
-      enum:
-      - redhat
-      example: redhat
     Spec_prod_Error:
       title: ErrorResponse
       type: object
@@ -597,148 +318,22 @@ components:
       - $ref: '#/components/schemas/AzureUsageRecordRequestByProductAndCustomer'
       - $ref: '#/components/schemas/AzureUsageRecordRequestBySubscription'
       title: Azure Usage Record Request
-    AzureUsageRecordRequestBySubscription:
-      title: By Subscription
-      type: object
-      properties:
-        cloud:
-          $ref: '#/components/schemas/AzureCloud'
-        subscription_id:
-          $ref: '#/components/schemas/SubscriptionId'
-        dimension:
-          $ref: '#/components/schemas/AzureDimension'
-        start_time:
-          $ref: '#/components/schemas/TimestampNotNull'
-        scheduled_at:
-          $ref: '#/components/schemas/Timestamp'
-        test:
-          $ref: '#/components/schemas/UsageRecordTest'
-      required:
-      - cloud
-      - subscription_id
-      - dimension
-      - start_time
-    TimestampNotNull:
+    RedHatProductId:
       type: string
-      description: ISO format timestamp with UTC offset
-      example: '2019-07-15T15:00:00.000000+00:00'
-      format: date-time
-      nullable: false
-    AwsCustomerId:
-      type: string
-      description: AWS Account Reference ID
-      example: ij3sXMkN3or
+      description: Red Hat Product Id
+      example: d7a149a199100ad8a9931f14ea95cd00
       minLength: 0
-    UsageRecordResponse:
-      title: UsageRecordResponse
-      type: object
-      description: Usage Record Response
-      properties:
-        data:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/UsageRecord'
-        metadata:
-          $ref: '#/components/schemas/UsageRecordMetadata'
-    AwsMeteringCustomerId:
-      type: string
-      description: AWS Customer Reference ID or AWS Account Number
-      example: 123456789012
-      minLength: 0
-    UsageRecordListResponse:
-      title: UsageRecordListResponse
-      type: object
-      description: Get All Usage Records Response
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/UsageRecord'
-        metadata:
-          $ref: '#/components/schemas/UsageRecordsMetadata'
-    Clouds:
-      anyOf:
-      - $ref: '#/components/schemas/AwsCloud'
-      - $ref: '#/components/schemas/GcpCloud'
-      - $ref: '#/components/schemas/AzureCloud'
-      - $ref: '#/components/schemas/RedHatCloud'
-      description: A string identifying a cloud marketplace
-    SubscriptionId:
-      type: string
-      description: Subscription Id
-      example: 5fd2a7e8908e88888c7f0e71
-      minLength: 0
-      nullable: true
-    GcpUsageRecordRequest:
-      anyOf:
-      - $ref: '#/components/schemas/GcpUsageRecordRequestByProductAndCustomer'
-      - $ref: '#/components/schemas/GcpUsageRecordRequestBySubscription'
-      title: Gcp Usage Record Request
-    Timestamp:
-      type: string
-      description: ISO format timestamp with UTC offset
-      example: '2019-07-15T15:00:00.000000+00:00'
-      format: date-time
-      nullable: true
     CustomerId:
       anyOf:
       - $ref: '#/components/schemas/AwsCustomerId'
       - $ref: '#/components/schemas/GcpCustomerId'
       - $ref: '#/components/schemas/AzureCustomerId'
       - $ref: '#/components/schemas/RedHatCustomerId'
-    AwsUsageRecordRequestByProductAndCustomer:
-      title: By Product and Customer
-      type: object
-      properties:
-        cloud:
-          $ref: '#/components/schemas/AwsCloud'
-        product_id:
-          $ref: '#/components/schemas/AwsMeteringProductId'
-        customer_id:
-          $ref: '#/components/schemas/AwsMeteringCustomerId'
-        dimension:
-          $ref: '#/components/schemas/AwsDimension'
-        start_time:
-          $ref: '#/components/schemas/TimestampNotNull'
-        scheduled_at:
-          $ref: '#/components/schemas/Timestamp'
-        test:
-          $ref: '#/components/schemas/UsageRecordTest'
-      required:
-      - cloud
-      - product_id
-      - customer_id
-      - dimension
-      - start_time
-    GcpCloud:
+    AwsProductId:
       type: string
-      description: GCP Cloud
-      default: gcp
-      enum:
-      - gcp
-      example: gcp
-    AwsUsageRecordRequestBySubscription:
-      title: By Subscription
-      type: object
-      properties:
-        cloud:
-          $ref: '#/components/schemas/AwsCloud'
-        subscription_id:
-          $ref: '#/components/schemas/AwsMeteringSubscriptionId'
-        dimension:
-          $ref: '#/components/schemas/AwsDimension'
-        start_time:
-          $ref: '#/components/schemas/TimestampNotNull'
-        scheduled_at:
-          $ref: '#/components/schemas/Timestamp'
-        test:
-          $ref: '#/components/schemas/UsageRecordTest'
-      required:
-      - cloud
-      - subscription_id
-      - dimension
-      - start_time
+      description: AWS Product Code
+      example: 1test1a2b3c4d5e6f7g8h9ijk
+      minLength: 0
     GcpUsageRecordRequestByProductAndCustomer:
       title: By Product and Customer
       type: object
@@ -790,11 +385,132 @@ components:
       - customer_id
       - dimension
       - start_time
-    GcpProductId:
+    AzureProductId:
       type: string
-      description: GCP Solution ID
-      example: tackle-for-gcp
+      description: Azure Offer ID
+      example: tackle-azure-platform
       minLength: 0
+    Uuid:
+      type: string
+      description: UUID
+      format: uuid
+      example: 8361e0bf-9d6a-466c-974a-36b73168527a
+    AwsMeteringProductId:
+      type: string
+      description: AWS Product Code
+      example: 1test1a2b3c4d5e6f7g8h9ijk
+      minLength: 0
+    SubscriptionId:
+      type:
+      - string
+      - 'null'
+      description: Subscription Id
+      example: 5fd2a7e8908e88888c7f0e71
+      minLength: 0
+    UsageRecordDelete:
+      title: UsageRecordDeleteResponse
+      type: object
+      description: Delete Usage Record Response
+      properties:
+        data:
+          $ref: '#/components/schemas/UsageRecord'
+    TimestampNotNull:
+      type: string
+      description: ISO format timestamp with UTC offset
+      example: '2019-07-15T15:00:00.000000+00:00'
+      format: date-time
+    Error:
+      title: ErrorResponse
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code
+          minLength: 0
+        error:
+          type: string
+          description: Error response
+          minLength: 0
+        errors:
+          description: Error details
+          type: array
+          items: {}
+        error_type:
+          type: string
+          enum:
+          - service_exception
+          - client_exception
+      required:
+      - code
+      - error
+      - errors
+    AzureUsageRecordRequestBySubscription:
+      title: By Subscription
+      type: object
+      properties:
+        cloud:
+          $ref: '#/components/schemas/AzureCloud'
+        subscription_id:
+          $ref: '#/components/schemas/SubscriptionId'
+        dimension:
+          $ref: '#/components/schemas/AzureDimension'
+        start_time:
+          $ref: '#/components/schemas/TimestampNotNull'
+        scheduled_at:
+          $ref: '#/components/schemas/Timestamp'
+        test:
+          $ref: '#/components/schemas/UsageRecordTest'
+      required:
+      - cloud
+      - subscription_id
+      - dimension
+      - start_time
+    AzureCustomerId:
+      type: string
+      description: Azure Subscription ID
+      example: 1b3gs3f4-2794-abcd-3fa3-063ga0s3t3re
+      minLength: 0
+    AwsUsageRecordRequestByProductAndCustomer:
+      title: By Product and Customer
+      type: object
+      properties:
+        cloud:
+          $ref: '#/components/schemas/AwsCloud'
+        product_id:
+          $ref: '#/components/schemas/AwsMeteringProductId'
+        customer_id:
+          $ref: '#/components/schemas/AwsMeteringCustomerId'
+        dimension:
+          $ref: '#/components/schemas/AwsDimension'
+        start_time:
+          $ref: '#/components/schemas/TimestampNotNull'
+        scheduled_at:
+          $ref: '#/components/schemas/Timestamp'
+        test:
+          $ref: '#/components/schemas/UsageRecordTest'
+      required:
+      - cloud
+      - product_id
+      - customer_id
+      - dimension
+      - start_time
+    AzureDimension:
+      type: object
+      description: Product Dimension
+      example:
+        name: metering-test-sku-from-vendor-123
+        quantity: 1
+      properties:
+        name:
+          type: string
+          example: metering-test-sku-from-vendor-123
+          minLength: 0
+        quantity:
+          type: integer
+          example: 1
+      required:
+      - name
+      - quantity
     GcpDimension:
       title: GcpDimension
       type: object
@@ -817,7 +533,335 @@ components:
       required:
       - name
       - quantity
+    Timestamp:
+      type:
+      - string
+      - 'null'
+      description: ISO format timestamp with UTC offset
+      example: '2019-07-15T15:00:00.000000+00:00'
+      format: date-time
+    RedHatCustomerId:
+      type: string
+      description: Red Hat Customer Id
+      example: 615334398743ac63d55cc4db
+      minLength: 0
+    AwsUsageRecordRequestBySubscription:
+      title: By Subscription
+      type: object
+      properties:
+        cloud:
+          $ref: '#/components/schemas/AwsCloud'
+        subscription_id:
+          $ref: '#/components/schemas/AwsMeteringSubscriptionId'
+        dimension:
+          $ref: '#/components/schemas/AwsDimension'
+        start_time:
+          $ref: '#/components/schemas/TimestampNotNull'
+        scheduled_at:
+          $ref: '#/components/schemas/Timestamp'
+        test:
+          $ref: '#/components/schemas/UsageRecordTest'
+      required:
+      - cloud
+      - subscription_id
+      - dimension
+      - start_time
+    UsageRecord:
+      title: UsageRecord
+      type: object
+      description: Metering Usage Record
+      properties:
+        id:
+          type: string
+          example: bd577c26-8a3e-42d2-8efc-4c0defaa758c
+        product_id:
+          $ref: '#/components/schemas/ProductId'
+        customer_id:
+          $ref: '#/components/schemas/CustomerId'
+        subscription_id:
+          $ref: '#/components/schemas/SubscriptionId'
+        cloud:
+          $ref: '#/components/schemas/Clouds'
+        dimension:
+          anyOf:
+          - $ref: '#/components/schemas/AwsDimension'
+          - $ref: '#/components/schemas/GcpDimension'
+        start_time:
+          $ref: '#/components/schemas/TimestampZeroUtcOffset'
+        end_time:
+          $ref: '#/components/schemas/TimestampZeroUtcOffsetOptional'
+        created_at:
+          $ref: '#/components/schemas/TimestampZeroUtcOffset'
+        updated_at:
+          $ref: '#/components/schemas/TimestampZeroUtcOffset'
+        deleted_at:
+          $ref: '#/components/schemas/TimestampZeroUtcOffsetOptional'
+        scheduled_at:
+          $ref: '#/components/schemas/TimestampZeroUtcOffsetOptional'
+        status:
+          $ref: '#/components/schemas/UsageRecordStatus'
+        reason:
+          $ref: '#/components/schemas/UsageRecordReason'
+        test:
+          $ref: '#/components/schemas/UsageRecordTest'
+    GcpProductId:
+      type: string
+      description: GCP Solution ID
+      example: tackle-for-gcp
+      minLength: 0
+    AwsCloud:
+      type: string
+      description: AWS Cloud
+      default: aws
+      enum:
+      - aws
+      example: aws
+    TimestampZeroUtcOffsetOptional:
+      type:
+      - string
+      - 'null'
+      description: Optional ISO format timestamp with zero UTC offset
+      example: '2021-10-25T21:38:20.865Z'
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d*)?Z$
+      format: date-time
+    GcpCustomerId:
+      type: string
+      description: GCP External Account ID
+      example: E-ABC2-D330-E2FG-H2Q2
+      minLength: 0
+    NextPageToken:
+      title: NextPageToken
+      type: string
+      description: A page token to fetch the next page of results using the associated "page" query parameter
+    Clouds:
+      anyOf:
+      - $ref: '#/components/schemas/AwsCloud'
+      - $ref: '#/components/schemas/GcpCloud'
+      - $ref: '#/components/schemas/AzureCloud'
+      - $ref: '#/components/schemas/RedHatCloud'
+      description: A string identifying a cloud marketplace
+    UsageRecordLink:
+      type: string
+      title: UsageRecordLink
+      description: Url for one or more metering usage records
+      format: uri
+    UsageRecordResponse:
+      title: UsageRecordResponse
+      type: object
+      description: Usage Record Response
+      properties:
+        data:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/UsageRecord'
+        metadata:
+          $ref: '#/components/schemas/UsageRecordMetadata'
+    TimestampZeroUtcOffset:
+      type: string
+      description: ISO format timestamp with zero UTC offset
+      example: '2021-10-25T21:38:20.865Z'
+      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d*)?Z$
+      format: date-time
+    AwsCustomerId:
+      type: string
+      description: AWS Account Reference ID
+      example: ij3sXMkN3or
+      minLength: 0
+    UsageRecordReason:
+      title: UsageRecordReason
+      type: string
+      description: Explanation of Status
+      enum:
+      - external-service-error
+      - external-too-many-requests
+      - external-access-denied
+      - invalid-usage-dimension
+      - customer-not-entitled
+      - duplicate-request
+      - invalid-product-code
+      - invalid-usage-allocation
+      - unrecognized-exception
+      - deleted
+    RedHatCloud:
+      type: string
+      description: Red Hat Cloud
+      default: redhat
+      enum:
+      - redhat
+      example: redhat
+    AwsMeteringSubscriptionId:
+      type:
+      - string
+      - 'null'
+      description: Agreement ID, License ID or License ARN
+      example: agmt-1234567890abcdefghijklmno
+      minLength: 0
+    UsageRecordTest:
+      title: UsageRecordTest
+      enum:
+      - accepted
+      - rejected
+      - not-operable
+      type:
+      - string
+      - 'null'
+      default: null
+      description: Specifies if the Usage Record is a test. When NOT null, the record is a test and is not sent to the marketplace
+    UsageRecordStatus:
+      type: string
+      description: Status of usage record
+      enum:
+      - idle
+      - in-progress
+      - accepted
+      - rejected
+    GcpUsageRecordRequestBySubscription:
+      title: By Subscription
+      type: object
+      properties:
+        cloud:
+          $ref: '#/components/schemas/GcpCloud'
+        subscription_id:
+          $ref: '#/components/schemas/SubscriptionId'
+        dimension:
+          $ref: '#/components/schemas/GcpDimension'
+        start_time:
+          $ref: '#/components/schemas/TimestampNotNull'
+        end_time:
+          $ref: '#/components/schemas/TimestampNotNull'
+        scheduled_at:
+          $ref: '#/components/schemas/Timestamp'
+        test:
+          $ref: '#/components/schemas/UsageRecordTest'
+      required:
+      - cloud
+      - subscription_id
+      - start_time
+      - end_time
+    GcpCloud:
+      type: string
+      description: GCP Cloud
+      default: gcp
+      enum:
+      - gcp
+      example: gcp
+    UsageRecordMetadata:
+      title: UsageRecordMetadata
+      type: object
+      description: Usage Record Metadata
+      properties:
+        link:
+          $ref: '#/components/schemas/UsageRecordLink'
+    AwsMeteringCustomerId:
+      type: string
+      description: AWS Customer Reference ID or AWS Account Number
+      example: 123456789012
+      minLength: 0
+    GcpUsageRecordRequest:
+      anyOf:
+      - $ref: '#/components/schemas/GcpUsageRecordRequestByProductAndCustomer'
+      - $ref: '#/components/schemas/GcpUsageRecordRequestBySubscription'
+      title: Gcp Usage Record Request
+    UsageRecordsMetadata:
+      title: UsageRecordsMetadata
+      type: object
+      description: Usage Record Metadata
+      properties:
+        link:
+          $ref: '#/components/schemas/UsageRecordLink'
+        nextPageToken:
+          $ref: '#/components/schemas/NextPageToken'
+    AwsDimension:
+      type: object
+      description: Product Dimension
+      example:
+        name: metering-test-sku-from-vendor-123
+        quantity: 1
+      properties:
+        name:
+          type: string
+          example: metering-test-sku-from-vendor-123
+          minLength: 0
+        quantity:
+          type: integer
+          example: 1
+        usage_allocations:
+          type: array
+          items:
+            type: object
+            properties:
+              allocated_usage_quantity:
+                type: integer
+                example: 1
+              tags:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                      minLength: 0
+                      example: test_tag
+                    value:
+                      type: string
+                      minLength: 0
+                      example: '1'
+        dry_run:
+          type: boolean
+          description: When true, sends a test/dry run to aws to verify configuration
+          example: false
+      required:
+      - name
+      - quantity
+    ProductId:
+      description: Cloud Marketplace issued ID for a product
+      example: abcd-1234-efgh-5678
+      anyOf:
+      - $ref: '#/components/schemas/AwsProductId'
+      - $ref: '#/components/schemas/GcpProductId'
+      - $ref: '#/components/schemas/AzureProductId'
+      - $ref: '#/components/schemas/RedHatProductId'
   responses:
+    Metering_409-Conflict-Duplicate:
+      description: Response if a matching usage record exists that was already sent to the marketplace
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Spec_prod_Error'
+          examples:
+            Conflict-Duplicate:
+              value:
+                code: conflict
+                error: 'a usage record has already been processed for the following request: product=pid, customer=cid, dimension=dim'
+                error_type: service_exception
+                errors: []
+    Metering_200-OK-GET-Usage-Record:
+      description: Response after successfully fetching a usage record
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UsageRecordResponse'
+          examples:
+            example:
+              value:
+                data:
+                - id: bd577c26-8a3e-42d2-8efc-4c0defaa758c
+                  product_id: e2fc31adc8dc32e281e3a6c27d003d7c
+                  customer_id: 615334387543ac63d55cc4dc
+                  subscription_id: null
+                  cloud: redhat
+                  dimension:
+                    name: metering-test-sku-from-vendor-123
+                    quantity: 1
+                  start_time: '2021-10-25T21:38:20.865Z'
+                  end_time: '2021-10-25T21:38:20.865Z'
+                  created_at: '2021-10-25T21:38:20.865Z'
+                  updated_at: '2021-10-25T21:38:20.865Z'
+                  deleted_at: null
+                  status: idle
+                metadata:
+                  link: https://api.tackle.io/v1/metering/usage-records
     401-Unauthorized-MTM:
       description: Unauthorized
       content:
@@ -853,65 +897,6 @@ components:
               value:
                 code: mtm_token_expired
                 error: Token expired
-                errors: []
-    Metering_404-Not-Found-Usage-Record:
-      description: Response if metering usage record was not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          examples:
-            record-not-found:
-              value:
-                code: not_found
-                error: Unable to locate resource db91d114-0231-4281-97fc-5b8a11b7ef0c
-                error_type: service_exception
-                errors: []
-    Metering_200-OK-DEL-Usage-Record:
-      description: Response after successfully deleting usage record
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UsageRecordDelete'
-          examples:
-            example:
-              value:
-                data:
-                  id: 12bd7418-1c88-4756-b1e7-5ba4a025da31
-                  vendor_id: DEMOVENDOR1
-                  product_id: e2fc31adc8dc32e281e3a6c27d003d7c
-                  customer_id: 615334387543ac63d55cc4dc
-                  subscription_id: null
-                  cloud: redhat
-                  dimension:
-                    name: metering-test-sku-from-isv-123
-                    quantity: 10
-                  start_time: '2021-01-22T17:31:12.789942Z'
-                  end_time: '2021-01-22T17:35:12.789942Z'
-                  created_at: '2021-12-01T18:48:05.515377Z'
-                  updated_at: '2021-12-09T21:39:30.513403Z'
-                  deleted_at: '2021-12-09T21:39:30.513403Z'
-                  status: idle
-                metadata:
-                  link: https://api.tackle.io/v1/metering/usage-records/12bd7418-1c88-4756-b1e7-5ba4a025da31
-    Metering_400-Bad-Request-Usage-Record:
-      description: Response if bad request made for usage record
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Metering_404-Order-Not-Found:
-      description: Response if metering usage record was not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          examples:
-            order-not-found:
-              value:
-                code: not_found
-                error: unable to find order or subscription
-                error_type: service_exception
                 errors: []
     Metering_200-OK-GET-Usage-Records:
       description: Response after successfully fetching usage records
@@ -958,101 +943,32 @@ components:
                 metadata:
                   next_page_token: null
                   link: https://api.tackle.io/v1/metering/usage-records
-    Metering_200-OK-POST-Usage-Records:
-      description: Response after successfully submitting usage records
+    Metering_404-Not-Found-Usage-Record:
+      description: Response if metering usage record was not found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UsageRecordResponse'
+            $ref: '#/components/schemas/Error'
           examples:
-            example:
+            record-not-found:
               value:
-                data:
-                - id: fe65c5a9-8d4c-4686-ae2d-c1f7804f4a62
-                  vendor_id: DEMOVENDOR1
-                  product_id: e2fc31adc8dc32e281e3a6c27d003d7c
-                  customer_id: 615334387543ac63d55cc4dc
-                  subscription_id: null
-                  cloud: aws
-                  dimension:
-                    name: metering-test-sku-from-isv-123
-                    quantity: 1
-                  start_time: '2021-11-15T18:31:12.789942Z'
-                  end_time: null
-                  created_at: '2021-12-09T21:39:09.048941Z'
-                  updated_at: '2021-12-09T21:39:09.048941Z'
-                  deleted_at: null
-                  status: idle
-                  link: https://api.tackle.io/v1/metering/usage-records/fe65c5a9-8d4c-4686-ae2d-c1f7804f4a62
-                metadata:
-                  link: https://api.tackle.io/v1/metering/usage-records
-    Metering_409-Conflict-Duplicate:
-      description: Response if a matching usage record exists that was already sent to the marketplace
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Spec_prod_Error'
-          examples:
-            Conflict-Duplicate:
-              value:
-                code: conflict
-                error: 'a usage record has already been processed for the following request: product=pid, customer=cid, dimension=dim'
+                code: not_found
+                error: Unable to locate resource db91d114-0231-4281-97fc-5b8a11b7ef0c
                 error_type: service_exception
                 errors: []
-    Metering_200-OK-GET-Usage-Record:
-      description: Response after successfully fetching a usage record
+    Metering_404-Order-Not-Found:
+      description: Response if metering usage record was not found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UsageRecordResponse'
+            $ref: '#/components/schemas/Error'
           examples:
-            example:
+            order-not-found:
               value:
-                data:
-                - id: bd577c26-8a3e-42d2-8efc-4c0defaa758c
-                  product_id: e2fc31adc8dc32e281e3a6c27d003d7c
-                  customer_id: 615334387543ac63d55cc4dc
-                  subscription_id: null
-                  cloud: redhat
-                  dimension:
-                    name: metering-test-sku-from-vendor-123
-                    quantity: 1
-                  start_time: '2021-10-25T21:38:20.865Z'
-                  end_time: '2021-10-25T21:38:20.865Z'
-                  created_at: '2021-10-25T21:38:20.865Z'
-                  updated_at: '2021-10-25T21:38:20.865Z'
-                  deleted_at: null
-                  status: idle
-                metadata:
-                  link: https://api.tackle.io/v1/metering/usage-records
-    Metering_200-OK-PUT-Usage-Records:
-      description: Response after successfully creating or updating usage records
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UsageRecordResponse'
-          examples:
-            example:
-              value:
-                data:
-                - id: fe65c5a9-8d4c-4686-ae2d-c1f7804f4a62
-                  vendor_id: DEMOVENDOR1
-                  product_id: e2fc31adc8dc32e281e3a6c27d003d7c
-                  customer_id: 615334387543ac63d55cc4dc
-                  subscription_id: null
-                  cloud: aws
-                  dimension:
-                    name: metering-test-sku-from-isv-123
-                    quantity: 1
-                  start_time: '2021-11-15T18:31:12.789942Z'
-                  end_time: null
-                  created_at: '2021-12-09T21:39:09.048941Z'
-                  updated_at: '2021-12-09T21:39:09.048941Z'
-                  deleted_at: null
-                  status: idle
-                  link: https://api.tackle.io/v1/metering/usage-records/fe65c5a9-8d4c-4686-ae2d-c1f7804f4a62
-                metadata:
-                  link: https://api.tackle.io/v1/metering/usage-records
+                code: not_found
+                error: unable to find order or subscription
+                error_type: service_exception
+                errors: []
     Metering_400-Bad-Request-Usage-Records:
       description: Invalid Payload or a Bad Request
       content:
@@ -1084,6 +1000,95 @@ components:
                 error_type: client_exception
                 error: the request is attempting to add usage records for products under multiple vendors
                 errors: []
+    Metering_200-OK-DEL-Usage-Record:
+      description: Response after successfully deleting usage record
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UsageRecordDelete'
+          examples:
+            example:
+              value:
+                data:
+                  id: 12bd7418-1c88-4756-b1e7-5ba4a025da31
+                  vendor_id: DEMOVENDOR1
+                  product_id: e2fc31adc8dc32e281e3a6c27d003d7c
+                  customer_id: 615334387543ac63d55cc4dc
+                  subscription_id: null
+                  cloud: redhat
+                  dimension:
+                    name: metering-test-sku-from-isv-123
+                    quantity: 10
+                  start_time: '2021-01-22T17:31:12.789942Z'
+                  end_time: '2021-01-22T17:35:12.789942Z'
+                  created_at: '2021-12-01T18:48:05.515377Z'
+                  updated_at: '2021-12-09T21:39:30.513403Z'
+                  deleted_at: '2021-12-09T21:39:30.513403Z'
+                  status: idle
+                metadata:
+                  link: https://api.tackle.io/v1/metering/usage-records/12bd7418-1c88-4756-b1e7-5ba4a025da31
+    Metering_200-OK-PUT-Usage-Records:
+      description: Response after successfully creating or updating usage records
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UsageRecordResponse'
+          examples:
+            example:
+              value:
+                data:
+                - id: fe65c5a9-8d4c-4686-ae2d-c1f7804f4a62
+                  vendor_id: DEMOVENDOR1
+                  product_id: e2fc31adc8dc32e281e3a6c27d003d7c
+                  customer_id: 615334387543ac63d55cc4dc
+                  subscription_id: null
+                  cloud: aws
+                  dimension:
+                    name: metering-test-sku-from-isv-123
+                    quantity: 1
+                  start_time: '2021-11-15T18:31:12.789942Z'
+                  end_time: null
+                  created_at: '2021-12-09T21:39:09.048941Z'
+                  updated_at: '2021-12-09T21:39:09.048941Z'
+                  deleted_at: null
+                  status: idle
+                  link: https://api.tackle.io/v1/metering/usage-records/fe65c5a9-8d4c-4686-ae2d-c1f7804f4a62
+                metadata:
+                  link: https://api.tackle.io/v1/metering/usage-records
+    Metering_400-Bad-Request-Usage-Record:
+      description: Response if bad request made for usage record
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Metering_200-OK-POST-Usage-Records:
+      description: Response after successfully submitting usage records
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UsageRecordResponse'
+          examples:
+            example:
+              value:
+                data:
+                - id: fe65c5a9-8d4c-4686-ae2d-c1f7804f4a62
+                  vendor_id: DEMOVENDOR1
+                  product_id: e2fc31adc8dc32e281e3a6c27d003d7c
+                  customer_id: 615334387543ac63d55cc4dc
+                  subscription_id: null
+                  cloud: aws
+                  dimension:
+                    name: metering-test-sku-from-isv-123
+                    quantity: 1
+                  start_time: '2021-11-15T18:31:12.789942Z'
+                  end_time: null
+                  created_at: '2021-12-09T21:39:09.048941Z'
+                  updated_at: '2021-12-09T21:39:09.048941Z'
+                  deleted_at: null
+                  status: idle
+                  link: https://api.tackle.io/v1/metering/usage-records/fe65c5a9-8d4c-4686-ae2d-c1f7804f4a62
+                metadata:
+                  link: https://api.tackle.io/v1/metering/usage-records
   parameters:
     page:
       name: page
@@ -1102,8 +1107,31 @@ components:
         minLength: 0
       description: Specifies the number of records returned in paged responses.
   securitySchemes:
-    tackleJwt:
+    BearerAuth:
+      description: The Tackle API requires a JWT for authentication. You can get this by [getting your API credentials](https://developers.tackle.io/docs/how-to-get-an-m2m-client-id-and-secret) from the Tackle Platform then [retrieving your Access Token](https://developers.tackle.io/docs/getting-an-access-token) using our Authentication endpoint.
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Tackle-issued JWT (interactive user or MTM token).
+    BasicAuthCallback:
+      description: Use `basic` for [basic HTTP authentication](https://en.wikipedia.org/wiki/Basic_access_authentication); this is only used for `callbacks`
+      type: http
+      scheme: basic
+    HeaderApiKeyAuthCallback:
+      description: Use `header_api_key` to specify a custom HTTP request header for authentication. Requests from Tackle will use the specified HTTP header for outbound requests to your Webhook URL; this is only used for `callbacks`'
+      type: apiKey
+      name: subscription-key
+      in: header
+    Oauth2AuthCallback:
+      description: This auth-type is for `oauth2` client credentials flow. We will use the client_id and client_secret to call the token_url to get an access token; this is only used for `callbacks`'
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes: {}
+externalDocs:
+  description: Tackle Developer Hub and API Documentation
+  url: https://developers.tackle.io
+x-readme:
+  explorer-enabled: false
+  proxy-enabled: true
+  samples-enabled: true

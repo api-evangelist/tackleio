@@ -1,13 +1,17 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Tackle Public Contracts Authentication Solutions API
-  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
-  version: 1.0.0
+  title: Tackle Co-Sell for AWS Partner Central Solutions API
+  description: 'This API lets you create and manage co-sell opportunities and invitations
+
+    in AWS Partner Central — formerly known as the AWS Partner Network Customer
+
+    Engagement (ACE) program.'
+  version: '1.0'
 servers:
-- url: https://contracts.tackle.io
-  description: Production
+- url: https://aws.cosell.tackle.io
+  description: AWS Co-Sell Service
 security:
-- tackleJwt: []
+- bearerAuth: []
 tags:
 - name: Solutions
   description: 'List the co-sell solutions registered with AWS Partner Central for
@@ -103,33 +107,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    Unauthorized:
-      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
-
-        authenticated principal could not be resolved.'
-    InternalServerError:
-      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
-
-        bodies for 5xx errors may be empty.'
   schemas:
-    ListSolutionsResponseItem:
-      type: object
-      properties:
-        id:
-          type: string
-        cloudProviderId:
-          type: string
-        name:
-          type: string
-        status:
-          type: string
-        category:
-          type: string
-        created:
-          type: string
-        lastSynced:
-          type: string
     ListSolutionsResponse:
       type: object
       properties:
@@ -149,9 +127,38 @@ components:
         nextIndex:
           description: The starting index to use for fetching the next page of solutions. Only present when `isNextPage` is `true`.
           type: integer
+    ListSolutionsResponseItem:
+      type: object
+      properties:
+        id:
+          type: string
+        cloudProviderId:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        category:
+          type: string
+        created:
+          type: string
+        lastSynced:
+          type: string
+  responses:
+    Unauthorized:
+      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
+
+        authenticated principal could not be resolved.'
+    InternalServerError:
+      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
+
+        bodies for 5xx errors may be empty.'
   securitySchemes:
-    tackleJwt:
+    bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT
-      description: Tackle-issued JWT (interactive user or MTM token).
+      bearerFormat: MTM JWT
+      description: 'Tackle machine-to-machine access token sent as `Authorization: Bearer <access_token>`.'
+externalDocs:
+  description: Tackle Developer Portal
+  url: https://developers.tackle.io

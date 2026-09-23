@@ -1,7 +1,9 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Tackle Public Authentication Contracts API
-  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
+  title: Tackle Public Contracts API
+  description: 'Customer-facing read API for cloud marketplace contracts that Tackle has
+
+    ingested for your Tackle account.'
   version: 1.0.0
 servers:
 - url: https://contracts.tackle.io
@@ -15,9 +17,7 @@ paths:
     get:
       operationId: listContracts
       summary: List contracts
-      description: 'Returns a paginated list of contracts available to your account.
-
-        '
+      description: Returns a paginated list of contracts available to your account.
       parameters:
       - in: query
         name: cursor
@@ -67,9 +67,7 @@ paths:
       summary: Describe contract
       description: 'Returns details for the contract identified by `contractId`. Returns
 
-        `404` when no contract is found for that id.
-
-        '
+        `404` when no contract is found for that id.'
       parameters:
       - in: path
         name: contractId
@@ -105,6 +103,47 @@ paths:
       - Contracts
 components:
   schemas:
+    Money:
+      type: object
+      required:
+      - amount
+      - currencyCode
+      properties:
+        amount:
+          type: number
+          format: double
+          example: 120000
+        currencyCode:
+          type: string
+          example: USD
+    CloudDataMsftSubscription:
+      type: object
+      required:
+      - subscription
+      properties:
+        subscription:
+          type: object
+          description: Verbatim Microsoft Subscription API payload.
+    ContractListResponse:
+      type: object
+      required:
+      - contracts
+      properties:
+        contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contract'
+        next:
+          type: string
+          description: Opaque pagination cursor. Omitted on the last page.
+    CloudDataAwsAgreement:
+      type: object
+      required:
+      - agreement
+      properties:
+        agreement:
+          type: object
+          description: Verbatim AWS Agreement API payload (`describeAgreement`, `agreementSummary`, `agreementTerms`).
     Contract:
       type: object
       required:
@@ -245,39 +284,6 @@ components:
             omitted from the response until the SDDS data lands.
 
             '
-    ContractListResponse:
-      type: object
-      required:
-      - contracts
-      properties:
-        contracts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Contract'
-        next:
-          type: string
-          description: Opaque pagination cursor. Omitted on the last page.
-    Money:
-      type: object
-      required:
-      - amount
-      - currencyCode
-      properties:
-        amount:
-          type: number
-          format: double
-          example: 120000
-        currencyCode:
-          type: string
-          example: USD
-    CloudDataAwsAgreement:
-      type: object
-      required:
-      - agreement
-      properties:
-        agreement:
-          type: object
-          description: Verbatim AWS Agreement API payload (`describeAgreement`, `agreementSummary`, `agreementTerms`).
     Error:
       type: object
       required:
@@ -285,14 +291,6 @@ components:
       properties:
         error:
           type: string
-    CloudDataMsftSubscription:
-      type: object
-      required:
-      - subscription
-      properties:
-        subscription:
-          type: object
-          description: Verbatim Microsoft Subscription API payload.
   securitySchemes:
     tackleJwt:
       type: http

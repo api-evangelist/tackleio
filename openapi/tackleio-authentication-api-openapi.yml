@@ -1,13 +1,14 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Tackle Public Contracts Authentication API
-  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
+  title: Tackle Authentication API
+  description: Authenticated programmatic access to Tackle's webhooks, metering, and more.
   version: 1.0.0
+  contact:
+    name: Tackle Support
+    email: support@tackle.io
+    url: https://tackle.io
 servers:
-- url: https://contracts.tackle.io
-  description: Production
-security:
-- tackleJwt: []
+- url: https://api.tackle.io
 tags:
 - name: Authentication
   description: Operations for API Authentication
@@ -39,6 +40,71 @@ paths:
           $ref: '#/components/responses/403-Forbidden'
       summary: Retrieve an Access Token
 components:
+  schemas:
+    AuthenticationResponse:
+      title: AuthenticationResponse
+      type: object
+      properties:
+        access_token:
+          description: JWT
+          type: string
+        expires_in:
+          description: Number of seconds until the token expires
+          type: integer
+        token_type:
+          description: Token type
+          type: string
+      required:
+      - access_token
+      - expires_in
+      - token_type
+    Error:
+      title: ErrorResponse
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code
+          minLength: 0
+        error:
+          type: string
+          description: Error response
+          minLength: 0
+        errors:
+          description: Error details
+          type: array
+          items: {}
+        error_type:
+          type: string
+          enum:
+          - service_exception
+          - client_exception
+      required:
+      - code
+      - error
+      - errors
+    AuthenticationRequest:
+      title: AuthenticationRequest
+      type: object
+      properties:
+        client_id:
+          type: string
+          description: MTM Client ID
+          minLength: 0
+        client_secret:
+          type: string
+          description: MTM Client Secret
+          minLength: 0
+        grant_type:
+          type: string
+          default: client_credentials
+          description: Client credential grant type
+          enum:
+          - client_credentials
+          example: client_credentials
+      required:
+      - client_id
+      - client_secret
   responses:
     403-Forbidden:
       description: Forbidden
@@ -80,74 +146,32 @@ components:
                 access_token: eyJhbGciOiJSU0ExXzUdLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0.BvO5gQVqA847uxphqcUtSkDFh-3MLI1rrvVmkBWGpvqIUwA78lyUHQVPNEUHyZkq9sDsxpJa0POaW9qIset9GTUJNgegwK5RzniLOc8bRl6LUu6bLJswBO7x0ARUiH7tcLHEOWRLkhHSN4smtfilwrWkSXgAz7oAUQsMgXDwWk5jv-zh0Nk9NPVcZHArgia7e4TQvTxO4rJZsWtzuAOdgEw5yzUCqHrO-PIRExLQRgsezxbCdGjYfwN-GWpBJB_wT8gmrx8HIz031Jm4zVEhCUJnZLM1prWSlHR3EEbjyg3FpUqfMmpjwiQhateSyp4OoHG0mhQWI2SozwNXZVPlGA.JAK468G1tacxPcKK68-6kg.hLODb2lyxNvDu1WD1IoL3q0wJsiwPnVASiy-xdchQApeEGiQKvq58zfpqMTkxJE_pd00vQuRgB3yem7sfyx6Ry4aQe2TmORytYGoRb4QBf5ni-UhLy1qZTGvJPLbE9pOtLl6Ko34qMv18zpXoFWHS2Hm2arv7_nhBV2xs9ACxnyukVlsTR04Iw_mz0ZL_W6KzoWBHkVORPwlKWcL6s3hhC90EpsAC9zrj3OV09YGYM-EzEB4XiBjvQGOEzLBQHJxALJzLn2IdAEqnNLRo4_xaPKzksWnIn0B6JckktlzaD3VsI9RtNFvyB6umHU0mCNSyAXaJrZh7g-AvmB6JVs113uyZqggMqbsE3KsDOr64RIJOnQYldFAsPl65hP3YcsfIF1j9jZBwJ03V7_c_PvrK4RTi9D2la9Imw9KkjjksDOeqxhkulvm4rQqdivwkjjsOQMEAgNDMjuQvWoTCUpbl6H_82uOGOFMKo4ARgaTIRoDDn39kLQDlDQyY0tN6bjiFOi6i3VkcmmfMFfYNEycD9cXdM4avMs_xJM3nQXX_fXbfMNjELuu6bIZco_asCxWV_9OSTiG47NsLEqxnSSUdw_pUqw8SIzGnIWrMzSeUYcrudZTG2TujFpD6zt7OVxT1y20YBwPoAtUFZ3n6HyymtGIk6HXecWyYOGJPlxb25shvCefG_6aMH7ia81CGwoJRml3ZARuURyeEQ1jAn6qKHeRpsNSR1JZFn2nBTgz5VYAt1xEWSM_hj6cMgcpKixdx2D6ay4AioRTtxTzft3DPA.f4bL_fjAwupn-cGpLY2-7DVZ-0YDPsG34xbwIJhetj2
                 token_type: bearer
                 expires_in: 5400
-  schemas:
-    AuthenticationRequest:
-      title: AuthenticationRequest
-      type: object
-      properties:
-        client_id:
-          type: string
-          description: MTM Client ID
-          minLength: 0
-        client_secret:
-          type: string
-          description: MTM Client Secret
-          minLength: 0
-        grant_type:
-          type: string
-          default: client_credentials
-          description: Client credential grant type
-          enum:
-          - client_credentials
-          example: client_credentials
-      required:
-      - client_id
-      - client_secret
-    Error:
-      title: ErrorResponse
-      type: object
-      properties:
-        code:
-          type: string
-          description: Error code
-          minLength: 0
-        error:
-          type: string
-          description: Error response
-          minLength: 0
-        errors:
-          description: Error details
-          type: array
-          items: {}
-        error_type:
-          type: string
-          enum:
-          - service_exception
-          - client_exception
-      required:
-      - code
-      - error
-      - errors
-    AuthenticationResponse:
-      title: AuthenticationResponse
-      type: object
-      properties:
-        access_token:
-          description: JWT
-          type: string
-        expires_in:
-          description: Number of seconds until the token expires
-          type: integer
-        token_type:
-          description: Token type
-          type: string
-      required:
-      - access_token
-      - expires_in
-      - token_type
   securitySchemes:
-    tackleJwt:
+    BearerAuth:
+      description: The Tackle API requires a JWT for authentication. You can get this by [getting your API credentials](https://developers.tackle.io/docs/how-to-get-an-m2m-client-id-and-secret) from the Tackle Platform then [retrieving your Access Token](https://developers.tackle.io/docs/getting-an-access-token) using our Authentication endpoint.
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Tackle-issued JWT (interactive user or MTM token).
+    BasicAuthCallback:
+      description: Use `basic` for [basic HTTP authentication](https://en.wikipedia.org/wiki/Basic_access_authentication); this is only used for `callbacks`
+      type: http
+      scheme: basic
+    HeaderApiKeyAuthCallback:
+      description: Use `header_api_key` to specify a custom HTTP request header for authentication. Requests from Tackle will use the specified HTTP header for outbound requests to your Webhook URL; this is only used for `callbacks`'
+      type: apiKey
+      name: subscription-key
+      in: header
+    Oauth2AuthCallback:
+      description: This auth-type is for `oauth2` client credentials flow. We will use the client_id and client_secret to call the token_url to get an access token; this is only used for `callbacks`'
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes: {}
+externalDocs:
+  description: Tackle Developer Hub and API Documentation
+  url: https://developers.tackle.io
+x-readme:
+  explorer-enabled: false
+  proxy-enabled: true
+  samples-enabled: true

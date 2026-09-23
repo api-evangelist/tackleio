@@ -1,13 +1,34 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Tackle Public Contracts Authentication Groups API
-  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
-  version: 1.0.0
+  title: SCIM Groups API
+  description: 'A SCIM (System for Cross-domain Identity Management) 2.0 compliant API for managing users
+
+    through Auth0. This API provides endpoints for user management operations following RFC 7644.
+
+
+    The API supports:
+
+    - User CRUD operations (Create, Read, Update, List)
+
+    - SCIM 2.0 compliant error responses
+
+    - Bearer token authentication
+
+    - Enterprise user extensions'
+  version: 2.0.0
+  contact:
+    name: Tackle.io
+  license:
+    name: Proprietary
 servers:
-- url: https://contracts.tackle.io
-  description: Production
+- url: https://scim.tackle.io
+  description: SCIM API Server
+  variables:
+    domain:
+      default: scim-api.tackle.io
+      description: The domain for the SCIM API
 security:
-- tackleJwt: []
+- ApiKeyAuth: []
 tags:
 - name: Groups
   description: SCIM 2.0 Groups endpoint - returns full Group resources (RFC 7643 §4.2)
@@ -23,9 +44,7 @@ paths:
 
         It fetches roles from the RBAC service and returns them as SCIM Group resources
 
-        with meta.resourceType set to "Group", as required by identity providers (Okta, Azure AD).
-
-        '
+        with meta.resourceType set to "Group", as required by identity providers (Okta, Azure AD).'
       operationId: getGroups
       responses:
         '200':
@@ -73,42 +92,37 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
-    ScimError:
+    GroupListResponse:
       type: object
       required:
       - schemas
-      - status
-      - detail
+      - totalResults
+      - startIndex
+      - itemsPerPage
+      - Resources
       properties:
         schemas:
           type: array
           items:
             type: string
           example:
-          - urn:ietf:params:scim:api:messages:2.0:Error
-        status:
-          type: string
-          description: HTTP status code as string
-          example: '400'
-        detail:
-          type: string
-          description: Human-readable error description
-          example: Invalid request
-        scimType:
-          type: string
-          description: SCIM-specific error type
-          enum:
-          - invalidFilter
-          - tooMany
-          - uniqueness
-          - mutability
-          - invalidSyntax
-          - invalidPath
-          - noTarget
-          - invalidValue
-          - invalidVers
-          - sensitive
-          example: invalidValue
+          - urn:ietf:params:scim:api:messages:2.0:ListResponse
+        totalResults:
+          type: integer
+          description: Total number of groups
+          example: 3
+        startIndex:
+          type: integer
+          description: 1-based index of the first result
+          example: 1
+        itemsPerPage:
+          type: integer
+          description: Number of groups in this response
+          example: 3
+        Resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
     Group:
       type: object
       required:
@@ -153,38 +167,54 @@ components:
           items:
             type: string
           example: []
-    GroupListResponse:
+    ScimError:
       type: object
       required:
       - schemas
-      - totalResults
-      - startIndex
-      - itemsPerPage
-      - Resources
+      - status
+      - detail
       properties:
         schemas:
           type: array
           items:
             type: string
           example:
-          - urn:ietf:params:scim:api:messages:2.0:ListResponse
-        totalResults:
-          type: integer
-          description: Total number of groups
-          example: 3
-        startIndex:
-          type: integer
-          description: 1-based index of the first result
-          example: 1
-        itemsPerPage:
-          type: integer
-          description: Number of groups in this response
-          example: 3
-        Resources:
-          type: array
-          items:
-            $ref: '#/components/schemas/Group'
+          - urn:ietf:params:scim:api:messages:2.0:Error
+        status:
+          type: string
+          description: HTTP status code as string
+          example: '400'
+        detail:
+          type: string
+          description: Human-readable error description
+          example: Invalid request
+        scimType:
+          type: string
+          description: SCIM-specific error type
+          enum:
+          - invalidFilter
+          - tooMany
+          - uniqueness
+          - mutability
+          - invalidSyntax
+          - invalidPath
+          - noTarget
+          - invalidValue
+          - invalidVers
+          - sensitive
+          example: invalidValue
   responses:
+    Forbidden:
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '403'
+            detail: Forbidden
     InternalServerError:
       description: Internal server error
       content:
@@ -207,20 +237,16 @@ components:
             - urn:ietf:params:scim:api:messages:2.0:Error
             status: '401'
             detail: Unauthorized
-    Forbidden:
-      description: Access forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '403'
-            detail: Forbidden
   securitySchemes:
-    tackleJwt:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: Tackle-issued JWT (interactive user or MTM token).
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'API key authentication.
+
+        Include the API key in the Authorization header.
+
+        '
+externalDocs:
+  description: SCIM 2.0 RFC 7644 Specification
+  url: https://datatracker.ietf.org/doc/html/rfc7644

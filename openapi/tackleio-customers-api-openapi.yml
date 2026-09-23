@@ -1,13 +1,17 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Tackle Public Contracts Authentication Customers API
-  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
-  version: 1.0.0
+  title: Tackle Co-Sell for Microsoft Partner Center Customer…
+  description: 'This API helps you interact with Microsoft to create and manage co-sell
+
+    referrals that you share with Microsoft as well as receive, respond to,
+
+    and manage referrals originated by Microsoft.'
+  version: '1.0'
 servers:
-- url: https://contracts.tackle.io
-  description: Production
+- url: https://msft.cosell.tackle.io
+  description: Microsoft Co-Sell production endpoint
 security:
-- tackleJwt: []
+- bearerAuth: []
 tags:
 - name: Customers
   description: 'Look up customer accounts in Microsoft Partner Center before
@@ -21,7 +25,7 @@ paths:
   /api/customerInfo:
     post:
       operationId: customerInfo
-      summary: Lookup customer info to determine if they are a US federal customer.
+      summary: Lookup customer info to determine if they are a US federal customer
       description: 'Looks up the customer in Microsoft Partner Center by company
 
         name and reports whether Microsoft has tagged the account as a
@@ -100,7 +104,7 @@ paths:
   /api/customerLookup:
     post:
       operationId: customerLookup
-      summary: Lookup customer details in Partner Center.
+      summary: Lookup customer details in Partner Center
       description: 'Searches Microsoft Partner Center for matching customer
 
         accounts by company name plus country, returning managed,
@@ -397,42 +401,21 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    InternalServerError:
-      description: 'An unexpected error occurred while processing the request. The response body is
-
-        empty.'
-    Unauthorized:
-      description: 'The request did not include a valid Tackle MTM access token, so no principal
-
-        could be established. The response body is `{}` — the `message` field is omitted.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example: {}
-    BadRequest:
-      description: 'The request was malformed or could not be processed. Returned when the JSON body
-
-        cannot be parsed, when a required field is missing, when an unsupported
-
-        `tackle-operation-id` is supplied, or when a referenced CRM ID is invalid.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Your request could not be processed.
-    Forbidden:
-      description: 'The authenticated principal does not have permission to perform this operation.
-
-        The response body is `{}` — the `message` field is omitted.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example: {}
   schemas:
+    Error:
+      type: object
+      description: 'Standard error envelope returned by this API. The `message` field is included
+
+        for most 4xx responses raised by request validation. For 401, 403, and 500
+
+        responses (and for `GET /api/referrals/{referral_id}` 404 responses) the body is
+
+        either `{}` or omitted entirely.'
+      properties:
+        message:
+          type: string
+          description: Human-readable description of the error condition.
+          example: Your request could not be processed.
     CustomerLookupAccount:
       type: object
       description: Customer Account
@@ -472,23 +455,47 @@ components:
               type: string
             msp_subverticalcode:
               type: string
-    Error:
-      type: object
-      description: 'Standard error envelope returned by this API. The `message` field is included
+  responses:
+    Forbidden:
+      description: 'The authenticated principal does not have permission to perform this operation.
 
-        for most 4xx responses raised by request validation. For 401, 403, and 500
+        The response body is `{}` — the `message` field is omitted.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example: {}
+    InternalServerError:
+      description: 'An unexpected error occurred while processing the request. The response body is
 
-        responses (and for `GET /api/referrals/{referral_id}` 404 responses) the body is
+        empty.'
+    BadRequest:
+      description: 'The request was malformed or could not be processed. Returned when the JSON body
 
-        either `{}` or omitted entirely.'
-      properties:
-        message:
-          type: string
-          description: Human-readable description of the error condition.
-          example: Your request could not be processed.
+        cannot be parsed, when a required field is missing, when an unsupported
+
+        `tackle-operation-id` is supplied, or when a referenced CRM ID is invalid.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Your request could not be processed.
+    Unauthorized:
+      description: 'The request did not include a valid Tackle MTM access token, so no principal
+
+        could be established. The response body is `{}` — the `message` field is omitted.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example: {}
   securitySchemes:
-    tackleJwt:
+    bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT
-      description: Tackle-issued JWT (interactive user or MTM token).
+      bearerFormat: MTM JWT
+      description: 'Tackle machine-to-machine access token sent as `Authorization: Bearer <access_token>`.'
+externalDocs:
+  description: Tackle Developer Portal
+  url: https://developers.tackle.io

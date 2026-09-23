@@ -1,13 +1,17 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Tackle Public Contracts Authentication Notifications API
-  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
+  title: Offers MSFT Notifications API
+  description: 'The Offers MSFT API manages Microsoft private offers in Tackle. It includes externally consumable endpoints authenticated by Tackle user or machine-to-machine bearer tokens and authorized through Tackle RBAC.
+
+
+    Clients may include the optional `tackle-operation-id` header for request tracing. API Gateway rate limiting and throttling are configured per environment.'
   version: 1.0.0
+  license:
+    name: Proprietary
+    url: https://www.tackle.io/
 servers:
-- url: https://contracts.tackle.io
-  description: Production
-security:
-- tackleJwt: []
+- url: https://msft.offers.tackle.io
+  description: MSFT Offers Service
 tags:
 - name: Notifications
   description: Buyer instruction notification operations.
@@ -26,9 +30,7 @@ paths:
         Tackle Notification Service and marks the offer as email sent.
 
 
-        Required RBAC action: `offers:SendOfferInstructions`.
-
-        '
+        Required RBAC action: `offers:SendOfferInstructions`.'
       operationId: createPrivateOfferNotification
       security:
       - bearerAuth: []
@@ -62,22 +64,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   responses:
-    NoContent:
-      description: Operation completed successfully with no response body.
-    InternalServerError:
-      description: Internal server error or upstream dependency failure.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    ForbiddenError:
-      description: Caller is not allowed to perform this action.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: forbidden
     NotFoundError:
       description: Requested offer or resource was not found.
       content:
@@ -86,6 +72,14 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
           example:
             message: not found
+    ForbiddenError:
+      description: Caller is not allowed to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: forbidden
     UnauthorizedError:
       description: Authentication failed.
       content:
@@ -102,33 +96,15 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
           example:
             message: missing id
-  parameters:
-    OfferId:
-      name: id
-      in: path
-      required: true
-      description: Tackle private offer ID.
-      schema:
-        type: string
-      example: po-1234
-    TackleOperationId:
-      name: tackle-operation-id
-      in: header
-      required: false
-      description: Optional caller-provided operation ID for request tracing.
-      schema:
-        type: string
-      example: 018f01ec-3f2b-7a70-b81e-4fc3d6a69f42
+    NoContent:
+      description: Operation completed successfully with no response body.
+    InternalServerError:
+      description: Internal server error or upstream dependency failure.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
-    ErrorResponse:
-      type: object
-      required:
-      - message
-      properties:
-        message:
-          type: string
-          description: Human-readable error message.
-          example: missing id
     CreateOfferNotificationRequest:
       type: object
       description: 'Request body for creating an offer notification. Only buyer instruction
@@ -152,9 +128,35 @@ components:
           - email
           description: Notification channel to use.
           example: email
+    ErrorResponse:
+      type: object
+      required:
+      - message
+      properties:
+        message:
+          type: string
+          description: Human-readable error message.
+          example: missing id
+  parameters:
+    OfferId:
+      name: id
+      in: path
+      required: true
+      description: Tackle private offer ID.
+      schema:
+        type: string
+      example: po-1234
+    TackleOperationId:
+      name: tackle-operation-id
+      in: header
+      required: false
+      description: Optional caller-provided operation ID for request tracing.
+      schema:
+        type: string
+      example: 018f01ec-3f2b-7a70-b81e-4fc3d6a69f42
   securitySchemes:
-    tackleJwt:
+    bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Tackle-issued JWT (interactive user or MTM token).
+      description: Tackle bearer token checked by RBAC for the operation action.

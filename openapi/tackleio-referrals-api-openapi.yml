@@ -1,13 +1,17 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Tackle Public Contracts Authentication Referrals API
-  description: "Customer-facing read API for cloud marketplace contracts that Tackle has\ningested for your Tackle account.\n\nThe response shape is a stable projection of the underlying\ncontract document. It is intended to be safe to consume long-term: fields\nwill be added over time, but documented fields will not be removed without\ndeprecation notice.\n\n## Authentication\n\nEvery request must include a valid Tackle JWT in the `Authorization`\nheader (`Authorization: Bearer <token>`). Machine-to-machine (MTM) tokens\nissued for your Tackle account are accepted. The token scopes every\nresponse to the account it represents.\n\n## Pagination\n\n`GET /api/contracts` is the only paginated endpoint. Pagination uses an\nopaque `cursor` query parameter:\n\n1. The first request omits `cursor`.\n2. If more pages exist, the response includes a `next` field. Pass that\n   value verbatim back as `cursor` on the next request.\n3. The last page omits `next`.\n\nCursors are opaque tokens. Do not parse, modify, or persist them across\nschema changes — request a fresh page from the start instead.\n"
-  version: 1.0.0
+  title: Tackle Co-Sell for Microsoft Partner Center Customer…
+  description: 'This API helps you interact with Microsoft to create and manage co-sell
+
+    referrals that you share with Microsoft as well as receive, respond to,
+
+    and manage referrals originated by Microsoft.'
+  version: '1.0'
 servers:
-- url: https://contracts.tackle.io
-  description: Production
+- url: https://msft.cosell.tackle.io
+  description: Microsoft Co-Sell production endpoint
 security:
-- tackleJwt: []
+- bearerAuth: []
 tags:
 - name: Referrals
   description: Create, read, update, and list events on Microsoft Partner Center co-sell referrals (both outbound and inbound).
@@ -1081,139 +1085,26 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
-    TrackingInfo:
+    RequirementsInput:
       type: object
-      description: 'Microsoft Partner Center tracking identifiers attached to the
-
-        referral. Most fields are populated by Microsoft and reflect
-
-        upstream tracking state; expect any field to be omitted when
-
-        Microsoft has not assigned a value.'
+      description: Industry, products, service type, and solutions the customer is interested in.
       properties:
-        microsoftMsxId:
+        solutionArea:
           type: string
-          description: Microsoft Sales Experience (MSX) identifier for the linked Dynamics 365 opportunity, when present.
-        microsoftUSFedOpportunityId:
+          description: The Solution area of the Customer need in the opportunity. Required for Services co-sell referrals only
+        solutionPlay:
           type: string
-          description: 'Microsoft US Federal opportunity identifier, populated only for US-Federal referrals (`dealSensitivity: USFed`).'
-        microsoftUSFedLeadId:
+          description: The Solution play of the Customer need in the opportunity. Required for Services co-sell referrals only
+        customerMarketplaceIntent:
           type: string
-          description: 'Microsoft US Federal lead identifier, populated only for US-Federal referrals (`dealSensitivity: USFed`).'
-        migratedPSCDealId:
-          type: string
-          description: Legacy Partner Sales Connect (PSC) deal ID preserved on referrals migrated from PSC.
-        migratedPSCPartnerDealId:
-          type: string
-          description: Legacy Partner Sales Connect (PSC) partner-deal ID preserved on referrals migrated from PSC.
-        leadToOpportunityLinkId:
-          type: string
-          description: Microsoft Partner Center linkage ID joining a lead-stage referral to its converted opportunity.
-        microsoftMilestoneIds:
+          description: Indicates the customers purchase intent on Microsoft marketplace.
+        solutions:
           type: array
-          description: Microsoft-side milestone identifiers associated with the referral lifecycle. Treat as opaque values.
+          description: The solutions the customer is interested in.
           items:
-            type: string
-    Link:
-      type: object
-      description: HATEOAS-style link surfaced by Microsoft Partner Center for follow-up navigation. Useful when integrating the Microsoft Partner Center UI side-by-side with a Tackle-driven flow; not required to operate this API.
-      properties:
-        uri:
-          type: string
-          description: The URI of the related resource.
-        method:
-          type: string
-          description: The HTTP method to use when following the link.
-          example: GET
-    SolutionInput:
-      type: object
-      properties:
-        type:
-          type: string
-          description: The type of solution. The only currently emitted value for IP is "Name".
-          enum:
-          - Name
-        id:
-          type: string
-          description: 'Identifier for the solution. For Microsoft first-party solutions, use `identifiers.id` from the Microsoft solutions response (`type: solution`); for owned or third-party solutions, use `solutionId` from the solution lookup.'
-        name:
-          type: string
-          description: Name of the solution. Use `name` from the solution lookup.
-        price:
-          type: string
-          description: Price of the solution. Caller-supplied for Microsoft first-party (`1P`) solutions; ignored otherwise.
-        quantity:
-          type: integer
-          description: Quantity of the solution. Caller-supplied for Microsoft first-party (`1P`) solutions; ignored otherwise.
-        currency:
-          type: string
-          description: ISO 4217 currency code. Caller-supplied for Microsoft first-party (`1P`) solutions; ignored otherwise.
-        solutionType:
-          type: string
-          description: The type of solution.  Possible types are 1P, 3P, and SA. type from solution lookup.
-          enum:
-          - 1P
-          - 3P
-          - SA
-        publisherName:
-          type: string
-          description: The solution publishers organization name.  publisherName from solution lookup.
+            $ref: '#/components/schemas/SolutionInput'
       required:
-      - type
-      - id
-      - name
-      - solutionType
-      - publisherName
-    AddressInput:
-      type: object
-      description: Customer address used when creating a referral.
-      properties:
-        addressLine1:
-          type: string
-          description: 'Street address (line 1). When the customer was matched via
-
-            `customerLookup`, copy `customerAccountDetails.address1_line1`;
-
-            for DUNS-matched customers, copy `address.addressLine1` from
-
-            the DUNS lookup.'
-        city:
-          type: string
-          description: 'City. When the customer was matched via `customerLookup`,
-
-            copy `customerAccountDetails.address1_city`; for DUNS-matched
-
-            customers, copy `address.city` from the DUNS lookup.'
-        postalCode:
-          type: string
-          description: 'Postal code. Required only when sourced from a DUNS lookup
-
-            (use `address.postalCode` from that response); ignored when
-
-            sourced from `customerLookup`.'
-        country:
-          type: string
-          description: 'Country in ISO 3166-1 alpha-2 form (see
-
-            [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)).
-
-            When the customer was matched via `customerLookup`, convert
-
-            `customerAccountDetails.address1_country` (e.g. "United
-
-            States") to its 2-letter code (`US`); for DUNS-matched
-
-            customers, copy `address.country` from the DUNS lookup.'
-        region:
-          type: string
-          description: 'Region. Required only when sourced from a DUNS lookup (use
-
-            `address.region` from that response); ignored when sourced
-
-            from `customerLookup`.'
-      required:
-      - addressLine1
-      - country
+      - customerMarketplaceIntent
     InviteContextInput:
       type: object
       description: 'Information supplied when inviting another organization into a
@@ -1276,6 +1167,133 @@ components:
       - organizationName
       - notes
       - team
+    AddressInput:
+      type: object
+      description: Customer address used when creating a referral.
+      properties:
+        addressLine1:
+          type: string
+          description: 'Street address (line 1). When the customer was matched via
+
+            `customerLookup`, copy `customerAccountDetails.address1_line1`;
+
+            for DUNS-matched customers, copy `address.addressLine1` from
+
+            the DUNS lookup.'
+        city:
+          type: string
+          description: 'City. When the customer was matched via `customerLookup`,
+
+            copy `customerAccountDetails.address1_city`; for DUNS-matched
+
+            customers, copy `address.city` from the DUNS lookup.'
+        postalCode:
+          type: string
+          description: 'Postal code. Required only when sourced from a DUNS lookup
+
+            (use `address.postalCode` from that response); ignored when
+
+            sourced from `customerLookup`.'
+        country:
+          type: string
+          description: 'Country in ISO 3166-1 alpha-2 form (see
+
+            [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)).
+
+            When the customer was matched via `customerLookup`, convert
+
+            `customerAccountDetails.address1_country` (e.g. "United
+
+            States") to its 2-letter code (`US`); for DUNS-matched
+
+            customers, copy `address.country` from the DUNS lookup.'
+        region:
+          type: string
+          description: 'Region. Required only when sourced from a DUNS lookup (use
+
+            `address.region` from that response); ignored when sourced
+
+            from `customerLookup`.'
+      required:
+      - addressLine1
+      - country
+    ConsentInput:
+      type: object
+      description: Consent flags around sharing information with other organizations and allowing them to contact users. Required.
+      properties:
+        consentToShareReferralWithMicrosoftSellers:
+          type: boolean
+          description: Indicates consent to share the deal with Microsoft sellers.  Note that to make a referral Partner-led, consentToShareReferralWithMicrosoftSellers is supplied as true. An active Private referral can be converted to Partner-led just by updating the referral for this field.
+        consentToToShareInfoWithOthers:
+          type: boolean
+          description: Indicates consent to share personal data with others. Must be true.
+        consentToContact:
+          type: boolean
+          description: Indicates consent to contact users.  Must be true.
+        consentToMicrosoftToContactSpecificPartners:
+          type: boolean
+          description: Indicates consent to let Microsoft contact specific partners for this deal.
+      required:
+      - consentToShareReferralWithMicrosoftSellers
+      - consentToToShareInfoWithOthers
+      - consentToContact
+    InviteContext:
+      type: object
+      description: 'Read-side representation of the invite context returned on a
+
+        referral. The shape differs from the request-side
+
+        `InviteContextInput`: the inviting organization is wrapped under
+
+        `invitedBy`, and `assistanceRequestCode` is typed as a free-form
+
+        string so that any value Microsoft returns is preserved verbatim
+
+        (including values outside the input enum, such as `Unknown`).
+
+        When constructing a request, use `InviteContextInput`; when
+
+        reading a referral, expect this shape.'
+      properties:
+        notes:
+          type: string
+          description: Notes the inviting organization provided when inviting another organization into the partner engagement.
+        invitedBy:
+          type: object
+          description: The organization that initiated the invite.
+          properties:
+            organizationId:
+              type: string
+              description: The organization ID that sent the referral.
+            organizationName:
+              type: string
+              description: The organization name that sent the referral.
+        assistanceRequestCode:
+          type: string
+          description: Type of help requested by the inviting organization. Whatever value Microsoft sent is returned as-is, which can include values outside the input enum (for example `Unknown`).
+        invitedMpnId:
+          type: string
+          description: MPN ID of the invited partner, when present.
+    ReferralResponse:
+      allOf:
+      - $ref: '#/components/schemas/Referral'
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/ReferralMetadata'
+    Target:
+      type: object
+      description: Sales target attached to the referral, identifying which solution profile or business profile location the referral is aimed at.
+      properties:
+        id:
+          type: string
+          description: Microsoft Partner Center identifier for the target resource.
+        type:
+          type: string
+          description: "What kind of target the `id` refers to.\n\n  - `BusinessProfileLocation` -- a published business profile location.\n  - `SolutionProfile` -- a published solution profile."
+          enum:
+          - BusinessProfileLocation
+          - SolutionProfile
     StatusChangedInput:
       type: object
       properties:
@@ -1299,6 +1317,94 @@ components:
           description: Represents users in the organizations that are involved in the partner engagement. Can be used when updating or accepting a referral.
           items:
             $ref: '#/components/schemas/MemberInput'
+    DetailsInput:
+      type: object
+      description: Customer details, notes, deal value, currency closing date. Required.
+      properties:
+        notes:
+          type: string
+          description: Notes for the referral.
+        dealValue:
+          type: number
+          description: Value of the referral.
+        currency:
+          type: string
+          description: The ISO 4217 currency symbol. https://learn.microsoft.com/en-us/dotnet/api/system.globalization.regioninfo.isocurrencysymbol?view=netframework-4.7.2&preserve-view=true
+        closingDateTime:
+          type: string
+          description: Date the customer is looking to close by.
+        requirements:
+          $ref: '#/components/schemas/RequirementsInput'
+      required:
+      - dealValue
+      - currency
+      - closingDateTime
+    Link:
+      type: object
+      description: HATEOAS-style link surfaced by Microsoft Partner Center for follow-up navigation. Useful when integrating the Microsoft Partner Center UI side-by-side with a Tackle-driven flow; not required to operate this API.
+      properties:
+        uri:
+          type: string
+          description: The URI of the related resource.
+        method:
+          type: string
+          description: The HTTP method to use when following the link.
+          example: GET
+    CreateReferralInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the Referral
+        companyWebsite:
+          type: string
+          description: URL of the customer organization. Captured by Tackle for context and not forwarded to Microsoft Partner Center.
+        crmId:
+          type: string
+          description: 'Identifier of the parent CRM record this referral is linked to
+
+            (typically a Salesforce 18-character Opportunity ID). 15-character
+
+            Salesforce IDs are accepted and normalized to 18 characters.'
+        crmOrgId:
+          type: string
+          description: Organization (tenant) ID of the CRM system. Required in multi-org CRM setups to disambiguate which org the `crmId` belongs to.
+        mpnId:
+          type: string
+          description: The MPN ID of the partner
+        campaignId:
+          type: string
+          description: Marketing campaign ID
+        dealSensitivity:
+          type: string
+          description: The sensitivity of the deal based on the selected customer.
+          enum:
+          - USFed
+          - None
+        customerProfile:
+          $ref: '#/components/schemas/CustomerProfileInput'
+        consent:
+          $ref: '#/components/schemas/ConsentInput'
+        details:
+          $ref: '#/components/schemas/DetailsInput'
+        team:
+          type: array
+          description: Represents users in the organizations that are involved in the partner engagement.
+          items:
+            $ref: '#/components/schemas/MemberInput'
+        inviteContexts:
+          type: array
+          description: Include to invite Microsoft or another organization to the deal.
+          items:
+            $ref: '#/components/schemas/InviteContextInput'
+      required:
+      - name
+      - mpnId
+      - dealSensitivity
+      - team
+      - customerProfile
+      - consent
+      - details
     Error:
       type: object
       description: 'Standard error envelope returned by this API. The `message` field is included
@@ -1313,64 +1419,6 @@ components:
           type: string
           description: Human-readable description of the error condition.
           example: Your request could not be processed.
-    CustomerProfileInput:
-      type: object
-      description: Customer contact information. Required.
-      properties:
-        name:
-          type: string
-          description: The customer organization name.
-        isMatchingComplete:
-          type: boolean
-          description: If the customer was matched using the customer lookup endpoint.
-        isMaccEligible:
-          type: boolean
-          description: Whether the customer is eligible for a Microsoft Azure Consumption Commitment (MACC). Copy this from the `msp_customermacceligibility` field on the matched account in the `customerLookup` response.
-        ids:
-          type: array
-          description: "Customer organization identifiers, copied from whichever lookup\nyou used to find the customer:\n\n  - From `customerLookup` -- populate `id` with\n    `customerAccountDetails.msp_accountnumber` and\n    `profileType: External`.\n  - From a DUNS lookup -- populate `id` with the customer's\n    DUNS number and `profileType: duns`."
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                description: Customer organization identifier. Source value depends on `profileType`.
-              profileType:
-                type: string
-                description: "Identifier source. Allowed values:\n\n  - `External` -- `id` is `customerAccountDetails.msp_accountnumber` from `customerLookup`.\n  - `duns` -- `id` is the customer's DUNS number from a DUNS lookup."
-                enum:
-                - External
-                - duns
-            required:
-            - id
-            - profileType
-        address:
-          $ref: '#/components/schemas/AddressInput'
-        team:
-          type: array
-          description: The contacts for the customer organization.
-          items:
-            $ref: '#/components/schemas/MemberInput'
-      required:
-      - name
-      - isMatchingComplete
-      - isMaccEligible
-    MemberInput:
-      type: object
-      description: Person on the customer or partner side participating in the engagement (a salesperson, technical contact, or executive sponsor).
-      properties:
-        firstName:
-          type: string
-          description: The contact's first name.
-        lastName:
-          type: string
-          description: The contact's surname.
-        phoneNumber:
-          type: string
-          description: The contact's phone number, in any locale-appropriate format.
-        email:
-          type: string
-          description: The contact's email address.
     ReferralMetadata:
       type: object
       description: 'Tackle-side metadata layered onto a referral when returned by
@@ -1524,44 +1572,105 @@ components:
           example:
             dealValue: 12345
             currency: USD
-    ConsentUpdateInput:
+    DetailsUpdateInput:
       type: object
-      description: Consent flags around sharing information with other organizations and allowing them to contact users. Required.
+      description: Customer details, notes, deal value, currency closing date. Required.
       properties:
-        consentToShareReferralWithMicrosoftSellers:
-          type: boolean
-          description: Indicates consent to share the deal with Microsoft sellers.  Note that to make a referral Partner-led, consentToShareReferralWithMicrosoftSellers is supplied as true. An active Private referral can be converted to Partner-led just by updating the referral for this field.
-    CreateReferralInput:
+        notes:
+          type: string
+          description: Notes for the referral.
+        dealValue:
+          type: number
+          description: Value of the referral.
+        currency:
+          type: string
+          description: The ISO 4217 currency symbol. https://learn.microsoft.com/en-us/dotnet/api/system.globalization.regioninfo.isocurrencysymbol?view=netframework-4.7.2&preserve-view=true
+        closingDateTime:
+          type: string
+          description: Date the customer is looking to close by.
+        requirements:
+          $ref: '#/components/schemas/RequirementsUpdateInput'
+    Referral:
       type: object
+      description: 'Read-side representation of a co-sell referral as returned by
+
+        `getReferral` and `listReferralEvents`. Fields are populated
+
+        from Microsoft Partner Center; `null` or omitted fields
+
+        indicate Microsoft did not return a value for that referral.'
       properties:
+        id:
+          type: string
+          description: Microsoft Partner Center referral ID. Stable across the lifetime of the referral.
+        engagementId:
+          type: string
+          description: Microsoft Partner Center engagement ID. All related referrals (for example, partner-led co-sell pairings) share the same `engagementId`.
         name:
           type: string
-          description: The name of the Referral
-        companyWebsite:
+          description: Caller-supplied human-readable name for the referral.
+        externalReferenceId:
           type: string
-          description: URL of the customer organization. Captured by Tackle for context and not forwarded to Microsoft Partner Center.
-        crmId:
+          description: Optional external reference ID supplied by the partner system, when present.
+        createdDateTime:
           type: string
-          description: 'Identifier of the parent CRM record this referral is linked to
-
-            (typically a Salesforce 18-character Opportunity ID). 15-character
-
-            Salesforce IDs are accepted and normalized to 18 characters.'
-        crmOrgId:
+          format: date-time
+          description: ISO-8601 timestamp recording when the referral was created.
+        updatedDateTime:
           type: string
-          description: Organization (tenant) ID of the CRM system. Required in multi-org CRM setups to disambiguate which org the `crmId` belongs to.
-        mpnId:
+          format: date-time
+          description: ISO-8601 timestamp recording when the referral was last updated.
+        expirationDateTime:
           type: string
-          description: The MPN ID of the partner
-        campaignId:
+          format: date-time
+          description: ISO-8601 timestamp recording when the referral will expire.
+        acceptedDateTime:
           type: string
-          description: Marketing campaign ID
-        dealSensitivity:
+          format: date-time
+          description: ISO-8601 timestamp recording when the referral was accepted by the receiving partner. For outgoing referrals this matches `createdDateTime`.
+        status:
           type: string
-          description: The sensitivity of the deal based on the selected customer.
+          description: "Top-level lifecycle stage of the referral. Combine with\n`substatus` to determine the precise state. Values:\n\n  - `None` — no status has been set yet (typically observed only\n    on draft referrals before submission to Microsoft).\n  - `New` — the referral has been created and is awaiting action\n    by the receiving organization.\n  - `Active` — the referral has been accepted and is currently\n    being worked.\n  - `Closed` — the referral has reached a terminal state; see\n    `substatus` (`Won`, `Lost`, `Declined`, `Expired`, `Error`)\n    for the outcome."
           enum:
-          - USFed
           - None
+          - New
+          - Active
+          - Closed
+        substatus:
+          type: string
+          description: "Sub-state of the referral, scoped to the parent `status`. Values:\n\n  - `None` — no sub-state has been set.\n  - `Pending` — submission to Microsoft is in flight or awaiting\n    acceptance.\n  - `Received` — Microsoft has received the referral and it is\n    awaiting partner action.\n  - `Accepted` — the receiving organization has accepted the\n    referral.\n  - `Won` — the referral closed as a won deal.\n  - `Lost` — the referral closed as lost.\n  - `Declined` — the receiving organization declined the\n    referral.\n  - `Expired` — the referral was closed because no action was\n    taken within Microsoft's allowed window.\n  - `Error` — the referral closed in an error state; see\n    `statusReason` for the reported reason."
+          enum:
+          - None
+          - Pending
+          - Received
+          - Accepted
+          - Won
+          - Lost
+          - Declined
+          - Expired
+          - Error
+        statusReason:
+          type: string
+          description: Reason supplied when the referral closed (won, lost, declined, or error). Format follows `<reasonCode>:<freeFormNotes>`.
+        type:
+          type: string
+          description: "Whether the referral is shared between the seller and a\npartner organization or independent.\n\n  - `Shared` — both sides see the referral.\n  - `Independent` — only the originating organization sees it."
+          enum:
+          - Shared
+          - Independent
+        tags:
+          type: array
+          description: Microsoft-applied tags on the referral, such as `IPCosell`. Treat as opaque labels.
+          items:
+            type: string
+        qualification:
+          type: string
+          description: "Sales qualification level reported by Microsoft.\n\n  - `None` — not qualified.\n  - `Direct` — direct customer interest, no MQL/SQL qualification.\n  - `MarketingQualified` — marketing-qualified lead.\n  - `SalesQualified` — sales-qualified lead."
+          enum:
+          - None
+          - Direct
+          - MarketingQualified
+          - SalesQualified
         customerProfile:
           $ref: '#/components/schemas/CustomerProfileInput'
         consent:
@@ -1570,22 +1679,132 @@ components:
           $ref: '#/components/schemas/DetailsInput'
         team:
           type: array
-          description: Represents users in the organizations that are involved in the partner engagement.
+          description: Members of the partner or seller organization participating in the engagement.
           items:
             $ref: '#/components/schemas/MemberInput'
-        inviteContexts:
+        inviteContext:
+          $ref: '#/components/schemas/InviteContext'
+        eTag:
+          type: string
+          description: Concurrency token for the referral as reported by Microsoft Partner Center. Treat the value as opaque.
+        target:
           type: array
-          description: Include to invite Microsoft or another organization to the deal.
+          description: Microsoft Partner Center targets attached to the referral (for example, the published business profile location or solution profile this referral is aimed at).
           items:
-            $ref: '#/components/schemas/InviteContextInput'
+            $ref: '#/components/schemas/Target'
+        mpnId:
+          type: string
+          description: Microsoft Partner Network (MPN) ID of the originating partner.
+        organizationId:
+          type: string
+          description: Microsoft Partner Center organization ID of the originating partner.
+        organizationName:
+          type: string
+          description: Display name of the originating partner organization.
+        lastModifiedVia:
+          type: string
+          description: Identifier of the principal that produced the most recent modification (for example, the Microsoft Partner Center user ID or the ID of an automated process).
+        lastRunId:
+          type: string
+          description: Identifier of the most recent processing run that touched the referral. Useful for correlating with audit logs.
+        referralSource:
+          type: string
+          description: Source channel that produced the referral (for example, a marketplace listing or a partner-initiated co-sell).
+        favorite:
+          type: boolean
+          description: Whether the referral has been marked as a favorite by the originating user.
+        campaignId:
+          type: string
+          description: Marketing campaign ID, when the referral was created from a campaign.
+        salesStage:
+          type: string
+          description: Microsoft Partner Center sales-stage code, transmitted as a string. See `UpdateReferralInput.salesStage` for the published code-to-stage mapping.
+        quality:
+          type: string
+          description: Microsoft-reported lead-quality grade for the referral (for example, `Unknown`). Treat unrecognized values as a safe default.
+        isSpam:
+          type: boolean
+          description: Whether Microsoft has flagged the referral as spam.
+        direction:
+          type: string
+          description: "Whether the referral is moving outbound from the partner to\nMicrosoft, or inbound from Microsoft to the partner.\n\n  - `Incoming` — the referral was originated outside the\n    partner organization (for example, by Microsoft) and is\n    being shared with the partner.\n  - `Outgoing` — the referral was originated by the partner\n    and submitted to Microsoft."
+          enum:
+          - Incoming
+          - Outgoing
+        referralProgram:
+          type: string
+          description: Microsoft co-sell program associated with this referral, when assigned by Microsoft.
+        dealSensitivity:
+          type: string
+          description: Special-handling marker for the referral. Currently the only emitted value is `USFed` (US Federal customer); otherwise the value is `None`.
+        createdVia:
+          type: string
+          description: Identifier of the principal that originally created the referral (Microsoft Partner Center user ID or automated-process ID).
+        closedDateTime:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp recording when the referral was closed (won, lost, declined, or in error).
+        callToAction:
+          type: string
+          description: Microsoft-suggested next action for the referral, when provided.
+        registrationStatus:
+          type: string
+          description: Microsoft Partner Center deal-registration state for the referral (for example, `None` when registration is not applicable). Treat unrecognized values as a safe default.
+        isAutoRegistrationEnabled:
+          type: boolean
+          description: Whether Microsoft will automatically register the deal on behalf of the partner.
+        links:
+          type: object
+          description: Microsoft Partner Center HATEOAS links for follow-up navigation, keyed by relation name. See `Link`.
+          additionalProperties:
+            $ref: '#/components/schemas/Link'
+        trackingInfo:
+          $ref: '#/components/schemas/TrackingInfo'
+        exception:
+          description: Free-form exception payload captured when the referral entered an error state, when present. The value may be a structured object or a JSON-encoded string; treat as best-effort diagnostic context.
+          oneOf:
+          - type: object
+          - type: string
+          example: '{"key": "value"}'
+    SolutionInput:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of solution. The only currently emitted value for IP is "Name".
+          enum:
+          - Name
+        id:
+          type: string
+          description: 'Identifier for the solution. For Microsoft first-party solutions, use `identifiers.id` from the Microsoft solutions response (`type: solution`); for owned or third-party solutions, use `solutionId` from the solution lookup.'
+        name:
+          type: string
+          description: Name of the solution. Use `name` from the solution lookup.
+        price:
+          type: string
+          description: Price of the solution. Caller-supplied for Microsoft first-party (`1P`) solutions; ignored otherwise.
+        quantity:
+          type: integer
+          description: Quantity of the solution. Caller-supplied for Microsoft first-party (`1P`) solutions; ignored otherwise.
+        currency:
+          type: string
+          description: ISO 4217 currency code. Caller-supplied for Microsoft first-party (`1P`) solutions; ignored otherwise.
+        solutionType:
+          type: string
+          description: The type of solution.  Possible types are 1P, 3P, and SA. type from solution lookup.
+          enum:
+          - 1P
+          - 3P
+          - SA
+        publisherName:
+          type: string
+          description: The solution publishers organization name.  publisherName from solution lookup.
       required:
+      - type
+      - id
       - name
-      - mpnId
-      - dealSensitivity
-      - team
-      - customerProfile
-      - consent
-      - details
+      - solutionType
+      - publisherName
     UpdateReferralInput:
       type: object
       properties:
@@ -1614,79 +1833,48 @@ components:
             $ref: '#/components/schemas/InviteContextInput'
       required:
       - team
-    DetailsInput:
+    CustomerProfileInput:
       type: object
-      description: Customer details, notes, deal value, currency closing date. Required.
+      description: Customer contact information. Required.
       properties:
-        notes:
+        name:
           type: string
-          description: Notes for the referral.
-        dealValue:
-          type: number
-          description: Value of the referral.
-        currency:
-          type: string
-          description: The ISO 4217 currency symbol. https://learn.microsoft.com/en-us/dotnet/api/system.globalization.regioninfo.isocurrencysymbol?view=netframework-4.7.2&preserve-view=true
-        closingDateTime:
-          type: string
-          description: Date the customer is looking to close by.
-        requirements:
-          $ref: '#/components/schemas/RequirementsInput'
+          description: The customer organization name.
+        isMatchingComplete:
+          type: boolean
+          description: If the customer was matched using the customer lookup endpoint.
+        isMaccEligible:
+          type: boolean
+          description: Whether the customer is eligible for a Microsoft Azure Consumption Commitment (MACC). Copy this from the `msp_customermacceligibility` field on the matched account in the `customerLookup` response.
+        ids:
+          type: array
+          description: "Customer organization identifiers, copied from whichever lookup\nyou used to find the customer:\n\n  - From `customerLookup` -- populate `id` with\n    `customerAccountDetails.msp_accountnumber` and\n    `profileType: External`.\n  - From a DUNS lookup -- populate `id` with the customer's\n    DUNS number and `profileType: duns`."
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Customer organization identifier. Source value depends on `profileType`.
+              profileType:
+                type: string
+                description: "Identifier source. Allowed values:\n\n  - `External` -- `id` is `customerAccountDetails.msp_accountnumber` from `customerLookup`.\n  - `duns` -- `id` is the customer's DUNS number from a DUNS lookup."
+                enum:
+                - External
+                - duns
+            required:
+            - id
+            - profileType
+        address:
+          $ref: '#/components/schemas/AddressInput'
+        team:
+          type: array
+          description: The contacts for the customer organization.
+          items:
+            $ref: '#/components/schemas/MemberInput'
       required:
-      - dealValue
-      - currency
-      - closingDateTime
-    DetailsUpdateInput:
-      type: object
-      description: Customer details, notes, deal value, currency closing date. Required.
-      properties:
-        notes:
-          type: string
-          description: Notes for the referral.
-        dealValue:
-          type: number
-          description: Value of the referral.
-        currency:
-          type: string
-          description: The ISO 4217 currency symbol. https://learn.microsoft.com/en-us/dotnet/api/system.globalization.regioninfo.isocurrencysymbol?view=netframework-4.7.2&preserve-view=true
-        closingDateTime:
-          type: string
-          description: Date the customer is looking to close by.
-        requirements:
-          $ref: '#/components/schemas/RequirementsUpdateInput'
-    ConsentInput:
-      type: object
-      description: Consent flags around sharing information with other organizations and allowing them to contact users. Required.
-      properties:
-        consentToShareReferralWithMicrosoftSellers:
-          type: boolean
-          description: Indicates consent to share the deal with Microsoft sellers.  Note that to make a referral Partner-led, consentToShareReferralWithMicrosoftSellers is supplied as true. An active Private referral can be converted to Partner-led just by updating the referral for this field.
-        consentToToShareInfoWithOthers:
-          type: boolean
-          description: Indicates consent to share personal data with others. Must be true.
-        consentToContact:
-          type: boolean
-          description: Indicates consent to contact users.  Must be true.
-        consentToMicrosoftToContactSpecificPartners:
-          type: boolean
-          description: Indicates consent to let Microsoft contact specific partners for this deal.
-      required:
-      - consentToShareReferralWithMicrosoftSellers
-      - consentToToShareInfoWithOthers
-      - consentToContact
-    Target:
-      type: object
-      description: Sales target attached to the referral, identifying which solution profile or business profile location the referral is aimed at.
-      properties:
-        id:
-          type: string
-          description: Microsoft Partner Center identifier for the target resource.
-        type:
-          type: string
-          description: "What kind of target the `id` refers to.\n\n  - `BusinessProfileLocation` -- a published business profile location.\n  - `SolutionProfile` -- a published solution profile."
-          enum:
-          - BusinessProfileLocation
-          - SolutionProfile
+      - name
+      - isMatchingComplete
+      - isMaccEligible
     ListReferralEvent:
       type: object
       required:
@@ -1888,239 +2076,62 @@ components:
               type: string
             email:
               type: string
-    RequirementsInput:
+    ConsentUpdateInput:
       type: object
-      description: Industry, products, service type, and solutions the customer is interested in.
+      description: Consent flags around sharing information with other organizations and allowing them to contact users. Required.
       properties:
-        solutionArea:
+        consentToShareReferralWithMicrosoftSellers:
+          type: boolean
+          description: Indicates consent to share the deal with Microsoft sellers.  Note that to make a referral Partner-led, consentToShareReferralWithMicrosoftSellers is supplied as true. An active Private referral can be converted to Partner-led just by updating the referral for this field.
+    MemberInput:
+      type: object
+      description: Person on the customer or partner side participating in the engagement (a salesperson, technical contact, or executive sponsor).
+      properties:
+        firstName:
           type: string
-          description: The Solution area of the Customer need in the opportunity. Required for Services co-sell referrals only
-        solutionPlay:
+          description: The contact's first name.
+        lastName:
           type: string
-          description: The Solution play of the Customer need in the opportunity. Required for Services co-sell referrals only
-        customerMarketplaceIntent:
+          description: The contact's surname.
+        phoneNumber:
           type: string
-          description: Indicates the customers purchase intent on Microsoft marketplace.
-        solutions:
+          description: The contact's phone number, in any locale-appropriate format.
+        email:
+          type: string
+          description: The contact's email address.
+    TrackingInfo:
+      type: object
+      description: 'Microsoft Partner Center tracking identifiers attached to the
+
+        referral. Most fields are populated by Microsoft and reflect
+
+        upstream tracking state; expect any field to be omitted when
+
+        Microsoft has not assigned a value.'
+      properties:
+        microsoftMsxId:
+          type: string
+          description: Microsoft Sales Experience (MSX) identifier for the linked Dynamics 365 opportunity, when present.
+        microsoftUSFedOpportunityId:
+          type: string
+          description: 'Microsoft US Federal opportunity identifier, populated only for US-Federal referrals (`dealSensitivity: USFed`).'
+        microsoftUSFedLeadId:
+          type: string
+          description: 'Microsoft US Federal lead identifier, populated only for US-Federal referrals (`dealSensitivity: USFed`).'
+        migratedPSCDealId:
+          type: string
+          description: Legacy Partner Sales Connect (PSC) deal ID preserved on referrals migrated from PSC.
+        migratedPSCPartnerDealId:
+          type: string
+          description: Legacy Partner Sales Connect (PSC) partner-deal ID preserved on referrals migrated from PSC.
+        leadToOpportunityLinkId:
+          type: string
+          description: Microsoft Partner Center linkage ID joining a lead-stage referral to its converted opportunity.
+        microsoftMilestoneIds:
           type: array
-          description: The solutions the customer is interested in.
-          items:
-            $ref: '#/components/schemas/SolutionInput'
-      required:
-      - customerMarketplaceIntent
-    InviteContext:
-      type: object
-      description: 'Read-side representation of the invite context returned on a
-
-        referral. The shape differs from the request-side
-
-        `InviteContextInput`: the inviting organization is wrapped under
-
-        `invitedBy`, and `assistanceRequestCode` is typed as a free-form
-
-        string so that any value Microsoft returns is preserved verbatim
-
-        (including values outside the input enum, such as `Unknown`).
-
-        When constructing a request, use `InviteContextInput`; when
-
-        reading a referral, expect this shape.'
-      properties:
-        notes:
-          type: string
-          description: Notes the inviting organization provided when inviting another organization into the partner engagement.
-        invitedBy:
-          type: object
-          description: The organization that initiated the invite.
-          properties:
-            organizationId:
-              type: string
-              description: The organization ID that sent the referral.
-            organizationName:
-              type: string
-              description: The organization name that sent the referral.
-        assistanceRequestCode:
-          type: string
-          description: Type of help requested by the inviting organization. Whatever value Microsoft sent is returned as-is, which can include values outside the input enum (for example `Unknown`).
-        invitedMpnId:
-          type: string
-          description: MPN ID of the invited partner, when present.
-    Referral:
-      type: object
-      description: 'Read-side representation of a co-sell referral as returned by
-
-        `getReferral` and `listReferralEvents`. Fields are populated
-
-        from Microsoft Partner Center; `null` or omitted fields
-
-        indicate Microsoft did not return a value for that referral.'
-      properties:
-        id:
-          type: string
-          description: Microsoft Partner Center referral ID. Stable across the lifetime of the referral.
-        engagementId:
-          type: string
-          description: Microsoft Partner Center engagement ID. All related referrals (for example, partner-led co-sell pairings) share the same `engagementId`.
-        name:
-          type: string
-          description: Caller-supplied human-readable name for the referral.
-        externalReferenceId:
-          type: string
-          description: Optional external reference ID supplied by the partner system, when present.
-        createdDateTime:
-          type: string
-          format: date-time
-          description: ISO-8601 timestamp recording when the referral was created.
-        updatedDateTime:
-          type: string
-          format: date-time
-          description: ISO-8601 timestamp recording when the referral was last updated.
-        expirationDateTime:
-          type: string
-          format: date-time
-          description: ISO-8601 timestamp recording when the referral will expire.
-        acceptedDateTime:
-          type: string
-          format: date-time
-          description: ISO-8601 timestamp recording when the referral was accepted by the receiving partner. For outgoing referrals this matches `createdDateTime`.
-        status:
-          type: string
-          description: "Top-level lifecycle stage of the referral. Combine with\n`substatus` to determine the precise state. Values:\n\n  - `None` — no status has been set yet (typically observed only\n    on draft referrals before submission to Microsoft).\n  - `New` — the referral has been created and is awaiting action\n    by the receiving organization.\n  - `Active` — the referral has been accepted and is currently\n    being worked.\n  - `Closed` — the referral has reached a terminal state; see\n    `substatus` (`Won`, `Lost`, `Declined`, `Expired`, `Error`)\n    for the outcome."
-          enum:
-          - None
-          - New
-          - Active
-          - Closed
-        substatus:
-          type: string
-          description: "Sub-state of the referral, scoped to the parent `status`. Values:\n\n  - `None` — no sub-state has been set.\n  - `Pending` — submission to Microsoft is in flight or awaiting\n    acceptance.\n  - `Received` — Microsoft has received the referral and it is\n    awaiting partner action.\n  - `Accepted` — the receiving organization has accepted the\n    referral.\n  - `Won` — the referral closed as a won deal.\n  - `Lost` — the referral closed as lost.\n  - `Declined` — the receiving organization declined the\n    referral.\n  - `Expired` — the referral was closed because no action was\n    taken within Microsoft's allowed window.\n  - `Error` — the referral closed in an error state; see\n    `statusReason` for the reported reason."
-          enum:
-          - None
-          - Pending
-          - Received
-          - Accepted
-          - Won
-          - Lost
-          - Declined
-          - Expired
-          - Error
-        statusReason:
-          type: string
-          description: Reason supplied when the referral closed (won, lost, declined, or error). Format follows `<reasonCode>:<freeFormNotes>`.
-        type:
-          type: string
-          description: "Whether the referral is shared between the seller and a\npartner organization or independent.\n\n  - `Shared` — both sides see the referral.\n  - `Independent` — only the originating organization sees it."
-          enum:
-          - Shared
-          - Independent
-        tags:
-          type: array
-          description: Microsoft-applied tags on the referral, such as `IPCosell`. Treat as opaque labels.
+          description: Microsoft-side milestone identifiers associated with the referral lifecycle. Treat as opaque values.
           items:
             type: string
-        qualification:
-          type: string
-          description: "Sales qualification level reported by Microsoft.\n\n  - `None` — not qualified.\n  - `Direct` — direct customer interest, no MQL/SQL qualification.\n  - `MarketingQualified` — marketing-qualified lead.\n  - `SalesQualified` — sales-qualified lead."
-          enum:
-          - None
-          - Direct
-          - MarketingQualified
-          - SalesQualified
-        customerProfile:
-          $ref: '#/components/schemas/CustomerProfileInput'
-        consent:
-          $ref: '#/components/schemas/ConsentInput'
-        details:
-          $ref: '#/components/schemas/DetailsInput'
-        team:
-          type: array
-          description: Members of the partner or seller organization participating in the engagement.
-          items:
-            $ref: '#/components/schemas/MemberInput'
-        inviteContext:
-          $ref: '#/components/schemas/InviteContext'
-        eTag:
-          type: string
-          description: Concurrency token for the referral as reported by Microsoft Partner Center. Treat the value as opaque.
-        target:
-          type: array
-          description: Microsoft Partner Center targets attached to the referral (for example, the published business profile location or solution profile this referral is aimed at).
-          items:
-            $ref: '#/components/schemas/Target'
-        mpnId:
-          type: string
-          description: Microsoft Partner Network (MPN) ID of the originating partner.
-        organizationId:
-          type: string
-          description: Microsoft Partner Center organization ID of the originating partner.
-        organizationName:
-          type: string
-          description: Display name of the originating partner organization.
-        lastModifiedVia:
-          type: string
-          description: Identifier of the principal that produced the most recent modification (for example, the Microsoft Partner Center user ID or the ID of an automated process).
-        lastRunId:
-          type: string
-          description: Identifier of the most recent processing run that touched the referral. Useful for correlating with audit logs.
-        referralSource:
-          type: string
-          description: Source channel that produced the referral (for example, a marketplace listing or a partner-initiated co-sell).
-        favorite:
-          type: boolean
-          description: Whether the referral has been marked as a favorite by the originating user.
-        campaignId:
-          type: string
-          description: Marketing campaign ID, when the referral was created from a campaign.
-        salesStage:
-          type: string
-          description: Microsoft Partner Center sales-stage code, transmitted as a string. See `UpdateReferralInput.salesStage` for the published code-to-stage mapping.
-        quality:
-          type: string
-          description: Microsoft-reported lead-quality grade for the referral (for example, `Unknown`). Treat unrecognized values as a safe default.
-        isSpam:
-          type: boolean
-          description: Whether Microsoft has flagged the referral as spam.
-        direction:
-          type: string
-          description: "Whether the referral is moving outbound from the partner to\nMicrosoft, or inbound from Microsoft to the partner.\n\n  - `Incoming` — the referral was originated outside the\n    partner organization (for example, by Microsoft) and is\n    being shared with the partner.\n  - `Outgoing` — the referral was originated by the partner\n    and submitted to Microsoft."
-          enum:
-          - Incoming
-          - Outgoing
-        referralProgram:
-          type: string
-          description: Microsoft co-sell program associated with this referral, when assigned by Microsoft.
-        dealSensitivity:
-          type: string
-          description: Special-handling marker for the referral. Currently the only emitted value is `USFed` (US Federal customer); otherwise the value is `None`.
-        createdVia:
-          type: string
-          description: Identifier of the principal that originally created the referral (Microsoft Partner Center user ID or automated-process ID).
-        closedDateTime:
-          type: string
-          format: date-time
-          description: ISO-8601 timestamp recording when the referral was closed (won, lost, declined, or in error).
-        callToAction:
-          type: string
-          description: Microsoft-suggested next action for the referral, when provided.
-        registrationStatus:
-          type: string
-          description: Microsoft Partner Center deal-registration state for the referral (for example, `None` when registration is not applicable). Treat unrecognized values as a safe default.
-        isAutoRegistrationEnabled:
-          type: boolean
-          description: Whether Microsoft will automatically register the deal on behalf of the partner.
-        links:
-          type: object
-          description: Microsoft Partner Center HATEOAS links for follow-up navigation, keyed by relation name. See `Link`.
-          additionalProperties:
-            $ref: '#/components/schemas/Link'
-        trackingInfo:
-          $ref: '#/components/schemas/TrackingInfo'
-        exception:
-          description: Free-form exception payload captured when the referral entered an error state, when present. The value may be a structured object or a JSON-encoded string; treat as best-effort diagnostic context.
-          oneOf:
-          - type: object
-          - type: string
-          example: '{"key": "value"}'
     RequirementsUpdateInput:
       type: object
       description: Industry, products, service type, and solutions the customer is interested in.
@@ -2133,32 +2144,7 @@ components:
           description: The solutions the customer is interested in.
           items:
             $ref: '#/components/schemas/SolutionInput'
-    ReferralResponse:
-      allOf:
-      - $ref: '#/components/schemas/Referral'
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/ReferralMetadata'
   responses:
-    Forbidden:
-      description: 'The authenticated principal does not have permission to perform this operation.
-
-        The response body is `{}` — the `message` field is omitted.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example: {}
-    Unauthorized:
-      description: 'The request did not include a valid Tackle MTM access token, so no principal
-
-        could be established. The response body is `{}` — the `message` field is omitted.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example: {}
     Conflict:
       description: 'The request conflicts with an existing resource. For example, attempting to
 
@@ -2173,10 +2159,15 @@ components:
             message: A co-sell opportunity already exists for this CRM ID
     NotFound:
       description: "The requested resource was not found.\n\nThe response body shape depends on the operation:\n\n- Read operations (for example `getReferral`) return an empty body\n  (no JSON envelope).\n- Write operations that look up a resource by ID before acting on it\n  (for example `updateIPReferral` with `tackle-operation-id:\n  requestSyncFromSalesforce`) return a JSON envelope of the form\n  `{\"message\": \"Referral not found\"}`."
-    InternalServerError:
-      description: 'An unexpected error occurred while processing the request. The response body is
+    Forbidden:
+      description: 'The authenticated principal does not have permission to perform this operation.
 
-        empty.'
+        The response body is `{}` — the `message` field is omitted.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example: {}
     BadRequest:
       description: 'The request was malformed or could not be processed. Returned when the JSON body
 
@@ -2189,6 +2180,19 @@ components:
             $ref: '#/components/schemas/Error'
           example:
             message: Your request could not be processed.
+    Unauthorized:
+      description: 'The request did not include a valid Tackle MTM access token, so no principal
+
+        could be established. The response body is `{}` — the `message` field is omitted.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example: {}
+    InternalServerError:
+      description: 'An unexpected error occurred while processing the request. The response body is
+
+        empty.'
   parameters:
     referral_id:
       name: referral_id
@@ -2199,8 +2203,11 @@ components:
         type: string
         example: tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3
   securitySchemes:
-    tackleJwt:
+    bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT
-      description: Tackle-issued JWT (interactive user or MTM token).
+      bearerFormat: MTM JWT
+      description: 'Tackle machine-to-machine access token sent as `Authorization: Bearer <access_token>`.'
+externalDocs:
+  description: Tackle Developer Portal
+  url: https://developers.tackle.io
