@@ -87,70 +87,54 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
+  responses:
+    UnauthorizedError:
+      description: Authentication failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: unauthorized
+    ForbiddenError:
+      description: Caller is not allowed to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: forbidden
+    BadRequestError:
+      description: Invalid request or unsupported operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: missing id
+    InternalServerError:
+      description: Internal server error or upstream dependency failure.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
-    CurrencyOption:
+    CurrencyConversionError:
       type: object
       properties:
-        value:
+        code:
           type: string
-          description: ISO 4217 currency code.
-          example: USD
-        display:
+        message:
           type: string
-          example: United States Dollar | USD ($)
-    CurrencyConversionPayload:
+    ErrorResponse:
       type: object
       required:
-      - id
-      - base_currency
-      - target_currency
-      - amount
+      - message
       properties:
-        id:
+        message:
           type: string
-          description: Caller-provided row ID echoed in the response.
-        base_currency:
-          type: string
-          example: USD
-        target_currency:
-          type: string
-          example: EUR
-        amount:
-          type: number
-          format: double
-          example: 100
-    MarketCurrenciesResponse:
-      type: object
-      properties:
-        currency_options:
-          type: array
-          items:
-            $ref: '#/components/schemas/CurrencyOption'
-        currency_markets:
-          type: object
-          additionalProperties:
-            type: array
-            items:
-              $ref: '#/components/schemas/MarketCurrency'
-      example:
-        currency_options:
-        - value: USD
-          display: United States Dollar | USD ($)
-        currency_markets:
-          USD:
-          - country_name: United States
-            iso2: US
-            currency: USD
-    CurrencyConversionResponse:
-      type: object
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/CurrencyConversionResult'
-        success:
-          type: boolean
-          example: true
+          description: Human-readable error message.
+          example: missing id
     CurrencyConversionResult:
       type: object
       properties:
@@ -194,22 +178,16 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/CurrencyConversionPayload'
-    ErrorResponse:
-      type: object
-      required:
-      - message
-      properties:
-        message:
-          type: string
-          description: Human-readable error message.
-          example: missing id
-    CurrencyConversionError:
+    CurrencyOption:
       type: object
       properties:
-        code:
+        value:
           type: string
-        message:
+          description: ISO 4217 currency code.
+          example: USD
+        display:
           type: string
+          example: United States Dollar | USD ($)
     MarketCurrency:
       type: object
       properties:
@@ -229,37 +207,59 @@ components:
           type: string
         source_revision:
           type: string
-  responses:
-    ForbiddenError:
-      description: Caller is not allowed to perform this action.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: forbidden
-    UnauthorizedError:
-      description: Authentication failed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: unauthorized
-    BadRequestError:
-      description: Invalid request or unsupported operation.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: missing id
-    InternalServerError:
-      description: Internal server error or upstream dependency failure.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
+    CurrencyConversionResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrencyConversionResult'
+        success:
+          type: boolean
+          example: true
+    MarketCurrenciesResponse:
+      type: object
+      properties:
+        currency_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrencyOption'
+        currency_markets:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/MarketCurrency'
+      example:
+        currency_options:
+        - value: USD
+          display: United States Dollar | USD ($)
+        currency_markets:
+          USD:
+          - country_name: United States
+            iso2: US
+            currency: USD
+    CurrencyConversionPayload:
+      type: object
+      required:
+      - id
+      - base_currency
+      - target_currency
+      - amount
+      properties:
+        id:
+          type: string
+          description: Caller-provided row ID echoed in the response.
+        base_currency:
+          type: string
+          example: USD
+        target_currency:
+          type: string
+          example: EUR
+        amount:
+          type: number
+          format: double
+          example: 100
   parameters:
     TackleOperationId:
       name: tackle-operation-id

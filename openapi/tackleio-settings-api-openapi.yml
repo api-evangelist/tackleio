@@ -76,33 +76,6 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    Forbidden:
-      description: The caller is not authorized to perform this action.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    InternalServerError:
-      description: 'An unexpected error occurred while processing the request.
-
-        Retry idempotent reads after a short delay; for writes, check
-
-        the opportunity history (`GET /api/opportunities/{id}/events`)
-
-        before retrying to confirm whether the prior request was
-
-        applied.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Missing or invalid authentication.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
     PicklistOptions:
       type: object
@@ -170,15 +143,6 @@ components:
           value: QUALIFY
         - display: Refine
           value: REFINE
-    Error:
-      type: object
-      description: 'Error response body. The service emits only a human-readable
-
-        `message`. A request identifier may be included in response headers for support and troubleshooting.'
-      properties:
-        message:
-          type: string
-          description: Human-readable error message.
     PicklistOption:
       type: object
       required:
@@ -198,6 +162,42 @@ components:
             one option per field is marked as default; absent if no
 
             default is defined.'
+    Error:
+      type: object
+      description: 'Error response body. The service emits only a human-readable
+
+        `message`. A request identifier may be included in response headers for support and troubleshooting.'
+      properties:
+        message:
+          type: string
+          description: Human-readable error message.
+  responses:
+    Unauthorized:
+      description: Missing or invalid authentication.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: The caller is not authorized to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: 'An unexpected error occurred while processing the request.
+
+        Retry idempotent reads after a short delay; for writes, check
+
+        the opportunity history (`GET /api/opportunities/{id}/events`)
+
+        before retrying to confirm whether the prior request was
+
+        applied.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   securitySchemes:
     bearerAuth:
       type: http

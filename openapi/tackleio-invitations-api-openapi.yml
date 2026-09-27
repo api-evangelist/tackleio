@@ -603,6 +603,248 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
+    InvitationReceiver:
+      type: object
+      properties:
+        alias:
+          type: string
+        awsAccountId:
+          type: string
+    InvitationMetadata:
+      type: object
+      properties:
+        id:
+          type: string
+          example: tackle-invitation-2jhD8b41CurTOqEsG2Soinub123
+        tackleOpportunityId:
+          type: string
+          example: tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3
+        crmId:
+          type: string
+          example: 006QL00000BahjLSKO
+        hasSalesforceErrors:
+          type: boolean
+          example: false
+        salesforceSyncError:
+          type: string
+          description: 'Most recent Salesforce sync error message, when the last sync attempt
+
+            failed. Absent on invitations where the last sync attempt succeeded.'
+          example: 'INVALID_FIELD_FOR_INSERT_UPDATE: TackleCoSell__c: bad field names on insert/update call'
+    ListInvitationEvents:
+      type: object
+      required:
+      - operation
+      - eventID
+      - timestamp
+      properties:
+        operation:
+          type: string
+          description: 'The operation recorded for this invitation history event. This is a free-form
+
+            string, intentionally not enumerated. Common values include
+
+            `acceptInvitation`, `rejectInvitation`, and synthetic system events such as
+
+            `internalUpdateEvent` and `cloudUpdateEvent`. History records may also include
+
+            CRM-sync and partner-system operations beyond this list; clients should treat
+
+            the value as an opaque string and surface unknown values verbatim rather than
+
+            rejecting them.'
+        eventID:
+          type: string
+          example: 2lsw6rdFuCz0d7cVNCubTYGSznY
+        timestamp:
+          type: string
+          example: '2024-09-10T15:25:19Z'
+        cloudRaw:
+          type: object
+          additionalProperties: true
+          description: 'Raw cloud-provider snapshot associated with this history event. Present
+
+            only when the recorded event captured a non-empty cloud-side snapshot;
+
+            omitted on events without one. For AWS, this corresponds to the serialized
+
+            engagement-invitation payload returned by AWS Partner Central at the time
+
+            the event was recorded; clients should treat the contents as opaque
+
+            diagnostic data, since the shape varies by cloud provider and operation.'
+        rawRequest:
+          type: object
+          properties:
+            operation:
+              type: string
+          additionalProperties: true
+        cloudResponses:
+          description: 'Per-request results from AWS Partner Central for the operations recorded
+
+            in this event. On success, each entry''s `response` object contains the
+
+            AWS payload and `success` is `true`. On failure, `response` is `null`,
+
+            `success` is `false`, and one of `errorType`, `errorResponse`, or
+
+            `errorResponses` is populated with the AWS error detail.'
+          type: array
+          items:
+            type: object
+            properties:
+              requestID:
+                type: string
+              success:
+                type: boolean
+              timestamp:
+                type: string
+              response:
+                type: object
+                additionalProperties: true
+              errorType:
+                type: string
+              errorResponse:
+                type: string
+              errorResponses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    fieldName:
+                      type: string
+                    errorMessage:
+                      type: string
+        cloudRequests:
+          type: array
+          items:
+            type: object
+            properties:
+              operation:
+                type: string
+              requestID:
+                type: string
+              timestamp:
+                type: string
+              request:
+                type: object
+                additionalProperties: true
+        activityDetails:
+          type: object
+          description: 'Details about the principal that performed the operation. The full set of
+
+            principal fields (`id`, `type`, `email`, `givenName`, `familyName`,
+
+            `pictureUrl`) appears alongside `displayText`.'
+          properties:
+            displayText:
+              type: string
+              description: A human-readable summary of the action that produced this event.
+            id:
+              type: string
+              description: "Identifier for the principal that performed the action.\n\n- For events caused by a person, this is the Tackle user ID.\n- For events caused by an M2M client, this is the machine principal ID.\n- For system-generated events, this is one of the reserved identifiers\n  `tackle-internal-update` (Tackle-initiated background updates) or\n  `aws-update` (updates that originated from AWS Partner Central).\n\nTreat any unrecognized identifier as an opaque string."
+            type:
+              type: string
+              description: 'Principal type. Common values include `user` and `otkuser` for actions taken
+
+                by a person, `machine` for actions taken by an M2M client, and
+
+                `tackle-automation` for actions taken by Tackle on the integrator''s behalf
+
+                (for example, scheduled retries or background reconciliation). Additional
+
+                system-generated principal types may appear over time as new automated
+
+                sources are introduced; clients should treat any unrecognized value as an
+
+                opaque string and surface it verbatim rather than rejecting the event.'
+            email:
+              type: string
+              description: Email of the principal, when known.
+            givenName:
+              type: string
+            familyName:
+              type: string
+            pictureUrl:
+              type: string
+    ListInvitationsResponse:
+      type: object
+      properties:
+        invitations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListInvitationsResponseItem'
+        total:
+          type: integer
+          example: 100
+        currentPageCount:
+          type: integer
+          example: 10
+        isNextPage:
+          type: boolean
+          example: true
+        nextIndex:
+          description: The starting index to use for fetching the next page of invitations. Only present when `isNextPage` is `true`.
+          type: integer
+          example: 10
+    ListInvitationsResponseItem:
+      type: object
+      properties:
+        id:
+          type: string
+        cloudProviderId:
+          type: string
+        cloudStatus:
+          type: string
+        expirationDate:
+          type: string
+        cloudCreated:
+          type: string
+        created:
+          type: string
+        crmId:
+          type: string
+        crmOrgId:
+          type: string
+        companyName:
+          type: string
+        pendingRequestIds:
+          type: array
+          items:
+            type: string
+            example: 00123456789ABCDEFGHIJKL
+        targetCompletionDate:
+          type: string
+        title:
+          type: string
+        opportunityID:
+          type: string
+          description: 'The cloud-provider opportunity identifier this invitation is linked to, when known.
+
+            Note: `listInvitations` rows emit this field as `opportunityID` (capital `ID`), while
+
+            `getInvitation` returns the same logical value as `opportunityId` (lowercase `d`).
+
+            Consumers should handle both casings.'
+          example: O1234123
+        origin:
+          type: string
+          description: The origin of the invitation. `aws` for AWS-led invitations, `partner` for partner-led.
+          enum:
+          - aws
+          - partner
+        senderCompanyName:
+          type: string
+          description: The display name of the sending account. For AWS-led invitations this is `AWS`.
+          example: AWS
+        hasCloudErrors:
+          type: boolean
+        hasSalesforceErrors:
+          type: boolean
+        salesforceSyncError:
+          type: string
+        unifiedCreatedDate:
+          type: string
     InvitationProject:
       type: object
       properties:
@@ -627,6 +869,68 @@ components:
                 - Monthly
               targetCompany:
                 type: string
+    InvitationResponse:
+      type: object
+      properties:
+        invitationId:
+          type: string
+          description: 'The Tackle ID for the invitation. Note: `getInvitation` returns this field
+
+            as `invitationId` (lowercase `d`); `createInvitation` returns the same
+
+            logical value as `invitationID` (capital `ID`). Consumers should handle both.'
+        id:
+          type: string
+        arn:
+          type: string
+        engagementTitle:
+          type: string
+        expirationDate:
+          type: string
+        invitationDate:
+          type: string
+        opportunityId:
+          type: string
+          description: 'The cloud-provider opportunity identifier this invitation is linked to,
+
+            when the invitation has been accepted or otherwise associated with an
+
+            opportunity. Absent on invitations that are not (yet) linked to an
+
+            opportunity.
+
+
+            Casing note: `getInvitation` returns this value as `opportunityId`
+
+            (lowercase `d`), while `listInvitations` rows return the same logical
+
+            value as `opportunityID` (capital `ID`). Clients should accept both
+
+            casings.'
+          example: O1234123
+        opportunityInvitationPayload:
+          $ref: '#/components/schemas/OpportunityInvitationPayload'
+        payloadType:
+          type: string
+          enum:
+          - OpportunityInvitation
+        receiver:
+          $ref: '#/components/schemas/InvitationReceiver'
+        rejectionReason:
+          type: string
+        senderAwsAccountId:
+          type: string
+        senderCompanyName:
+          type: string
+        status:
+          type: string
+          enum:
+          - ACCEPTED
+          - PENDING
+          - REJECTED
+          - EXPIRED
+        metadata:
+          $ref: '#/components/schemas/InvitationMetadata'
     OpportunityInvitationPayload:
       type: object
       properties:
@@ -821,169 +1125,6 @@ components:
                         type: string
                       phone:
                         type: string
-    InvitationReceiver:
-      type: object
-      properties:
-        alias:
-          type: string
-        awsAccountId:
-          type: string
-    ListInvitationEvents:
-      type: object
-      required:
-      - operation
-      - eventID
-      - timestamp
-      properties:
-        operation:
-          type: string
-          description: 'The operation recorded for this invitation history event. This is a free-form
-
-            string, intentionally not enumerated. Common values include
-
-            `acceptInvitation`, `rejectInvitation`, and synthetic system events such as
-
-            `internalUpdateEvent` and `cloudUpdateEvent`. History records may also include
-
-            CRM-sync and partner-system operations beyond this list; clients should treat
-
-            the value as an opaque string and surface unknown values verbatim rather than
-
-            rejecting them.'
-        eventID:
-          type: string
-          example: 2lsw6rdFuCz0d7cVNCubTYGSznY
-        timestamp:
-          type: string
-          example: '2024-09-10T15:25:19Z'
-        cloudRaw:
-          type: object
-          additionalProperties: true
-          description: 'Raw cloud-provider snapshot associated with this history event. Present
-
-            only when the recorded event captured a non-empty cloud-side snapshot;
-
-            omitted on events without one. For AWS, this corresponds to the serialized
-
-            engagement-invitation payload returned by AWS Partner Central at the time
-
-            the event was recorded; clients should treat the contents as opaque
-
-            diagnostic data, since the shape varies by cloud provider and operation.'
-        rawRequest:
-          type: object
-          properties:
-            operation:
-              type: string
-          additionalProperties: true
-        cloudResponses:
-          description: 'Per-request results from AWS Partner Central for the operations recorded
-
-            in this event. On success, each entry''s `response` object contains the
-
-            AWS payload and `success` is `true`. On failure, `response` is `null`,
-
-            `success` is `false`, and one of `errorType`, `errorResponse`, or
-
-            `errorResponses` is populated with the AWS error detail.'
-          type: array
-          items:
-            type: object
-            properties:
-              requestID:
-                type: string
-              success:
-                type: boolean
-              timestamp:
-                type: string
-              response:
-                type: object
-                additionalProperties: true
-              errorType:
-                type: string
-              errorResponse:
-                type: string
-              errorResponses:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    fieldName:
-                      type: string
-                    errorMessage:
-                      type: string
-        cloudRequests:
-          type: array
-          items:
-            type: object
-            properties:
-              operation:
-                type: string
-              requestID:
-                type: string
-              timestamp:
-                type: string
-              request:
-                type: object
-                additionalProperties: true
-        activityDetails:
-          type: object
-          description: 'Details about the principal that performed the operation. The full set of
-
-            principal fields (`id`, `type`, `email`, `givenName`, `familyName`,
-
-            `pictureUrl`) appears alongside `displayText`.'
-          properties:
-            displayText:
-              type: string
-              description: A human-readable summary of the action that produced this event.
-            id:
-              type: string
-              description: "Identifier for the principal that performed the action.\n\n- For events caused by a person, this is the Tackle user ID.\n- For events caused by an M2M client, this is the machine principal ID.\n- For system-generated events, this is one of the reserved identifiers\n  `tackle-internal-update` (Tackle-initiated background updates) or\n  `aws-update` (updates that originated from AWS Partner Central).\n\nTreat any unrecognized identifier as an opaque string."
-            type:
-              type: string
-              description: 'Principal type. Common values include `user` and `otkuser` for actions taken
-
-                by a person, `machine` for actions taken by an M2M client, and
-
-                `tackle-automation` for actions taken by Tackle on the integrator''s behalf
-
-                (for example, scheduled retries or background reconciliation). Additional
-
-                system-generated principal types may appear over time as new automated
-
-                sources are introduced; clients should treat any unrecognized value as an
-
-                opaque string and surface it verbatim rather than rejecting the event.'
-            email:
-              type: string
-              description: Email of the principal, when known.
-            givenName:
-              type: string
-            familyName:
-              type: string
-            pictureUrl:
-              type: string
-    ListInvitationsResponse:
-      type: object
-      properties:
-        invitations:
-          type: array
-          items:
-            $ref: '#/components/schemas/ListInvitationsResponseItem'
-        total:
-          type: integer
-          example: 100
-        currentPageCount:
-          type: integer
-          example: 10
-        isNextPage:
-          type: boolean
-          example: true
-        nextIndex:
-          description: The starting index to use for fetching the next page of invitations. Only present when `isNextPage` is `true`.
-          type: integer
-          example: 10
     Error:
       type: object
       description: 'Error envelope returned for typed error responses. Some 4xx and 5xx responses
@@ -996,148 +1137,19 @@ components:
           type: string
           description: A short, human-readable description of the error.
           example: Opportunity not found
-    ListInvitationsResponseItem:
-      type: object
-      properties:
-        id:
-          type: string
-        cloudProviderId:
-          type: string
-        cloudStatus:
-          type: string
-        expirationDate:
-          type: string
-        cloudCreated:
-          type: string
-        created:
-          type: string
-        crmId:
-          type: string
-        crmOrgId:
-          type: string
-        companyName:
-          type: string
-        pendingRequestIds:
-          type: array
-          items:
-            type: string
-            example: 00123456789ABCDEFGHIJKL
-        targetCompletionDate:
-          type: string
-        title:
-          type: string
-        opportunityID:
-          type: string
-          description: 'The cloud-provider opportunity identifier this invitation is linked to, when known.
-
-            Note: `listInvitations` rows emit this field as `opportunityID` (capital `ID`), while
-
-            `getInvitation` returns the same logical value as `opportunityId` (lowercase `d`).
-
-            Consumers should handle both casings.'
-          example: O1234123
-        origin:
-          type: string
-          description: The origin of the invitation. `aws` for AWS-led invitations, `partner` for partner-led.
-          enum:
-          - aws
-          - partner
-        senderCompanyName:
-          type: string
-          description: The display name of the sending account. For AWS-led invitations this is `AWS`.
-          example: AWS
-        hasCloudErrors:
-          type: boolean
-        hasSalesforceErrors:
-          type: boolean
-        salesforceSyncError:
-          type: string
-        unifiedCreatedDate:
-          type: string
-    InvitationResponse:
-      type: object
-      properties:
-        invitationId:
-          type: string
-          description: 'The Tackle ID for the invitation. Note: `getInvitation` returns this field
-
-            as `invitationId` (lowercase `d`); `createInvitation` returns the same
-
-            logical value as `invitationID` (capital `ID`). Consumers should handle both.'
-        id:
-          type: string
-        arn:
-          type: string
-        engagementTitle:
-          type: string
-        expirationDate:
-          type: string
-        invitationDate:
-          type: string
-        opportunityId:
-          type: string
-          description: 'The cloud-provider opportunity identifier this invitation is linked to,
-
-            when the invitation has been accepted or otherwise associated with an
-
-            opportunity. Absent on invitations that are not (yet) linked to an
-
-            opportunity.
-
-
-            Casing note: `getInvitation` returns this value as `opportunityId`
-
-            (lowercase `d`), while `listInvitations` rows return the same logical
-
-            value as `opportunityID` (capital `ID`). Clients should accept both
-
-            casings.'
-          example: O1234123
-        opportunityInvitationPayload:
-          $ref: '#/components/schemas/OpportunityInvitationPayload'
-        payloadType:
-          type: string
-          enum:
-          - OpportunityInvitation
-        receiver:
-          $ref: '#/components/schemas/InvitationReceiver'
-        rejectionReason:
-          type: string
-        senderAwsAccountId:
-          type: string
-        senderCompanyName:
-          type: string
-        status:
-          type: string
-          enum:
-          - ACCEPTED
-          - PENDING
-          - REJECTED
-          - EXPIRED
-        metadata:
-          $ref: '#/components/schemas/InvitationMetadata'
-    InvitationMetadata:
-      type: object
-      properties:
-        id:
-          type: string
-          example: tackle-invitation-2jhD8b41CurTOqEsG2Soinub123
-        tackleOpportunityId:
-          type: string
-          example: tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3
-        crmId:
-          type: string
-          example: 006QL00000BahjLSKO
-        hasSalesforceErrors:
-          type: boolean
-          example: false
-        salesforceSyncError:
-          type: string
-          description: 'Most recent Salesforce sync error message, when the last sync attempt
-
-            failed. Absent on invitations where the last sync attempt succeeded.'
-          example: 'INVALID_FIELD_FOR_INSERT_UPDATE: TackleCoSell__c: bad field names on insert/update call'
   responses:
+    Unauthorized:
+      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
+
+        authenticated principal could not be resolved.'
+    NotFound:
+      description: Not Found. No resource exists at the requested path for the authenticated vendor.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Opportunity not found
     BadRequest:
       description: 'Bad Request. The request was malformed or failed validation (for example, an invalid
 
@@ -1162,22 +1174,10 @@ components:
             $ref: '#/components/schemas/Error'
           example:
             message: Locked
-    NotFound:
-      description: Not Found. No resource exists at the requested path for the authenticated vendor.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Opportunity not found
     InternalServerError:
       description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
 
         bodies for 5xx errors may be empty.'
-    Unauthorized:
-      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
-
-        authenticated principal could not be resolved.'
   parameters:
     invitation_id:
       name: invitation_id

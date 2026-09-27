@@ -116,34 +116,6 @@ components:
         currencyCode:
           type: string
           example: USD
-    CloudDataMsftSubscription:
-      type: object
-      required:
-      - subscription
-      properties:
-        subscription:
-          type: object
-          description: Verbatim Microsoft Subscription API payload.
-    ContractListResponse:
-      type: object
-      required:
-      - contracts
-      properties:
-        contracts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Contract'
-        next:
-          type: string
-          description: Opaque pagination cursor. Omitted on the last page.
-    CloudDataAwsAgreement:
-      type: object
-      required:
-      - agreement
-      properties:
-        agreement:
-          type: object
-          description: Verbatim AWS Agreement API payload (`describeAgreement`, `agreementSummary`, `agreementTerms`).
     Contract:
       type: object
       required:
@@ -264,6 +236,14 @@ components:
             - `cloudMarketplace=gcp` → omitted entirely in this version.
 
             '
+    CloudDataMsftSubscription:
+      type: object
+      required:
+      - subscription
+      properties:
+        subscription:
+          type: object
+          description: Verbatim Microsoft Subscription API payload.
     CloudDataAwsPartnerAgreement:
       type: object
       required:
@@ -284,6 +264,26 @@ components:
             omitted from the response until the SDDS data lands.
 
             '
+    CloudDataAwsAgreement:
+      type: object
+      required:
+      - agreement
+      properties:
+        agreement:
+          type: object
+          description: Verbatim AWS Agreement API payload (`describeAgreement`, `agreementSummary`, `agreementTerms`).
+    ContractListResponse:
+      type: object
+      required:
+      - contracts
+      properties:
+        contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contract'
+        next:
+          type: string
+          description: Opaque pagination cursor. Omitted on the last page.
     Error:
       type: object
       required:

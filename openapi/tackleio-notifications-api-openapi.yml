@@ -64,22 +64,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   responses:
-    NotFoundError:
-      description: Requested offer or resource was not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: not found
-    ForbiddenError:
-      description: Caller is not allowed to perform this action.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: forbidden
     UnauthorizedError:
       description: Authentication failed.
       content:
@@ -88,6 +72,24 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
           example:
             message: unauthorized
+    NotFoundError:
+      description: Requested offer or resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: not found
+    NoContent:
+      description: Operation completed successfully with no response body.
+    ForbiddenError:
+      description: Caller is not allowed to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: forbidden
     BadRequestError:
       description: Invalid request or unsupported operation.
       content:
@@ -96,8 +98,6 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
           example:
             message: missing id
-    NoContent:
-      description: Operation completed successfully with no response body.
     InternalServerError:
       description: Internal server error or upstream dependency failure.
       content:

@@ -166,6 +166,72 @@ paths:
                 error: Internal server error
 components:
   schemas:
+    PaginationMetadata:
+      type: object
+      properties:
+        next_page:
+          type: string
+          description: Next page index, or an empty string when there is no next page.
+          example: '1'
+        previous_page:
+          type: string
+          description: Previous page index, or an empty string when there is no previous page.
+          example: ''
+        current_page_number:
+          type: integer
+          description: 0-based current page index.
+          example: 0
+        current_page_record_count:
+          type: integer
+          description: Number of records in the current page.
+          example: 50
+        total_record_count:
+          type: integer
+          description: Total number of records matching the filter.
+          example: 250
+        search_after:
+          type: array
+          description: Pagination anchor to pass as the next request's `search_after`.
+          items:
+            type: string
+    PaginatedScoredDomainsResponse:
+      type: object
+      required:
+      - data
+      - metadata
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoredDomain'
+        metadata:
+          $ref: '#/components/schemas/PaginationMetadata'
+    ScoredDomain:
+      type: object
+      required:
+      - domain
+      properties:
+        domain:
+          type: string
+          example: example.com
+        score_aws:
+          type: string
+          description: AWS Marketplace score value, or an empty string when unavailable.
+          example: High
+        score_azure:
+          type: string
+          description: Azure Marketplace score value, or an empty string when unavailable.
+          example: Medium
+        score_gcp:
+          type: string
+          description: Google Cloud Marketplace score value, or an empty string when unavailable.
+          example: Low
+        score_channel_partner:
+          type: string
+          description: Channel partner score value, or an empty string when unavailable.
+          example: ''
+        demographics:
+          $ref: '#/components/schemas/Demographics'
     SearchError:
       type: object
       required:
@@ -173,13 +239,36 @@ components:
       properties:
         error:
           type: string
-    ScoreBin:
+    ScoreDomainsRequest:
+      type: object
+      required:
+      - domains
+      - signalType
+      properties:
+        domains:
+          type: array
+          minItems: 1
+          description: One or more domains to score.
+          items:
+            type: string
+            example: example.com
+        signalType:
+          $ref: '#/components/schemas/BuyerSignalType'
+    MessageError:
+      type: object
+      required:
+      - message
+      properties:
+        message:
+          type: string
+    BuyerSignalType:
       type: string
-      description: The display value for a propensity score.
+      description: Identifies which cloud marketplace signal to score.
       enum:
-      - Low
-      - Medium
-      - High
+      - PropensityToBuy-aws
+      - PropensityToBuy-azure
+      - PropensityToBuy-gcp
+      - ChannelPartner-aws
     SearchScoredDomainsRequest:
       type: object
       description: Filter and pagination parameters for scored-domain search.
@@ -254,110 +343,6 @@ components:
           $ref: '#/components/schemas/ScoreBin'
         demographics:
           $ref: '#/components/schemas/Demographics'
-    MessageError:
-      type: object
-      required:
-      - message
-      properties:
-        message:
-          type: string
-    CloudMarketplace:
-      type: string
-      description: A cloud marketplace filter value.
-      enum:
-      - aws
-      - gcp
-      - azure
-      - ChannelPartner-aws
-    PaginationMetadata:
-      type: object
-      properties:
-        next_page:
-          type: string
-          description: Next page index, or an empty string when there is no next page.
-          example: '1'
-        previous_page:
-          type: string
-          description: Previous page index, or an empty string when there is no previous page.
-          example: ''
-        current_page_number:
-          type: integer
-          description: 0-based current page index.
-          example: 0
-        current_page_record_count:
-          type: integer
-          description: Number of records in the current page.
-          example: 50
-        total_record_count:
-          type: integer
-          description: Total number of records matching the filter.
-          example: 250
-        search_after:
-          type: array
-          description: Pagination anchor to pass as the next request's `search_after`.
-          items:
-            type: string
-    ScoredDomain:
-      type: object
-      required:
-      - domain
-      properties:
-        domain:
-          type: string
-          example: example.com
-        score_aws:
-          type: string
-          description: AWS Marketplace score value, or an empty string when unavailable.
-          example: High
-        score_azure:
-          type: string
-          description: Azure Marketplace score value, or an empty string when unavailable.
-          example: Medium
-        score_gcp:
-          type: string
-          description: Google Cloud Marketplace score value, or an empty string when unavailable.
-          example: Low
-        score_channel_partner:
-          type: string
-          description: Channel partner score value, or an empty string when unavailable.
-          example: ''
-        demographics:
-          $ref: '#/components/schemas/Demographics'
-    ScoreDomainsRequest:
-      type: object
-      required:
-      - domains
-      - signalType
-      properties:
-        domains:
-          type: array
-          minItems: 1
-          description: One or more domains to score.
-          items:
-            type: string
-            example: example.com
-        signalType:
-          $ref: '#/components/schemas/BuyerSignalType'
-    BuyerSignalType:
-      type: string
-      description: Identifies which cloud marketplace signal to score.
-      enum:
-      - PropensityToBuy-aws
-      - PropensityToBuy-azure
-      - PropensityToBuy-gcp
-      - ChannelPartner-aws
-    PaginatedScoredDomainsResponse:
-      type: object
-      required:
-      - data
-      - metadata
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ScoredDomain'
-        metadata:
-          $ref: '#/components/schemas/PaginationMetadata'
     Demographics:
       type: object
       description: Firmographic enrichment for a domain.
@@ -397,15 +382,22 @@ components:
           - string
           - 'null'
           example: Example Co
+    ScoreBin:
+      type: string
+      description: The display value for a propensity score.
+      enum:
+      - Low
+      - Medium
+      - High
+    CloudMarketplace:
+      type: string
+      description: A cloud marketplace filter value.
+      enum:
+      - aws
+      - gcp
+      - azure
+      - ChannelPartner-aws
   responses:
-    ForbiddenError:
-      description: The access token is not authorized for this operation.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/MessageError'
-          example:
-            message: Forbidden
     UnauthorizedError:
       description: The access token is missing, malformed, or expired.
       content:
@@ -414,6 +406,14 @@ components:
             $ref: '#/components/schemas/MessageError'
           example:
             message: Unauthorized
+    ForbiddenError:
+      description: The access token is not authorized for this operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MessageError'
+          example:
+            message: Forbidden
     InternalServerError:
       description: The request could not be completed.
       content:

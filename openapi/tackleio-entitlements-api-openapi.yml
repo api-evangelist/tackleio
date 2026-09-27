@@ -58,38 +58,41 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  schemas:
-    EntitlementListResponse:
-      type: object
-      required:
-      - schemas
-      - totalResults
-      - startIndex
-      - itemsPerPage
-      - Resources
-      properties:
-        schemas:
-          type: array
-          items:
-            type: string
+  responses:
+    Unauthorized:
+      description: Authentication information is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
           example:
-          - urn:ietf:params:scim:api:messages:2.0:ListResponse
-        totalResults:
-          type: integer
-          description: Total number of entitlements
-          example: 3
-        startIndex:
-          type: integer
-          description: 1-based index of the first result
-          example: 1
-        itemsPerPage:
-          type: integer
-          description: Number of entitlements in this response
-          example: 3
-        Resources:
-          type: array
-          items:
-            $ref: '#/components/schemas/Entitlement'
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '401'
+            detail: Unauthorized
+    Forbidden:
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '403'
+            detail: Forbidden
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '500'
+            detail: Internal server error
+  schemas:
     ScimError:
       type: object
       required:
@@ -126,6 +129,37 @@ components:
           - invalidVers
           - sensitive
           example: invalidValue
+    EntitlementListResponse:
+      type: object
+      required:
+      - schemas
+      - totalResults
+      - startIndex
+      - itemsPerPage
+      - Resources
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:api:messages:2.0:ListResponse
+        totalResults:
+          type: integer
+          description: Total number of entitlements
+          example: 3
+        startIndex:
+          type: integer
+          description: 1-based index of the first result
+          example: 1
+        itemsPerPage:
+          type: integer
+          description: Number of entitlements in this response
+          example: 3
+        Resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entitlement'
     Entitlement:
       type: object
       required:
@@ -145,40 +179,6 @@ components:
           type: string
           description: The type of entitlement
           example: role
-  responses:
-    Forbidden:
-      description: Access forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '403'
-            detail: Forbidden
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '500'
-            detail: Internal server error
-    Unauthorized:
-      description: Authentication information is missing or invalid
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '401'
-            detail: Unauthorized
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
