@@ -602,35 +602,104 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  schemas:
-    InvitationReceiver:
-      type: object
-      properties:
-        alias:
-          type: string
-        awsAccountId:
-          type: string
-    InvitationMetadata:
-      type: object
-      properties:
-        id:
-          type: string
-          example: tackle-invitation-2jhD8b41CurTOqEsG2Soinub123
-        tackleOpportunityId:
-          type: string
-          example: tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3
-        crmId:
-          type: string
-          example: 006QL00000BahjLSKO
-        hasSalesforceErrors:
-          type: boolean
-          example: false
-        salesforceSyncError:
-          type: string
-          description: 'Most recent Salesforce sync error message, when the last sync attempt
+  responses:
+    Locked:
+      description: 'Locked. The request was rejected because the vendor is currently in a mid-reset state
 
-            failed. Absent on invitations where the last sync attempt succeeded.'
-          example: 'INVALID_FIELD_FOR_INSERT_UPDATE: TackleCoSell__c: bad field names on insert/update call'
+        (for example, while the vendor''s AWS Partner Central connection is being re-established).
+
+        Retry the request once the vendor''s reset has completed.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Locked
+    BadRequest:
+      description: 'Bad Request. The request was malformed or failed validation (for example, an invalid
+
+        `sortField`/`sortOrder` value, an unsupported `tackle-operation-id`, or a request body that
+
+        fails to parse as JSON).'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Invalid sortField
+    InternalServerError:
+      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
+
+        bodies for 5xx errors may be empty.'
+    NotFound:
+      description: Not Found. No resource exists at the requested path for the authenticated vendor.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Opportunity not found
+    Unauthorized:
+      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
+
+        authenticated principal could not be resolved.'
+  schemas:
+    InvitationProject:
+      type: object
+      properties:
+        businessProblem:
+          type: string
+        targetCompletionDate:
+          type: string
+        title:
+          type: string
+        expectedCustomerSpend:
+          type: array
+          items:
+            type: object
+            properties:
+              amount:
+                type: string
+              currencyCode:
+                type: string
+              frequency:
+                type: string
+                enum:
+                - Monthly
+              targetCompany:
+                type: string
+    ListInvitationsResponse:
+      type: object
+      properties:
+        invitations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListInvitationsResponseItem'
+        total:
+          type: integer
+          example: 100
+        currentPageCount:
+          type: integer
+          example: 10
+        isNextPage:
+          type: boolean
+          example: true
+        nextIndex:
+          description: The starting index to use for fetching the next page of invitations. Only present when `isNextPage` is `true`.
+          type: integer
+          example: 10
+    Error:
+      type: object
+      description: 'Error envelope returned for typed error responses. Some 4xx and 5xx responses
+
+        (such as direct `Unauthorized` and `Internal Server Error` responses) may instead
+
+        return an empty body; consumers should be tolerant of that.'
+      properties:
+        message:
+          type: string
+          description: A short, human-readable description of the error.
+          example: Opportunity not found
     ListInvitationEvents:
       type: object
       required:
@@ -767,26 +836,6 @@ components:
               type: string
             pictureUrl:
               type: string
-    ListInvitationsResponse:
-      type: object
-      properties:
-        invitations:
-          type: array
-          items:
-            $ref: '#/components/schemas/ListInvitationsResponseItem'
-        total:
-          type: integer
-          example: 100
-        currentPageCount:
-          type: integer
-          example: 10
-        isNextPage:
-          type: boolean
-          example: true
-        nextIndex:
-          description: The starting index to use for fetching the next page of invitations. Only present when `isNextPage` is `true`.
-          type: integer
-          example: 10
     ListInvitationsResponseItem:
       type: object
       properties:
@@ -845,30 +894,46 @@ components:
           type: string
         unifiedCreatedDate:
           type: string
-    InvitationProject:
+    InvitationCustomer:
       type: object
       properties:
-        businessProblem:
+        companyName:
           type: string
-        targetCompletionDate:
+        websiteUrl:
           type: string
-        title:
+        countryCode:
           type: string
-        expectedCustomerSpend:
-          type: array
-          items:
-            type: object
-            properties:
-              amount:
-                type: string
-              currencyCode:
-                type: string
-              frequency:
-                type: string
-                enum:
-                - Monthly
-              targetCompany:
-                type: string
+        industry:
+          type: string
+          enum:
+          - Aerospace
+          - Agriculture
+          - Automotive
+          - Computers and Electronics
+          - Consumer Goods
+          - Education
+          - Energy - Oil and Gas
+          - Energy - Power and Utilities
+          - Financial Services
+          - Gaming
+          - Government
+          - Healthcare
+          - Hospitality
+          - Life Sciences
+          - Manufacturing
+          - Marketing and Advertising
+          - Media and Entertainment
+          - Mining
+          - Non-Profit Organization
+          - Professional Services
+          - Real Estate and Construction
+          - Retail
+          - Software and Internet
+          - Telecommunications
+          - Transportation and Logistics
+          - Travel
+          - Wholesale and Distribution
+          - Other
     InvitationResponse:
       type: object
       properties:
@@ -931,85 +996,13 @@ components:
           - EXPIRED
         metadata:
           $ref: '#/components/schemas/InvitationMetadata'
-    OpportunityInvitationPayload:
+    InvitationReceiver:
       type: object
       properties:
-        receiverResponsibilities:
-          type: array
-          items:
-            type: string
-            enum:
-            - Distributor
-            - Reseller
-            - HardwarePartner
-            - ManagedServiceProvider
-            - SoftwarePartner
-            - ServicesPartner
-            - TrainingPartner
-        customer:
-          $ref: '#/components/schemas/InvitationCustomer'
-        project:
-          $ref: '#/components/schemas/InvitationProject'
-        senderContacts:
-          type: array
-          description: 'The AWS-side contacts attached to the invitation, including the AWS
-
-            sales rep, account owner, and partner-development managers. Returned
-
-            as an array of contact records.'
-          items:
-            type: object
-            properties:
-              email:
-                type: string
-              firstName:
-                type: string
-              lastName:
-                type: string
-              phone:
-                type: string
-              businessTitle:
-                type: string
-    InvitationCustomer:
-      type: object
-      properties:
-        companyName:
+        alias:
           type: string
-        websiteUrl:
+        awsAccountId:
           type: string
-        countryCode:
-          type: string
-        industry:
-          type: string
-          enum:
-          - Aerospace
-          - Agriculture
-          - Automotive
-          - Computers and Electronics
-          - Consumer Goods
-          - Education
-          - Energy - Oil and Gas
-          - Energy - Power and Utilities
-          - Financial Services
-          - Gaming
-          - Government
-          - Healthcare
-          - Hospitality
-          - Life Sciences
-          - Manufacturing
-          - Marketing and Advertising
-          - Media and Entertainment
-          - Mining
-          - Non-Profit Organization
-          - Professional Services
-          - Real Estate and Construction
-          - Retail
-          - Software and Internet
-          - Telecommunications
-          - Transportation and Logistics
-          - Travel
-          - Wholesale and Distribution
-          - Other
     CreateInvitationRequest:
       type: object
       description: 'Request body for `createInvitation` (test-environment-only). The required fields are
@@ -1125,59 +1118,66 @@ components:
                         type: string
                       phone:
                         type: string
-    Error:
+    InvitationMetadata:
       type: object
-      description: 'Error envelope returned for typed error responses. Some 4xx and 5xx responses
-
-        (such as direct `Unauthorized` and `Internal Server Error` responses) may instead
-
-        return an empty body; consumers should be tolerant of that.'
       properties:
-        message:
+        id:
           type: string
-          description: A short, human-readable description of the error.
-          example: Opportunity not found
-  responses:
-    Unauthorized:
-      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
+          example: tackle-invitation-2jhD8b41CurTOqEsG2Soinub123
+        tackleOpportunityId:
+          type: string
+          example: tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3
+        crmId:
+          type: string
+          example: 006QL00000BahjLSKO
+        hasSalesforceErrors:
+          type: boolean
+          example: false
+        salesforceSyncError:
+          type: string
+          description: 'Most recent Salesforce sync error message, when the last sync attempt
 
-        authenticated principal could not be resolved.'
-    NotFound:
-      description: Not Found. No resource exists at the requested path for the authenticated vendor.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Opportunity not found
-    BadRequest:
-      description: 'Bad Request. The request was malformed or failed validation (for example, an invalid
+            failed. Absent on invitations where the last sync attempt succeeded.'
+          example: 'INVALID_FIELD_FOR_INSERT_UPDATE: TackleCoSell__c: bad field names on insert/update call'
+    OpportunityInvitationPayload:
+      type: object
+      properties:
+        receiverResponsibilities:
+          type: array
+          items:
+            type: string
+            enum:
+            - Distributor
+            - Reseller
+            - HardwarePartner
+            - ManagedServiceProvider
+            - SoftwarePartner
+            - ServicesPartner
+            - TrainingPartner
+        customer:
+          $ref: '#/components/schemas/InvitationCustomer'
+        project:
+          $ref: '#/components/schemas/InvitationProject'
+        senderContacts:
+          type: array
+          description: 'The AWS-side contacts attached to the invitation, including the AWS
 
-        `sortField`/`sortOrder` value, an unsupported `tackle-operation-id`, or a request body that
+            sales rep, account owner, and partner-development managers. Returned
 
-        fails to parse as JSON).'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Invalid sortField
-    Locked:
-      description: 'Locked. The request was rejected because the vendor is currently in a mid-reset state
-
-        (for example, while the vendor''s AWS Partner Central connection is being re-established).
-
-        Retry the request once the vendor''s reset has completed.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Locked
-    InternalServerError:
-      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
-
-        bodies for 5xx errors may be empty.'
+            as an array of contact records.'
+          items:
+            type: object
+            properties:
+              email:
+                type: string
+              firstName:
+                type: string
+              lastName:
+                type: string
+              phone:
+                type: string
+              businessTitle:
+                type: string
   parameters:
     invitation_id:
       name: invitation_id

@@ -166,34 +166,35 @@ paths:
                 error: Internal server error
 components:
   schemas:
-    PaginationMetadata:
+    ScoreBin:
+      type: string
+      description: The display value for a propensity score.
+      enum:
+      - Low
+      - Medium
+      - High
+    BuyerSignalType:
+      type: string
+      description: Identifies which cloud marketplace signal to score.
+      enum:
+      - PropensityToBuy-aws
+      - PropensityToBuy-azure
+      - PropensityToBuy-gcp
+      - ChannelPartner-aws
+    MessageError:
       type: object
+      required:
+      - message
       properties:
-        next_page:
+        message:
           type: string
-          description: Next page index, or an empty string when there is no next page.
-          example: '1'
-        previous_page:
+    SearchError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
           type: string
-          description: Previous page index, or an empty string when there is no previous page.
-          example: ''
-        current_page_number:
-          type: integer
-          description: 0-based current page index.
-          example: 0
-        current_page_record_count:
-          type: integer
-          description: Number of records in the current page.
-          example: 50
-        total_record_count:
-          type: integer
-          description: Total number of records matching the filter.
-          example: 250
-        search_after:
-          type: array
-          description: Pagination anchor to pass as the next request's `search_after`.
-          items:
-            type: string
     PaginatedScoredDomainsResponse:
       type: object
       required:
@@ -206,39 +207,22 @@ components:
             $ref: '#/components/schemas/ScoredDomain'
         metadata:
           $ref: '#/components/schemas/PaginationMetadata'
-    ScoredDomain:
+    ScoreResult:
       type: object
       required:
       - domain
+      - signalType
+      - displayScore
       properties:
         domain:
           type: string
           example: example.com
-        score_aws:
-          type: string
-          description: AWS Marketplace score value, or an empty string when unavailable.
-          example: High
-        score_azure:
-          type: string
-          description: Azure Marketplace score value, or an empty string when unavailable.
-          example: Medium
-        score_gcp:
-          type: string
-          description: Google Cloud Marketplace score value, or an empty string when unavailable.
-          example: Low
-        score_channel_partner:
-          type: string
-          description: Channel partner score value, or an empty string when unavailable.
-          example: ''
+        signalType:
+          $ref: '#/components/schemas/BuyerSignalType'
+        displayScore:
+          $ref: '#/components/schemas/ScoreBin'
         demographics:
           $ref: '#/components/schemas/Demographics'
-    SearchError:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
     ScoreDomainsRequest:
       type: object
       required:
@@ -254,21 +238,6 @@ components:
             example: example.com
         signalType:
           $ref: '#/components/schemas/BuyerSignalType'
-    MessageError:
-      type: object
-      required:
-      - message
-      properties:
-        message:
-          type: string
-    BuyerSignalType:
-      type: string
-      description: Identifies which cloud marketplace signal to score.
-      enum:
-      - PropensityToBuy-aws
-      - PropensityToBuy-azure
-      - PropensityToBuy-gcp
-      - ChannelPartner-aws
     SearchScoredDomainsRequest:
       type: object
       description: Filter and pagination parameters for scored-domain search.
@@ -327,22 +296,6 @@ components:
         new_high_scores:
           type: boolean
           description: When `true`, restrict results to domains that recently reached `High`.
-    ScoreResult:
-      type: object
-      required:
-      - domain
-      - signalType
-      - displayScore
-      properties:
-        domain:
-          type: string
-          example: example.com
-        signalType:
-          $ref: '#/components/schemas/BuyerSignalType'
-        displayScore:
-          $ref: '#/components/schemas/ScoreBin'
-        demographics:
-          $ref: '#/components/schemas/Demographics'
     Demographics:
       type: object
       description: Firmographic enrichment for a domain.
@@ -382,13 +335,60 @@ components:
           - string
           - 'null'
           example: Example Co
-    ScoreBin:
-      type: string
-      description: The display value for a propensity score.
-      enum:
-      - Low
-      - Medium
-      - High
+    ScoredDomain:
+      type: object
+      required:
+      - domain
+      properties:
+        domain:
+          type: string
+          example: example.com
+        score_aws:
+          type: string
+          description: AWS Marketplace score value, or an empty string when unavailable.
+          example: High
+        score_azure:
+          type: string
+          description: Azure Marketplace score value, or an empty string when unavailable.
+          example: Medium
+        score_gcp:
+          type: string
+          description: Google Cloud Marketplace score value, or an empty string when unavailable.
+          example: Low
+        score_channel_partner:
+          type: string
+          description: Channel partner score value, or an empty string when unavailable.
+          example: ''
+        demographics:
+          $ref: '#/components/schemas/Demographics'
+    PaginationMetadata:
+      type: object
+      properties:
+        next_page:
+          type: string
+          description: Next page index, or an empty string when there is no next page.
+          example: '1'
+        previous_page:
+          type: string
+          description: Previous page index, or an empty string when there is no previous page.
+          example: ''
+        current_page_number:
+          type: integer
+          description: 0-based current page index.
+          example: 0
+        current_page_record_count:
+          type: integer
+          description: Number of records in the current page.
+          example: 50
+        total_record_count:
+          type: integer
+          description: Total number of records matching the filter.
+          example: 250
+        search_after:
+          type: array
+          description: Pagination anchor to pass as the next request's `search_after`.
+          items:
+            type: string
     CloudMarketplace:
       type: string
       description: A cloud marketplace filter value.
@@ -398,6 +398,14 @@ components:
       - azure
       - ChannelPartner-aws
   responses:
+    InternalServerError:
+      description: The request could not be completed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MessageError'
+          example:
+            message: Internal server error
     UnauthorizedError:
       description: The access token is missing, malformed, or expired.
       content:
@@ -414,14 +422,6 @@ components:
             $ref: '#/components/schemas/MessageError'
           example:
             message: Forbidden
-    InternalServerError:
-      description: The request could not be completed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/MessageError'
-          example:
-            message: Internal server error
   securitySchemes:
     bearerAuth:
       type: http

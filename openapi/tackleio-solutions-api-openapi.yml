@@ -107,16 +107,24 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    InternalServerError:
-      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
-
-        bodies for 5xx errors may be empty.'
-    Unauthorized:
-      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
-
-        authenticated principal could not be resolved.'
   schemas:
+    ListSolutionsResponseItem:
+      type: object
+      properties:
+        id:
+          type: string
+        cloudProviderId:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        category:
+          type: string
+        created:
+          type: string
+        lastSynced:
+          type: string
     ListSolutionsResponse:
       type: object
       properties:
@@ -136,23 +144,15 @@ components:
         nextIndex:
           description: The starting index to use for fetching the next page of solutions. Only present when `isNextPage` is `true`.
           type: integer
-    ListSolutionsResponseItem:
-      type: object
-      properties:
-        id:
-          type: string
-        cloudProviderId:
-          type: string
-        name:
-          type: string
-        status:
-          type: string
-        category:
-          type: string
-        created:
-          type: string
-        lastSynced:
-          type: string
+  responses:
+    InternalServerError:
+      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
+
+        bodies for 5xx errors may be empty.'
+    Unauthorized:
+      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
+
+        authenticated principal could not be resolved.'
   securitySchemes:
     bearerAuth:
       type: http

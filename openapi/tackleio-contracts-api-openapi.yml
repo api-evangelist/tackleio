@@ -103,19 +103,53 @@ paths:
       - Contracts
 components:
   schemas:
-    Money:
+    CloudDataAwsAgreement:
       type: object
       required:
-      - amount
-      - currencyCode
+      - agreement
       properties:
-        amount:
-          type: number
-          format: double
-          example: 120000
-        currencyCode:
+        agreement:
+          type: object
+          description: Verbatim AWS Agreement API payload (`describeAgreement`, `agreementSummary`, `agreementTerms`).
+    CloudDataAwsPartnerAgreement:
+      type: object
+      required:
+      - agreement
+      properties:
+        agreement:
+          type: object
+          description: 'Verbatim AWS Marketplace SDDS (Seller Delivery Data Service)
+
+            partner agreement record. SDDS reports arrive on a daily
+
+            cadence rather than at time of purchase, so this payload
+
+            can be missing for up to 24 hours after a partner contract
+
+            is created. The enclosing `cloudData` field will simply be
+
+            omitted from the response until the SDDS data lands.
+
+            '
+    Error:
+      type: object
+      required:
+      - error
+      properties:
+        error:
           type: string
-          example: USD
+    ContractListResponse:
+      type: object
+      required:
+      - contracts
+      properties:
+        contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contract'
+        next:
+          type: string
+          description: Opaque pagination cursor. Omitted on the last page.
     Contract:
       type: object
       required:
@@ -236,6 +270,19 @@ components:
             - `cloudMarketplace=gcp` → omitted entirely in this version.
 
             '
+    Money:
+      type: object
+      required:
+      - amount
+      - currencyCode
+      properties:
+        amount:
+          type: number
+          format: double
+          example: 120000
+        currencyCode:
+          type: string
+          example: USD
     CloudDataMsftSubscription:
       type: object
       required:
@@ -244,53 +291,6 @@ components:
         subscription:
           type: object
           description: Verbatim Microsoft Subscription API payload.
-    CloudDataAwsPartnerAgreement:
-      type: object
-      required:
-      - agreement
-      properties:
-        agreement:
-          type: object
-          description: 'Verbatim AWS Marketplace SDDS (Seller Delivery Data Service)
-
-            partner agreement record. SDDS reports arrive on a daily
-
-            cadence rather than at time of purchase, so this payload
-
-            can be missing for up to 24 hours after a partner contract
-
-            is created. The enclosing `cloudData` field will simply be
-
-            omitted from the response until the SDDS data lands.
-
-            '
-    CloudDataAwsAgreement:
-      type: object
-      required:
-      - agreement
-      properties:
-        agreement:
-          type: object
-          description: Verbatim AWS Agreement API payload (`describeAgreement`, `agreementSummary`, `agreementTerms`).
-    ContractListResponse:
-      type: object
-      required:
-      - contracts
-      properties:
-        contracts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Contract'
-        next:
-          type: string
-          description: Opaque pagination cursor. Omitted on the last page.
-    Error:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
   securitySchemes:
     tackleJwt:
       type: http

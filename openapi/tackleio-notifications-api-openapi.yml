@@ -64,14 +64,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   responses:
-    UnauthorizedError:
-      description: Authentication failed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: unauthorized
     NotFoundError:
       description: Requested offer or resource was not found.
       content:
@@ -80,16 +72,6 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
           example:
             message: not found
-    NoContent:
-      description: Operation completed successfully with no response body.
-    ForbiddenError:
-      description: Caller is not allowed to perform this action.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: forbidden
     BadRequestError:
       description: Invalid request or unsupported operation.
       content:
@@ -104,6 +86,41 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+    UnauthorizedError:
+      description: Authentication failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: unauthorized
+    ForbiddenError:
+      description: Caller is not allowed to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: forbidden
+    NoContent:
+      description: Operation completed successfully with no response body.
+  parameters:
+    TackleOperationId:
+      name: tackle-operation-id
+      in: header
+      required: false
+      description: Optional caller-provided operation ID for request tracing.
+      schema:
+        type: string
+      example: 018f01ec-3f2b-7a70-b81e-4fc3d6a69f42
+    OfferId:
+      name: id
+      in: path
+      required: true
+      description: Tackle private offer ID.
+      schema:
+        type: string
+      example: po-1234
   schemas:
     CreateOfferNotificationRequest:
       type: object
@@ -137,23 +154,6 @@ components:
           type: string
           description: Human-readable error message.
           example: missing id
-  parameters:
-    OfferId:
-      name: id
-      in: path
-      required: true
-      description: Tackle private offer ID.
-      schema:
-        type: string
-      example: po-1234
-    TackleOperationId:
-      name: tackle-operation-id
-      in: header
-      required: false
-      description: Optional caller-provided operation ID for request tracing.
-      schema:
-        type: string
-      example: 018f01ec-3f2b-7a70-b81e-4fc3d6a69f42
   securitySchemes:
     bearerAuth:
       type: http

@@ -255,111 +255,50 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    Unauthorized:
-      description: Authentication information is missing or invalid
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '401'
-            detail: Unauthorized
-    Forbidden:
-      description: Access forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '403'
-            detail: Forbidden
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '500'
-            detail: Internal server error
   schemas:
-    ScimError:
+    ResourceType:
       type: object
       required:
       - schemas
-      - status
-      - detail
+      - id
+      - name
+      - endpoint
+      - schema
       properties:
         schemas:
           type: array
           items:
             type: string
           example:
-          - urn:ietf:params:scim:api:messages:2.0:Error
-        status:
+          - urn:ietf:params:scim:schemas:core:2.0:ResourceType
+        id:
           type: string
-          description: HTTP status code as string
-          example: '400'
-        detail:
-          type: string
-          description: Human-readable error description
-          example: Invalid request
-        scimType:
-          type: string
-          description: SCIM-specific error type
-          enum:
-          - invalidFilter
-          - tooMany
-          - uniqueness
-          - mutability
-          - invalidSyntax
-          - invalidPath
-          - noTarget
-          - invalidValue
-          - invalidVers
-          - sensitive
-          example: invalidValue
-    AuthenticationScheme:
-      type: object
-      required:
-      - type
-      - name
-      - description
-      - primary
-      properties:
-        type:
-          type: string
-          description: Authentication scheme type
-          example: oauthbearertoken
+          description: Resource type identifier
+          example: User
         name:
           type: string
-          description: Authentication scheme name
-          example: OAuth Bearer Token
+          description: Resource type name
+          example: User
         description:
           type: string
-          description: Authentication scheme description
-          example: Authentication scheme using the OAuth Bearer Token Standard
-        specUri:
+          description: Resource type description
+          example: User Account
+        endpoint:
           type: string
           format: uri
-          description: URI to the specification
-          example: http://www.rfc-editor.org/info/rfc6750
-        documentationUri:
+          description: Endpoint for this resource type
+          example: https://scim-api.tackle.io/scim/v2/Users
+        schema:
           type: string
-          format: uri
-          description: URI to documentation
-        primary:
-          type: boolean
-          description: Whether this is the primary authentication scheme
-          example: true
-    SchemaListResponse:
+          description: Primary schema for this resource type
+          example: urn:ietf:params:scim:schemas:core:2.0:User
+        schemaExtensions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SchemaExtension'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    ResourceTypeListResponse:
       type: object
       required:
       - schemas
@@ -377,11 +316,11 @@ components:
         totalResults:
           type: integer
           description: Total number of results
-          example: 2
+          example: 1
         itemsPerPage:
           type: integer
           description: Number of results per page
-          example: 2
+          example: 1
         startIndex:
           type: integer
           description: 1-based index of the first result
@@ -389,7 +328,7 @@ components:
         Resources:
           type: array
           items:
-            $ref: '#/components/schemas/Schema'
+            $ref: '#/components/schemas/ResourceType'
     SchemaExtension:
       type: object
       required:
@@ -404,6 +343,77 @@ components:
           type: boolean
           description: Whether this extension is required
           example: true
+    SchemaAttribute:
+      type: object
+      required:
+      - name
+      - type
+      - mutability
+      - returned
+      - uniqueness
+      - required
+      - multiValued
+      - caseExact
+      properties:
+        name:
+          type: string
+          description: Attribute name
+          example: userName
+        type:
+          type: string
+          description: Attribute type
+          enum:
+          - string
+          - boolean
+          - decimal
+          - integer
+          - dateTime
+          - reference
+          - complex
+          example: string
+        mutability:
+          type: string
+          description: Attribute mutability
+          enum:
+          - readOnly
+          - readWrite
+          - immutable
+          - writeOnly
+          example: readWrite
+        returned:
+          type: string
+          description: When the attribute is returned
+          enum:
+          - always
+          - never
+          - default
+          - request
+          example: default
+        uniqueness:
+          type: string
+          description: Attribute uniqueness constraint
+          enum:
+          - none
+          - server
+          - global
+          example: server
+        required:
+          type: boolean
+          description: Whether the attribute is required
+          example: true
+        multiValued:
+          type: boolean
+          description: Whether the attribute can have multiple values
+          example: false
+        caseExact:
+          type: boolean
+          description: Whether the attribute is case exact
+          example: false
+        subAttributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/SchemaAttribute'
+          description: Sub-attributes for complex types
     Schema:
       type: object
       required:
@@ -560,48 +570,42 @@ components:
               example: 100
         meta:
           $ref: '#/components/schemas/Meta'
-    ResourceType:
+    ScimError:
       type: object
       required:
       - schemas
-      - id
-      - name
-      - endpoint
-      - schema
+      - status
+      - detail
       properties:
         schemas:
           type: array
           items:
             type: string
           example:
-          - urn:ietf:params:scim:schemas:core:2.0:ResourceType
-        id:
+          - urn:ietf:params:scim:api:messages:2.0:Error
+        status:
           type: string
-          description: Resource type identifier
-          example: User
-        name:
+          description: HTTP status code as string
+          example: '400'
+        detail:
           type: string
-          description: Resource type name
-          example: User
-        description:
+          description: Human-readable error description
+          example: Invalid request
+        scimType:
           type: string
-          description: Resource type description
-          example: User Account
-        endpoint:
-          type: string
-          format: uri
-          description: Endpoint for this resource type
-          example: https://scim-api.tackle.io/scim/v2/Users
-        schema:
-          type: string
-          description: Primary schema for this resource type
-          example: urn:ietf:params:scim:schemas:core:2.0:User
-        schemaExtensions:
-          type: array
-          items:
-            $ref: '#/components/schemas/SchemaExtension'
-        meta:
-          $ref: '#/components/schemas/Meta'
+          description: SCIM-specific error type
+          enum:
+          - invalidFilter
+          - tooMany
+          - uniqueness
+          - mutability
+          - invalidSyntax
+          - invalidPath
+          - noTarget
+          - invalidValue
+          - invalidVers
+          - sensitive
+          example: invalidValue
     Meta:
       type: object
       readOnly: true
@@ -625,7 +629,40 @@ components:
           format: uri
           description: URL to the resource
           example: https://scim-api.tackle.io/scim/v2/Users/user123
-    ResourceTypeListResponse:
+    AuthenticationScheme:
+      type: object
+      required:
+      - type
+      - name
+      - description
+      - primary
+      properties:
+        type:
+          type: string
+          description: Authentication scheme type
+          example: oauthbearertoken
+        name:
+          type: string
+          description: Authentication scheme name
+          example: OAuth Bearer Token
+        description:
+          type: string
+          description: Authentication scheme description
+          example: Authentication scheme using the OAuth Bearer Token Standard
+        specUri:
+          type: string
+          format: uri
+          description: URI to the specification
+          example: http://www.rfc-editor.org/info/rfc6750
+        documentationUri:
+          type: string
+          format: uri
+          description: URI to documentation
+        primary:
+          type: boolean
+          description: Whether this is the primary authentication scheme
+          example: true
+    SchemaListResponse:
       type: object
       required:
       - schemas
@@ -643,11 +680,11 @@ components:
         totalResults:
           type: integer
           description: Total number of results
-          example: 1
+          example: 2
         itemsPerPage:
           type: integer
           description: Number of results per page
-          example: 1
+          example: 2
         startIndex:
           type: integer
           description: 1-based index of the first result
@@ -655,78 +692,41 @@ components:
         Resources:
           type: array
           items:
-            $ref: '#/components/schemas/ResourceType'
-    SchemaAttribute:
-      type: object
-      required:
-      - name
-      - type
-      - mutability
-      - returned
-      - uniqueness
-      - required
-      - multiValued
-      - caseExact
-      properties:
-        name:
-          type: string
-          description: Attribute name
-          example: userName
-        type:
-          type: string
-          description: Attribute type
-          enum:
-          - string
-          - boolean
-          - decimal
-          - integer
-          - dateTime
-          - reference
-          - complex
-          example: string
-        mutability:
-          type: string
-          description: Attribute mutability
-          enum:
-          - readOnly
-          - readWrite
-          - immutable
-          - writeOnly
-          example: readWrite
-        returned:
-          type: string
-          description: When the attribute is returned
-          enum:
-          - always
-          - never
-          - default
-          - request
-          example: default
-        uniqueness:
-          type: string
-          description: Attribute uniqueness constraint
-          enum:
-          - none
-          - server
-          - global
-          example: server
-        required:
-          type: boolean
-          description: Whether the attribute is required
-          example: true
-        multiValued:
-          type: boolean
-          description: Whether the attribute can have multiple values
-          example: false
-        caseExact:
-          type: boolean
-          description: Whether the attribute is case exact
-          example: false
-        subAttributes:
-          type: array
-          items:
-            $ref: '#/components/schemas/SchemaAttribute'
-          description: Sub-attributes for complex types
+            $ref: '#/components/schemas/Schema'
+  responses:
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '500'
+            detail: Internal server error
+    Unauthorized:
+      description: Authentication information is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '401'
+            detail: Unauthorized
+    Forbidden:
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '403'
+            detail: Forbidden
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

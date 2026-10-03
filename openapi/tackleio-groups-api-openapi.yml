@@ -92,6 +92,17 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   responses:
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '500'
+            detail: Internal server error
     Unauthorized:
       description: Authentication information is missing or invalid
       content:
@@ -114,18 +125,38 @@ components:
             - urn:ietf:params:scim:api:messages:2.0:Error
             status: '403'
             detail: Forbidden
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '500'
-            detail: Internal server error
   schemas:
+    GroupListResponse:
+      type: object
+      required:
+      - schemas
+      - totalResults
+      - startIndex
+      - itemsPerPage
+      - Resources
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:api:messages:2.0:ListResponse
+        totalResults:
+          type: integer
+          description: Total number of groups
+          example: 3
+        startIndex:
+          type: integer
+          description: 1-based index of the first result
+          example: 1
+        itemsPerPage:
+          type: integer
+          description: Number of groups in this response
+          example: 3
+        Resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
     ScimError:
       type: object
       required:
@@ -162,37 +193,6 @@ components:
           - invalidVers
           - sensitive
           example: invalidValue
-    GroupListResponse:
-      type: object
-      required:
-      - schemas
-      - totalResults
-      - startIndex
-      - itemsPerPage
-      - Resources
-      properties:
-        schemas:
-          type: array
-          items:
-            type: string
-          example:
-          - urn:ietf:params:scim:api:messages:2.0:ListResponse
-        totalResults:
-          type: integer
-          description: Total number of groups
-          example: 3
-        startIndex:
-          type: integer
-          description: 1-based index of the first result
-          example: 1
-        itemsPerPage:
-          type: integer
-          description: Number of groups in this response
-          example: 3
-        Resources:
-          type: array
-          items:
-            $ref: '#/components/schemas/Group'
     Group:
       type: object
       required:

@@ -59,6 +59,17 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   responses:
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '500'
+            detail: Internal server error
     Unauthorized:
       description: Authentication information is missing or invalid
       content:
@@ -81,17 +92,6 @@ components:
             - urn:ietf:params:scim:api:messages:2.0:Error
             status: '403'
             detail: Forbidden
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '500'
-            detail: Internal server error
   schemas:
     ScimError:
       type: object
@@ -129,6 +129,25 @@ components:
           - invalidVers
           - sensitive
           example: invalidValue
+    Entitlement:
+      type: object
+      required:
+      - value
+      - display
+      - type
+      properties:
+        value:
+          type: string
+          description: The unique identifier of the entitlement (role ID)
+          example: role_admin_123
+        display:
+          type: string
+          description: The display name of the entitlement (role name)
+          example: Administrator
+        type:
+          type: string
+          description: The type of entitlement
+          example: role
     EntitlementListResponse:
       type: object
       required:
@@ -160,25 +179,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Entitlement'
-    Entitlement:
-      type: object
-      required:
-      - value
-      - display
-      - type
-      properties:
-        value:
-          type: string
-          description: The unique identifier of the entitlement (role ID)
-          example: role_admin_123
-        display:
-          type: string
-          description: The display name of the entitlement (role name)
-          example: Administrator
-        type:
-          type: string
-          description: The type of entitlement
-          example: role
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

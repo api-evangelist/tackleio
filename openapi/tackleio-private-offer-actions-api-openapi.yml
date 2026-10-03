@@ -156,95 +156,62 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    UnauthorizedError:
-      description: Authentication failed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: unauthorized
-    InternalServerError:
-      description: Internal server error or upstream dependency failure.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    NotFoundError:
-      description: Requested offer or resource was not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: not found
-    ForbiddenError:
-      description: Caller is not allowed to perform this action.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: forbidden
-    BadRequestError:
-      description: Invalid request or unsupported operation.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: missing id
   schemas:
-    PlanTemplate:
+    BuyerDetails:
       type: object
       properties:
-        ref:
+        company_name:
           type: string
-        display:
+        billing_account_id:
           type: string
-    PrivateOfferError:
-      type: object
-      properties:
-        source:
-          type: string
-        type:
-          type: string
-        message:
-          type: string
-    OfferStateValue:
+        buyers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Buyer'
+    PaymentModel:
       type: string
       enum:
-      - draft
-      - pending
-      - submitted_in_cloud
-      - created_in_cloud
-      - email_sent
-      - instructions_opened
-      - viewed
-      - partner_marked_up
-      - accepted
-      - subscribed
-      - attention_needed
-      - pending_cancellation
-      - pending_cancellation_withdrawn
-      - canceled
-      - deleted_in_cloud
-    StartOn:
+      - PaymentSchedule
+      - PerYear
+      - OneTime
+      - PerMonth
+    ProductType:
       type: string
       enum:
-      - acceptance
-      - custom
-    DimensionQuantity:
+      - saas
+      - ami
+      - professional_services
+    Dimension:
       type: object
       properties:
-        dimension_term:
-          $ref: '#/components/schemas/ContractDuration'
-        unlimited_quantity:
+        enabled:
           type: boolean
-        quantity:
+        id:
+          type: string
+        unit_of_measure:
+          type: string
+        price_per_unit_in_usd:
           type: number
           format: double
+        included_quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/DimensionQuantity'
+    PaymentInstallment:
+      type: object
+      properties:
+        price_per_payment_in_usd:
+          type: number
+          format: double
+    Partner:
+      type: object
+      properties:
+        partner_name:
+          type:
+          - string
+          - 'null'
+        partner_seller_id:
+          type: string
     PrivateOfferState:
       type: object
       properties:
@@ -267,139 +234,13 @@ components:
         last_modified:
           type: string
           format: date-time
-    Clone:
+    UserLimits:
       type: object
       properties:
-        source:
-          $ref: '#/components/schemas/Source'
-        originating_offer_id:
-          type: string
-    OfferPricing:
-      type: object
-      properties:
-        plan_ref:
-          type: string
-          description: Microsoft plan ID.
-        plan_name:
-          type: string
-        description:
-          type: string
-        contract_duration:
-          $ref: '#/components/schemas/ContractDuration'
-        payment_model:
-          $ref: '#/components/schemas/PaymentModel'
-        payment_installments:
-          oneOf:
-          - $ref: '#/components/schemas/PaymentInstallment'
-          - type: 'null'
-        payment_schedule:
-          oneOf:
-          - $ref: '#/components/schemas/PaymentSchedule'
-          - type: 'null'
-        pricing_type:
-          oneOf:
-          - $ref: '#/components/schemas/PricingType'
-          - type: 'null'
-        user_limits:
-          oneOf:
-          - $ref: '#/components/schemas/UserLimits'
-          - type: 'null'
-        dimensions:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/Dimension'
-    PricingType:
-      type: string
-      enum:
-      - flat_rate
-      - per_user
-    Partner:
-      type: object
-      properties:
-        partner_name:
-          type:
-          - string
-          - 'null'
-        partner_seller_id:
-          type: string
-    EULA:
-      type: object
-      properties:
-        type:
-          type:
-          - string
-          - 'null'
-          description: Offer EULA type.
-          example: standard
-        document_urns:
-          type: array
-          items:
-            type: string
-        merged_urn:
-          type:
-          - string
-          - 'null'
-        presigned_url:
-          type:
-          - string
-          - 'null'
-          format: uri
-    PreRegistrationDetails:
-      type: object
-      properties:
-        company_website:
-          type:
-          - string
-          - 'null'
-          format: uri
-        details:
-          type: object
-          additionalProperties:
-            type: string
-    ErrorResponse:
-      type: object
-      required:
-      - message
-      properties:
-        message:
-          type: string
-          description: Human-readable error message.
-          example: missing id
-    PaymentInstallment:
-      type: object
-      properties:
-        price_per_payment_in_usd:
-          type: number
-          format: double
-    BuyerDetails:
-      type: object
-      properties:
-        company_name:
-          type: string
-        billing_account_id:
-          type: string
-        buyers:
-          type: array
-          items:
-            $ref: '#/components/schemas/Buyer'
-    PaymentSchedule:
-      type: object
-      properties:
-        initial_charge:
-          $ref: '#/components/schemas/InitialCharge'
-        payment_schedule:
-          type: array
-          items:
-            $ref: '#/components/schemas/ScheduleDetail'
-    ContractDuration:
-      type: object
-      properties:
-        type:
-          type: string
-          example: month
-        frequency:
+        min:
           type: integer
-          example: 12
+        max:
+          type: integer
     MsftResponse:
       type: object
       properties:
@@ -415,70 +256,22 @@ components:
           - 'null'
         raw_response:
           type: string
-    PaymentModel:
+    PrivateOfferStateDetail:
+      type: object
+      properties:
+        raw_message:
+          type: string
+    Source:
       type: string
       enum:
-      - PaymentSchedule
-      - PerYear
-      - OneTime
-      - PerMonth
-    UserLimits:
-      type: object
-      properties:
-        min:
-          type: integer
-        max:
-          type: integer
-    Buyer:
-      type: object
-      properties:
-        full_name:
-          type: string
-        email_address:
-          type: string
-          format: email
-        title:
-          type: string
-    PrivateOfferActivity:
-      type: object
-      properties:
-        slug:
-          type:
-          - string
-          - 'null'
-          example: created-draft-offer
-        user_id:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-          format: date-time
-        metadata:
-          type:
-          - object
-          - 'null'
-          additionalProperties: true
-        user:
-          oneOf:
-          - $ref: '#/components/schemas/PrivateOfferActivityUser'
-          - type: 'null'
-    UserToNotify:
-      type: object
-      properties:
-        contact_type:
-          type: string
-        value:
-          type:
-          - string
-          - 'null'
-        first_name:
-          type: string
-        last_name:
-          type: string
-        email:
-          type: string
-          format: email
+      - salesforce
+      - tackle
+      - microsoft
+    PricingType:
+      type: string
+      enum:
+      - flat_rate
+      - per_user
     PrivateOffer:
       type: object
       description: Stored Tackle Microsoft private offer.
@@ -684,101 +477,121 @@ components:
           $ref: '#/components/schemas/PrivateOfferState'
         msft_response:
           $ref: '#/components/schemas/MsftResponse'
-    PrivateOfferActivityUser:
+    ContractDuration:
       type: object
       properties:
-        id:
+        type:
           type: string
-        name:
+          example: month
+        frequency:
+          type: integer
+          example: 12
+    Buyer:
+      type: object
+      properties:
+        full_name:
           type: string
-        email:
+        email_address:
           type: string
           format: email
-        principal_type:
+        title:
           type: string
-    Source:
-      type: string
-      enum:
-      - salesforce
-      - tackle
-      - microsoft
-    PrivateOfferSalesforce:
+    EULA:
       type: object
       properties:
-        created_at:
+        type:
           type:
           - string
           - 'null'
-          format: date-time
-        custom_object_id:
-          type:
-          - string
-          - 'null'
-        opportunity_id:
-          type:
-          - string
-          - 'null'
-    ProductType:
-      type: string
-      enum:
-      - saas
-      - ami
-      - professional_services
-    InitialCharge:
-      type: object
-      properties:
-        price_per_payment_in_usd:
-          type:
-          - number
-          - 'null'
-          format: double
-        note:
-          type:
-          - string
-          - 'null'
-    Dimension:
-      type: object
-      properties:
-        enabled:
-          type: boolean
-        id:
-          type: string
-        unit_of_measure:
-          type: string
-        price_per_unit_in_usd:
-          type: number
-          format: double
-        included_quantities:
+          description: Offer EULA type.
+          example: standard
+        document_urns:
           type: array
           items:
-            $ref: '#/components/schemas/DimensionQuantity'
-    PrivateOfferStateDetail:
+            type: string
+        merged_urn:
+          type:
+          - string
+          - 'null'
+        presigned_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+    OfferPricing:
       type: object
       properties:
-        raw_message:
+        plan_ref:
           type: string
-    ScheduleDetail:
+          description: Microsoft plan ID.
+        plan_name:
+          type: string
+        description:
+          type: string
+        contract_duration:
+          $ref: '#/components/schemas/ContractDuration'
+        payment_model:
+          $ref: '#/components/schemas/PaymentModel'
+        payment_installments:
+          oneOf:
+          - $ref: '#/components/schemas/PaymentInstallment'
+          - type: 'null'
+        payment_schedule:
+          oneOf:
+          - $ref: '#/components/schemas/PaymentSchedule'
+          - type: 'null'
+        pricing_type:
+          oneOf:
+          - $ref: '#/components/schemas/PricingType'
+          - type: 'null'
+        user_limits:
+          oneOf:
+          - $ref: '#/components/schemas/UserLimits'
+          - type: 'null'
+        dimensions:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Dimension'
+    PlanTemplate:
       type: object
       properties:
-        charge_date:
+        ref:
+          type: string
+        display:
+          type: string
+    PrivateOfferActivity:
+      type: object
+      properties:
+        slug:
           type:
           - string
           - 'null'
-          format: date
-        price_per_payment_in_usd:
-          type:
-          - number
-          - 'null'
-          format: double
-        note:
+          example: created-draft-offer
+        user_id:
           type:
           - string
           - 'null'
-    OfferType:
-      type: string
-      enum:
-      - direct
-      - partner
+        created_at:
+          type: string
+          format: date-time
+        metadata:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+        user:
+          oneOf:
+          - $ref: '#/components/schemas/PrivateOfferActivityUser'
+          - type: 'null'
+    PrivateOfferError:
+      type: object
+      properties:
+        source:
+          type: string
+        type:
+          type: string
+        message:
+          type: string
     OfferStatus:
       type: string
       description: 'Controls the offer workflow. Use `draft_status` to save the offer in
@@ -808,15 +621,155 @@ components:
       - delete_pending
       - delete_validation_pending
       - deleted
+    OfferStateValue:
+      type: string
+      enum:
+      - draft
+      - pending
+      - submitted_in_cloud
+      - created_in_cloud
+      - email_sent
+      - instructions_opened
+      - viewed
+      - partner_marked_up
+      - accepted
+      - subscribed
+      - attention_needed
+      - pending_cancellation
+      - pending_cancellation_withdrawn
+      - canceled
+      - deleted_in_cloud
+    PreRegistrationDetails:
+      type: object
+      properties:
+        company_website:
+          type:
+          - string
+          - 'null'
+          format: uri
+        details:
+          type: object
+          additionalProperties:
+            type: string
+    ErrorResponse:
+      type: object
+      required:
+      - message
+      properties:
+        message:
+          type: string
+          description: Human-readable error message.
+          example: missing id
+    UserToNotify:
+      type: object
+      properties:
+        contact_type:
+          type: string
+        value:
+          type:
+          - string
+          - 'null'
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+    PrivateOfferActivityUser:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        principal_type:
+          type: string
+    StartOn:
+      type: string
+      enum:
+      - acceptance
+      - custom
+    DimensionQuantity:
+      type: object
+      properties:
+        dimension_term:
+          $ref: '#/components/schemas/ContractDuration'
+        unlimited_quantity:
+          type: boolean
+        quantity:
+          type: number
+          format: double
+    Clone:
+      type: object
+      properties:
+        source:
+          $ref: '#/components/schemas/Source'
+        originating_offer_id:
+          type: string
+    PrivateOfferSalesforce:
+      type: object
+      properties:
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        custom_object_id:
+          type:
+          - string
+          - 'null'
+        opportunity_id:
+          type:
+          - string
+          - 'null'
+    PaymentSchedule:
+      type: object
+      properties:
+        initial_charge:
+          $ref: '#/components/schemas/InitialCharge'
+        payment_schedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduleDetail'
+    InitialCharge:
+      type: object
+      properties:
+        price_per_payment_in_usd:
+          type:
+          - number
+          - 'null'
+          format: double
+        note:
+          type:
+          - string
+          - 'null'
+    OfferType:
+      type: string
+      enum:
+      - direct
+      - partner
+    ScheduleDetail:
+      type: object
+      properties:
+        charge_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        price_per_payment_in_usd:
+          type:
+          - number
+          - 'null'
+          format: double
+        note:
+          type:
+          - string
+          - 'null'
   parameters:
-    OfferId:
-      name: id
-      in: path
-      required: true
-      description: Tackle private offer ID.
-      schema:
-        type: string
-      example: po-1234
     UpdateDocs:
       name: update_docs
       in: query
@@ -826,6 +779,14 @@ components:
         type: boolean
         default: false
       example: true
+    OfferId:
+      name: id
+      in: path
+      required: true
+      description: Tackle private offer ID.
+      schema:
+        type: string
+      example: po-1234
     TackleOperationId:
       name: tackle-operation-id
       in: header
@@ -834,6 +795,45 @@ components:
       schema:
         type: string
       example: 018f01ec-3f2b-7a70-b81e-4fc3d6a69f42
+  responses:
+    UnauthorizedError:
+      description: Authentication failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: unauthorized
+    ForbiddenError:
+      description: Caller is not allowed to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: forbidden
+    BadRequestError:
+      description: Invalid request or unsupported operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: missing id
+    NotFoundError:
+      description: Requested offer or resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: not found
+    InternalServerError:
+      description: Internal server error or upstream dependency failure.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   securitySchemes:
     bearerAuth:
       type: http
