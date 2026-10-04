@@ -407,16 +407,41 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
+  responses:
+    Unauthorized:
+      description: Authentication information is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '401'
+            detail: Unauthorized
+    Forbidden:
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '403'
+            detail: Forbidden
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '500'
+            detail: Internal server error
   schemas:
-    Manager:
-      type: object
-      required:
-      - value
-      properties:
-        value:
-          type: string
-          description: Manager's user ID
-          example: manager456
     User:
       type: object
       required:
@@ -479,6 +504,20 @@ components:
           $ref: '#/components/schemas/Meta'
         urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:
           $ref: '#/components/schemas/EnterpriseUser'
+    Name:
+      type: object
+      required:
+      - givenName
+      - familyName
+      properties:
+        givenName:
+          type: string
+          description: First name
+          example: John
+        familyName:
+          type: string
+          description: Last name
+          example: Doe
     Email:
       type: object
       required:
@@ -498,86 +537,6 @@ components:
           type: boolean
           description: Whether this is the primary email
           example: true
-    PatchOperation:
-      type: object
-      required:
-      - op
-      properties:
-        op:
-          type: string
-          description: The operation to perform
-          enum:
-          - add
-          - remove
-          - replace
-          example: replace
-        path:
-          type: string
-          description: The attribute path to modify
-          example: active
-        value:
-          description: The value for the operation (type varies by operation and path)
-          oneOf:
-          - type: string
-          - type: boolean
-          - type: integer
-          - type: object
-          - type: array
-    Photo:
-      type: object
-      required:
-      - type
-      - value
-      properties:
-        type:
-          type: string
-          description: Type of photo
-          example: photo
-        value:
-          type: string
-          format: uri
-          description: URL to the photo
-          example: https://example.com/photo.jpg
-    Meta:
-      type: object
-      readOnly: true
-      properties:
-        resourceType:
-          type: string
-          description: The resource type
-          example: User
-        created:
-          type: string
-          format: date-time
-          description: When the resource was created
-          example: '2024-01-15T10:30:00Z'
-        lastModified:
-          type: string
-          format: date-time
-          description: When the resource was last modified
-          example: '2024-01-15T10:30:00Z'
-        location:
-          type: string
-          format: uri
-          description: URL to the resource
-          example: https://scim-api.tackle.io/scim/v2/Users/user123
-    PatchOp:
-      type: object
-      required:
-      - schemas
-      - Operations
-      properties:
-        schemas:
-          type: array
-          items:
-            type: string
-          example:
-          - urn:ietf:params:scim:api:messages:2.0:PatchOp
-        Operations:
-          type: array
-          items:
-            $ref: '#/components/schemas/PatchOperation'
-          description: List of patch operations to perform
     UserListResponse:
       type: object
       required:
@@ -609,6 +568,150 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
+    Meta:
+      type: object
+      readOnly: true
+      properties:
+        resourceType:
+          type: string
+          description: The resource type
+          example: User
+        created:
+          type: string
+          format: date-time
+          description: When the resource was created
+          example: '2024-01-15T10:30:00Z'
+        lastModified:
+          type: string
+          format: date-time
+          description: When the resource was last modified
+          example: '2024-01-15T10:30:00Z'
+        location:
+          type: string
+          format: uri
+          description: URL to the resource
+          example: https://scim-api.tackle.io/scim/v2/Users/user123
+    UserInput:
+      type: object
+      required:
+      - schemas
+      - userName
+      - name
+      - emails
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:schemas:core:2.0:User
+          - urn:ietf:params:scim:schemas:extension:enterprise:2.0:User
+        externalId:
+          type: string
+          description: External identifier for the user
+          example: ext_user_456
+        userName:
+          type: string
+          description: Unique username for the user
+          example: john.doe@example.com
+        displayName:
+          type: string
+          description: Display name for the user
+          example: John Doe
+        nickName:
+          type: string
+          description: Nickname for the user
+          example: Johnny
+        title:
+          type: string
+          description: Job title
+          example: Senior Engineer
+        active:
+          type: boolean
+          description: Whether the user is active
+          example: true
+        locale:
+          type: string
+          description: User's preferred locale
+          example: en-US
+        name:
+          $ref: '#/components/schemas/Name'
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/Email'
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+        urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:
+          $ref: '#/components/schemas/EnterpriseUser'
+    PatchOp:
+      type: object
+      required:
+      - schemas
+      - Operations
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:api:messages:2.0:PatchOp
+        Operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatchOperation'
+          description: List of patch operations to perform
+    Photo:
+      type: object
+      required:
+      - type
+      - value
+      properties:
+        type:
+          type: string
+          description: Type of photo
+          example: photo
+        value:
+          type: string
+          format: uri
+          description: URL to the photo
+          example: https://example.com/photo.jpg
+    Manager:
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          description: Manager's user ID
+          example: manager456
+    PatchOperation:
+      type: object
+      required:
+      - op
+      properties:
+        op:
+          type: string
+          description: The operation to perform
+          enum:
+          - add
+          - remove
+          - replace
+          example: replace
+        path:
+          type: string
+          description: The attribute path to modify
+          example: active
+        value:
+          description: The value for the operation (type varies by operation and path)
+          oneOf:
+          - type: string
+          - type: boolean
+          - type: integer
+          - type: object
+          - type: array
     ScimError:
       type: object
       required:
@@ -666,109 +769,6 @@ components:
           example: Platform
         manager:
           $ref: '#/components/schemas/Manager'
-    Name:
-      type: object
-      required:
-      - givenName
-      - familyName
-      properties:
-        givenName:
-          type: string
-          description: First name
-          example: John
-        familyName:
-          type: string
-          description: Last name
-          example: Doe
-    UserInput:
-      type: object
-      required:
-      - schemas
-      - userName
-      - name
-      - emails
-      properties:
-        schemas:
-          type: array
-          items:
-            type: string
-          example:
-          - urn:ietf:params:scim:schemas:core:2.0:User
-          - urn:ietf:params:scim:schemas:extension:enterprise:2.0:User
-        externalId:
-          type: string
-          description: External identifier for the user
-          example: ext_user_456
-        userName:
-          type: string
-          description: Unique username for the user
-          example: john.doe@example.com
-        displayName:
-          type: string
-          description: Display name for the user
-          example: John Doe
-        nickName:
-          type: string
-          description: Nickname for the user
-          example: Johnny
-        title:
-          type: string
-          description: Job title
-          example: Senior Engineer
-        active:
-          type: boolean
-          description: Whether the user is active
-          example: true
-        locale:
-          type: string
-          description: User's preferred locale
-          example: en-US
-        name:
-          $ref: '#/components/schemas/Name'
-        emails:
-          type: array
-          items:
-            $ref: '#/components/schemas/Email'
-        photos:
-          type: array
-          items:
-            $ref: '#/components/schemas/Photo'
-        urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:
-          $ref: '#/components/schemas/EnterpriseUser'
-  responses:
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '500'
-            detail: Internal server error
-    Unauthorized:
-      description: Authentication information is missing or invalid
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '401'
-            detail: Unauthorized
-    Forbidden:
-      description: Access forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '403'
-            detail: Forbidden
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

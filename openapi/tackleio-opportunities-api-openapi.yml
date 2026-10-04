@@ -1291,7 +1291,785 @@ paths:
     - url: https://gcp.cosell.tackle.io
       description: GCP Co-Sell Service
 components:
+  responses:
+    Unauthorized:
+      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
+
+        authenticated principal could not be resolved.'
+    BadRequest:
+      description: 'Bad Request. The request was malformed or failed validation (for example, an invalid
+
+        `sortField`/`sortOrder` value, an unsupported `tackle-operation-id`, or a request body that
+
+        fails to parse as JSON).'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Invalid sortField
+    NotFound:
+      description: Not Found. No resource exists at the requested path for the authenticated vendor.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Opportunity not found
+    InternalServerError:
+      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
+
+        bodies for 5xx errors may be empty.'
+    Locked:
+      description: 'Locked. The request was rejected because the vendor is currently in a mid-reset state
+
+        (for example, while the vendor''s AWS Partner Central connection is being re-established).
+
+        Retry the request once the vendor''s reset has completed.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Locked
+    Conflict:
+      description: 'Conflict. The request cannot be applied to the resource in its current state (for example,
+
+        attempting `updateDraftOpportunity` on an opportunity that is no longer in draft state, or
+
+        `createOpportunity` with a `crmId` that already maps to an existing co-sell opportunity).'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Draft opportunity cannot be updated as it is not in draft state.
+    Unauthorized_2:
+      description: Missing or invalid authentication.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error_2'
+    InternalServerError_2:
+      description: 'An unexpected error occurred while processing the request.
+
+        Retry idempotent reads after a short delay; for writes, check
+
+        the opportunity history (`GET /api/opportunities/{id}/events`)
+
+        before retrying to confirm whether the prior request was
+
+        applied.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error_2'
+    NotFound_2:
+      description: The requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error_2'
+    BadRequest_2:
+      description: 'The request was malformed or failed validation. Common triggers
+
+        include missing required fields, invalid enum values, type
+
+        mismatches, an unrecognized `tackle-operation-id`, and (for
+
+        create) `qualificationInfo.legalLanguageAccepted` not being
+
+        `true`. The response `message` describes the specific
+
+        violation.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error_2'
+    Forbidden:
+      description: The caller is not authorized to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error_2'
+    Locked_2:
+      description: 'The vendor''s co-sell configuration is in the middle of a reset
+
+        and cannot accept changes. Retry the request after a short
+
+        delay; if the lock persists for more than a few minutes,
+
+        contact Tackle support.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error_2'
+    Conflict_2:
+      description: 'The request conflicts with existing state. For
+
+        `createOpportunity` and `updateOpportunity`, this is returned
+
+        when the supplied `$tkl-metadata.crm.id` is already linked to
+
+        another co-sell opportunity for the same vendor.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error_2'
   schemas:
+    Customer:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/Account'
+        contacts:
+          $ref: '#/components/schemas/Contacts'
+    Insights:
+      type: object
+      description: AWS-derived insights about the opportunity, populated by AWS Partner Central when available.
+      properties:
+        engagementScore:
+          type: string
+          description: 'AWS Partner Central engagement score for the opportunity, when
+
+            provided. Common values include `Low`, `Medium`, and `High`;
+
+            clients should treat unrecognized values as opaque.'
+          example: High
+        nextBestActions:
+          type: string
+          description: AWS-suggested next-best-action text for the opportunity, when provided.
+    AwsOpportunityTeam:
+      type: object
+      properties:
+        businessTitle:
+          type: string
+          enum:
+          - AWSSalesRep
+          - AWSAccountOwner
+          - WWPSPDM
+          - PDM
+          - PSM
+          - ISVSM
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+    Project:
+      type: object
+      properties:
+        additionalComments:
+          type: string
+        customerBusinessProblem:
+          type: string
+        apnPrograms:
+          type: array
+          description: 'AWS Partner Network (APN) programs associated with this opportunity,
+
+            returned as an array of program names from the enumerated list below.'
+          items:
+            type: string
+            enum:
+            - APN Immersion Days
+            - APN Solution Space
+            - ATO (Authority to Operate)
+            - AWS Marketplace Campaign
+            - IS Immersion Day SFID Program
+            - ISV Workload Migration
+            - Migration Acceleration Program
+            - P3
+            - Partner Launch Initiative
+            - Partner Opportunity Acceleration Funded
+            - The Next Smart
+            - VMware Cloud on AWS
+            - Well-Architected
+            - Windows
+            - Workspaces/AppStream Accelerator Program
+            - WWPS NDPP
+        competitorName:
+          type: string
+          enum:
+          - Oracle Cloud
+          - On-Prem
+          - Co-location
+          - Akamai
+          - AliCloud
+          - Google Cloud Platform
+          - IBM Softlayer
+          - Microsoft Azure
+          - Other- Cost Optimization
+          - No Competition
+          - '*Other'
+        customerUseCase:
+          type: string
+        deliveryModels:
+          type: array
+          items:
+            type: string
+            enum:
+            - SaaS or PaaS
+            - BYOL or AMI
+            - Managed Services
+            - Professional Services
+            - Resell
+            - Other
+        expectedCustomerSpend:
+          type: array
+          items:
+            type: object
+            properties:
+              currencyCode:
+                type: string
+              amount:
+                type: string
+              frequency:
+                type: string
+                enum:
+                - Monthly
+              targetCompany:
+                type: string
+        otherCompetitorNames:
+          type: string
+        otherSolutionDescription:
+          type: string
+        relatedOpportunityIdentifier:
+          type: string
+        title:
+          type: string
+        salesActivities:
+          type: array
+          items:
+            type: string
+            enum:
+            - Initialized discussions with customer
+            - Customer has shown interest in solution
+            - Conducted POC / Demo
+            - In evaluation / planning stage
+            - Agreed on solution to Business Problem
+            - Completed Action Plan
+            - Finalized Deployment Need
+            - SOW Signed
+    Contacts:
+      type: array
+      items:
+        type: object
+        properties:
+          email:
+            type: string
+          firstName:
+            type: string
+          lastName:
+            type: string
+          phone:
+            type: string
+          businessTitle:
+            type: string
+    Marketing:
+      type: object
+      properties:
+        awsFundingUsed:
+          type: string
+          enum:
+          - 'No'
+          - 'Yes'
+        campaignName:
+          type: string
+        channels:
+          type: array
+          items:
+            type: string
+        source:
+          type: string
+          description: 'AWS Partner Central marketing source for the opportunity. Common values
+
+            include `None`, `Marketing Activity`, and `Other`; treat unrecognized
+
+            values as opaque.'
+          example: None
+        useCases:
+          type: array
+          items:
+            type: string
+    Address:
+      type: object
+      properties:
+        city:
+          type: string
+        countryCode:
+          type: string
+        postalCode:
+          type: string
+        stateOrRegion:
+          type: string
+        streetAddress:
+          type: string
+    ListOpportunityEvents:
+      type: object
+      required:
+      - operation
+      - eventID
+      - timestamp
+      properties:
+        operation:
+          type: string
+          description: 'The operation recorded for this history event. This is a free-form string,
+
+            intentionally not enumerated. Common values include the lifecycle operations
+
+            exposed by `createOpportunity` and the `tackle-operation-id` header on
+
+            `updateOpportunity` (for example `createOpportunity`, `createDraftOpportunity`,
+
+            `updateOpportunity`, `updateDraftOpportunity`,
+
+            `updateStartEngagementOpportunity`, `startEngagement`, `closeLostOpportunity`,
+
+            `launchOpportunity`, `updateOpportunityCRMID`, `acceptOpportunity`,
+
+            `rejectOpportunity`), plus synthetic system events such as `internalUpdateEvent`
+
+            and `cloudUpdateEvent`. History records may also include CRM-sync and
+
+            partner-system operations beyond this list; clients should treat the value as
+
+            an opaque string and surface unknown values verbatim rather than rejecting
+
+            them.'
+        eventID:
+          type: string
+          example: 2lsw6rdFuCz0d7cVNCubTYGSznY
+        timestamp:
+          type: string
+          example: '2024-09-10T15:25:19Z'
+        cloudRaw:
+          type: object
+          additionalProperties: true
+          description: 'Raw cloud-provider snapshot associated with this history event. Present
+
+            only when the recorded event captured a non-empty cloud-side snapshot;
+
+            omitted on events without one. For AWS, this corresponds to the serialized
+
+            opportunity payload returned by AWS Partner Central at the time the event
+
+            was recorded; clients should treat the contents as opaque diagnostic data,
+
+            since the shape varies by cloud provider and operation.'
+        rawRequest:
+          type: object
+          properties:
+            targetCloseDate:
+              type: string
+          additionalProperties: true
+        cloudResponses:
+          description: 'Per-request results from AWS Partner Central for the operations recorded
+
+            in this event. On success, each entry''s `response` object contains the
+
+            AWS payload and `success` is `true`. On failure, `response` is `null`,
+
+            `success` is `false`, and one of `errorType`, `errorResponse`, or
+
+            `errorResponses` is populated with the AWS error detail.'
+          type: array
+          items:
+            type: object
+            properties:
+              requestID:
+                type: string
+              success:
+                type: boolean
+              timestamp:
+                type: string
+              response:
+                type: object
+                additionalProperties: true
+              errorType:
+                type: string
+              errorResponse:
+                type: string
+              errorResponses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    fieldName:
+                      type: string
+                    errorMessage:
+                      type: string
+        cloudRequests:
+          type: array
+          items:
+            type: object
+            properties:
+              operation:
+                type: string
+              requestID:
+                type: string
+              timestamp:
+                type: string
+              request:
+                type: object
+                additionalProperties: true
+        activityDetails:
+          type: object
+          description: 'Details about the principal that performed the operation. The full set of
+
+            principal fields (`id`, `type`, `email`, `givenName`, `familyName`,
+
+            `pictureUrl`) appears alongside `displayText`.'
+          properties:
+            displayText:
+              type: string
+              description: A human-readable summary of the action that produced this event.
+            id:
+              type: string
+              description: "Identifier for the principal that performed the action.\n\n- For events caused by a person, this is the Tackle user ID.\n- For events caused by an M2M client, this is the machine principal ID.\n- For system-generated events, this is one of the reserved identifiers\n  `tackle-internal-update` (Tackle-initiated background updates) or\n  `aws-update` (updates that originated from AWS Partner Central).\n\nTreat any unrecognized identifier as an opaque string."
+            type:
+              type: string
+              description: 'Principal type. Common values include `user` and `otkuser` for actions taken
+
+                by a person, `machine` for actions taken by an M2M client, and
+
+                `tackle-automation` for actions taken by Tackle on the integrator''s behalf
+
+                (for example, scheduled retries or background reconciliation). Additional
+
+                system-generated principal types may appear over time as new automated
+
+                sources are introduced; clients should treat any unrecognized value as an
+
+                opaque string and surface it verbatim rather than rejecting the event.'
+            email:
+              type: string
+              description: Email of the principal, when known.
+            givenName:
+              type: string
+            familyName:
+              type: string
+            pictureUrl:
+              type: string
+    ListOpportunitiesResponse:
+      type: object
+      properties:
+        opportunities:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListOpportunitiesResponseItem'
+        total:
+          description: The total number of opportunities that matches the filter criteria.
+          type: integer
+          example: 100
+        currentPageCount:
+          description: The number of opportunities returned in the current page.
+          type: integer
+          example: 10
+        isNextPage:
+          description: A boolean value indicating if there are more opportunities to be fetched.
+          type: boolean
+          example: true
+        nextIndex:
+          description: The starting index to use for fetching the next page of opportunities. Only present when `isNextPage` is `true`.
+          type: integer
+          example: 10
+    ListOpportunitiesResponseItem:
+      type: object
+      properties:
+        id:
+          type: string
+        cloudProviderId:
+          type: string
+        cloudStatus:
+          type: string
+        cloudSalesStage:
+          type: string
+        companyName:
+          type: string
+        created:
+          type: string
+        lastModified:
+          type: string
+        pendingRequestIds:
+          type: array
+          items:
+            type: string
+            example: 00123456789ABCDEFGHIJKL
+        hasCloudErrors:
+          type: boolean
+        hasSalesforceErrors:
+          type: boolean
+        salesforceSyncError:
+          type: string
+        title:
+          type: string
+        opportunityType:
+          type: string
+        crmId:
+          type: string
+        source:
+          type: string
+        cloudCreated:
+          type: string
+        cloudLastModified:
+          type: string
+        targetCloseDate:
+          type: string
+          description: The target close date of the opportunity, formatted as `YYYY-MM-DD`.
+          example: '2024-09-18'
+        unifiedCreatedDate:
+          type: string
+    DataMapper:
+      type: object
+      properties:
+        $tkl-metadata:
+          type: string
+    OpportunityInput:
+      allOf:
+      - $ref: '#/components/schemas/Opportunity'
+      type: object
+      properties:
+        awsSubmission:
+          description: This information is required to start engagement with AWS.
+          type: object
+          properties:
+            visibility:
+              type: string
+              enum:
+              - Full
+              - Limited
+            involvementType:
+              type: string
+              enum:
+              - Co-Sell
+              - For Visibility Only
+    LifeCycle:
+      type: object
+      properties:
+        closedLostReason:
+          type: string
+          description: 'Reason the opportunity was closed lost, when `stage` is
+
+            `Closed Lost`. Absent on opportunities still in active stages.'
+          enum:
+          - Customer Deficiency
+          - Delay / Cancellation of Project
+          - Legal / Tax / Regulatory
+          - Lost to Competitor - Google
+          - Lost to Competitor - Microsoft
+          - Lost to Competitor - SoftLayer
+          - Lost to Competitor - VMWare
+          - Lost to Competitor - Other
+          - No Opportunity
+          - On Premises Deployment
+          - Partner Gap
+          - Price
+          - Security / Compliance
+          - Technical Limitations
+          - Customer Experience
+          - Other
+          - People/Relationship/Governance
+          - Product/Technology
+          - Financial/Commercial
+        nextSteps:
+          type: string
+        nextStepsHistory:
+          type: array
+          items:
+            type: object
+            properties:
+              time:
+                type: string
+              value:
+                type: string
+        reviewComments:
+          type: string
+        reviewStatus:
+          type: string
+          readOnly: true
+          enum:
+          - Pending Submission
+          - Submitted
+          - In review
+          - Approved
+          - Rejected
+          - Action Required
+        reviewStatusReason:
+          type: string
+        stage:
+          type: string
+          description: 'AWS Partner Central sales-stage value for this opportunity, restricted
+
+            to the stages used in partner-side reporting and updates. Move through
+
+            the stages in order as the deal progresses (`Prospect` → `Qualified` →
+
+            `Technical Validation` → `Business Validation` → `Committed` →
+
+            `Launched`); set to `Closed Lost` and supply `closedLostReason` if the
+
+            opportunity is lost.'
+          enum:
+          - Prospect
+          - Qualified
+          - Technical Validation
+          - Business Validation
+          - Committed
+          - Launched
+          - Closed Lost
+        targetCloseDate:
+          type: string
+          description: The target close date for the opportunity, formatted as `YYYY-MM-DD`.
+          example: '2024-09-18'
+    OpportunityMetadata:
+      type: object
+      required:
+      - id
+      - companyName
+      - createdDate
+      - lastModifiedDate
+      properties:
+        id:
+          type: string
+          example: tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3
+        tackleInvitationId:
+          type: string
+          description: 'The Tackle identifier of the invitation this opportunity was created from, when the
+
+            opportunity originated from an inbound AWS-led invitation. Absent on opportunities
+
+            that were not created from an invitation.'
+          example: tackle-invitation-2sKlF3xSRGx8M724Oy3fprAX51q
+        companyName:
+          type: string
+          example: Example INC.
+        createdDate:
+          type: string
+          example: '2024-08-19T15:30:20Z'
+        lastModifiedDate:
+          type: string
+          example: '2024-08-19T16:00:08Z'
+        pendingRequestIds:
+          type: array
+          items:
+            type: string
+          example:
+          - 00123456789ABCDEFGHIJKL
+        crmId:
+          type: string
+          example: 006ABCDEFGHIJK
+        hubspotCrmId:
+          type: string
+          description: HubSpot Deal ID associated with this co-sell opportunity
+          example: '12345678'
+        crmOrgId:
+          type: string
+          description: The Salesforce organization identifier (org ID or alias) for the CRM org this opportunity's `crmId` belongs to.
+          example: 00D5g000004uvWXYZ
+        hasCloudErrors:
+          type: boolean
+          example: false
+        hasSalesforceErrors:
+          type: boolean
+          example: false
+        salesforceSyncError:
+          type: string
+          description: 'Most recent Salesforce sync error message, when the last sync attempt
+
+            failed. Absent on opportunities where the last sync attempt succeeded.'
+          example: 'INVALID_FIELD_FOR_INSERT_UPDATE: TackleCoSell__c: bad field names on insert/update call'
+        archivedAt:
+          type: string
+          format: date-time
+          description: Timestamp at which the opportunity was archived. Absent on non-archived opportunities.
+        lastCRMSyncCloud:
+          type: string
+          format: date-time
+          description: Timestamp of the last CRM sync attempt to the cloud (success or failure).
+        lastCRMSyncCloudStatus:
+          type: string
+          description: 'Status of the most recent CRM-to-cloud sync attempt for this
+
+            opportunity. Common values are `success` and `failed`. Absent on
+
+            opportunities that have never been synced to the cloud.'
+          example: success
+        lastCRMSyncCloudSuccessful:
+          type: string
+          format: date-time
+          description: Timestamp of the last successful CRM sync to the cloud; present only when the last sync succeeded.
+        lastCRMSyncReceived:
+          type: string
+          format: date-time
+          description: Timestamp of the last CRM sync received from the CRM (success or failure).
+        lastCRMSyncReceivedStatus:
+          type: string
+          description: 'Status of the most recent CRM-to-Tackle inbound sync for this
+
+            opportunity. Common values are `success` and `failed`. Absent on
+
+            opportunities that have never received an inbound CRM update.'
+          example: success
+        lastCRMSyncReceivedChanges:
+          type: object
+          description: Map of field names to their changed values from the last CRM sync received.
+          additionalProperties: true
+    Error:
+      type: object
+      description: 'Error envelope returned for typed error responses. Some 4xx and 5xx responses
+
+        (such as direct `Unauthorized` and `Internal Server Error` responses) may instead
+
+        return an empty body; consumers should be tolerant of that.'
+      properties:
+        message:
+          type: string
+          description: A short, human-readable description of the error.
+          example: Opportunity not found
+    CreateOpportunityInput:
+      allOf:
+      - $ref: '#/components/schemas/OpportunityInput'
+      type: object
+      properties:
+        crmId:
+          type: string
+          example: 006QL00000BahjGYAR
+        hubspotCrmId:
+          type: string
+          description: HubSpot Deal ID to associate with this co-sell opportunity
+          example: '12345678'
+        awsSubmission:
+          type: object
+          properties:
+            visibility:
+              type: string
+              enum:
+              - Full
+              - Limited
+            involvementType:
+              type: string
+              enum:
+              - Co-Sell
+              - For Visibility Only
+        opportunityTeam:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                type: string
+              firstName:
+                type: string
+              lastName:
+                type: string
+              phone:
+                type: string
+              businessTitle:
+                type: string
+                enum:
+                - PartnerAccountManager
+                - OpportunityOwner
     Account:
       type: object
       properties:
@@ -1338,30 +2116,68 @@ components:
           type: string
         address:
           $ref: '#/components/schemas/Address'
-    Error:
+    Opportunity:
       type: object
-      description: 'Error envelope returned for typed error responses. Some 4xx and 5xx responses
-
-        (such as direct `Unauthorized` and `Internal Server Error` responses) may instead
-
-        return an empty body; consumers should be tolerant of that.'
       properties:
-        message:
+        nationalSecurity:
           type: string
-          description: A short, human-readable description of the error.
-          example: Opportunity not found
-    DataMapper:
-      type: object
-      properties:
-        $tkl-metadata:
+          description: 'Whether the opportunity is for a national-security or government
+
+            customer that AWS Partner Central treats as restricted. Submit `Yes`
+
+            for national-security workloads (which routes the opportunity through
+
+            AWS''s restricted review path) and `No` otherwise.'
+          enum:
+          - 'No'
+          - 'Yes'
+        customer:
+          $ref: '#/components/schemas/Customer'
+        lifeCycle:
+          $ref: '#/components/schemas/LifeCycle'
+        marketing:
+          $ref: '#/components/schemas/Marketing'
+        opportunityType:
           type: string
-    Customer:
-      type: object
-      properties:
-        account:
-          $ref: '#/components/schemas/Account'
-        contacts:
-          $ref: '#/components/schemas/Contacts'
+          enum:
+          - Net New Business
+          - Expansion
+          - Flat Renewal
+        primaryNeedsFromAws:
+          type: array
+          items:
+            type: string
+            enum:
+            - Co-Sell - Architectural Validation
+            - Co-Sell - Business Presentation
+            - Co-Sell - Competitive Information
+            - Co-Sell - Pricing Assistance
+            - Co-Sell - Technical Consultation
+            - Co-Sell - Total Cost of Ownership Evaluation
+            - Co-Sell - Deal Support
+            - Co-Sell - Support for Public Tender / RFx
+        project:
+          $ref: '#/components/schemas/Project'
+        softwareRevenue:
+          $ref: '#/components/schemas/SoftwareRevenue'
+        solutions:
+          type: array
+          items:
+            type: string
+        awsMarketplaceOffers:
+          type: array
+          items:
+            type: string
+          description: Array of AWS Marketplace offer identifiers associated with the opportunity.
+        awsProducts:
+          type: array
+          items:
+            type: string
+          description: 'Array of AWS product identifiers associated with the opportunity. These represent AWS services
+
+            or products that are part of the customer''s solution (e.g., AmazonBedrock, AmazonS3, AmazonEC2Trn2).'
+        dataMapper:
+          $ref: '#/components/schemas/DataMapper'
     OpportunityResponse:
       allOf:
       - $ref: '#/components/schemas/Opportunity'
@@ -1634,128 +2450,6 @@ components:
               enum:
               - Full
               - Limited
-    Address:
-      type: object
-      properties:
-        city:
-          type: string
-        countryCode:
-          type: string
-        postalCode:
-          type: string
-        stateOrRegion:
-          type: string
-        streetAddress:
-          type: string
-    OpportunityInput:
-      allOf:
-      - $ref: '#/components/schemas/Opportunity'
-      type: object
-      properties:
-        awsSubmission:
-          description: This information is required to start engagement with AWS.
-          type: object
-          properties:
-            visibility:
-              type: string
-              enum:
-              - Full
-              - Limited
-            involvementType:
-              type: string
-              enum:
-              - Co-Sell
-              - For Visibility Only
-    Marketing:
-      type: object
-      properties:
-        awsFundingUsed:
-          type: string
-          enum:
-          - 'No'
-          - 'Yes'
-        campaignName:
-          type: string
-        channels:
-          type: array
-          items:
-            type: string
-        source:
-          type: string
-          description: 'AWS Partner Central marketing source for the opportunity. Common values
-
-            include `None`, `Marketing Activity`, and `Other`; treat unrecognized
-
-            values as opaque.'
-          example: None
-        useCases:
-          type: array
-          items:
-            type: string
-    AwsOpportunityTeam:
-      type: object
-      properties:
-        businessTitle:
-          type: string
-          enum:
-          - AWSSalesRep
-          - AWSAccountOwner
-          - WWPSPDM
-          - PDM
-          - PSM
-          - ISVSM
-        email:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-    ListOpportunitiesResponseItem:
-      type: object
-      properties:
-        id:
-          type: string
-        cloudProviderId:
-          type: string
-        cloudStatus:
-          type: string
-        cloudSalesStage:
-          type: string
-        companyName:
-          type: string
-        created:
-          type: string
-        lastModified:
-          type: string
-        pendingRequestIds:
-          type: array
-          items:
-            type: string
-            example: 00123456789ABCDEFGHIJKL
-        hasCloudErrors:
-          type: boolean
-        hasSalesforceErrors:
-          type: boolean
-        salesforceSyncError:
-          type: string
-        title:
-          type: string
-        opportunityType:
-          type: string
-        crmId:
-          type: string
-        source:
-          type: string
-        cloudCreated:
-          type: string
-        cloudLastModified:
-          type: string
-        targetCloseDate:
-          type: string
-          description: The target close date of the opportunity, formatted as `YYYY-MM-DD`.
-          example: '2024-09-18'
-        unifiedCreatedDate:
-          type: string
     SoftwareRevenue:
       type: object
       properties:
@@ -1776,750 +2470,43 @@ components:
               type: string
             amount:
               type: string
-    Insights:
-      type: object
-      description: AWS-derived insights about the opportunity, populated by AWS Partner Central when available.
-      properties:
-        engagementScore:
-          type: string
-          description: 'AWS Partner Central engagement score for the opportunity, when
-
-            provided. Common values include `Low`, `Medium`, and `High`;
-
-            clients should treat unrecognized values as opaque.'
-          example: High
-        nextBestActions:
-          type: string
-          description: AWS-suggested next-best-action text for the opportunity, when provided.
-    LifeCycle:
-      type: object
-      properties:
-        closedLostReason:
-          type: string
-          description: 'Reason the opportunity was closed lost, when `stage` is
-
-            `Closed Lost`. Absent on opportunities still in active stages.'
-          enum:
-          - Customer Deficiency
-          - Delay / Cancellation of Project
-          - Legal / Tax / Regulatory
-          - Lost to Competitor - Google
-          - Lost to Competitor - Microsoft
-          - Lost to Competitor - SoftLayer
-          - Lost to Competitor - VMWare
-          - Lost to Competitor - Other
-          - No Opportunity
-          - On Premises Deployment
-          - Partner Gap
-          - Price
-          - Security / Compliance
-          - Technical Limitations
-          - Customer Experience
-          - Other
-          - People/Relationship/Governance
-          - Product/Technology
-          - Financial/Commercial
-        nextSteps:
-          type: string
-        nextStepsHistory:
-          type: array
-          items:
-            type: object
-            properties:
-              time:
-                type: string
-              value:
-                type: string
-        reviewComments:
-          type: string
-        reviewStatus:
-          type: string
-          readOnly: true
-          enum:
-          - Pending Submission
-          - Submitted
-          - In review
-          - Approved
-          - Rejected
-          - Action Required
-        reviewStatusReason:
-          type: string
-        stage:
-          type: string
-          description: 'AWS Partner Central sales-stage value for this opportunity, restricted
-
-            to the stages used in partner-side reporting and updates. Move through
-
-            the stages in order as the deal progresses (`Prospect` → `Qualified` →
-
-            `Technical Validation` → `Business Validation` → `Committed` →
-
-            `Launched`); set to `Closed Lost` and supply `closedLostReason` if the
-
-            opportunity is lost.'
-          enum:
-          - Prospect
-          - Qualified
-          - Technical Validation
-          - Business Validation
-          - Committed
-          - Launched
-          - Closed Lost
-        targetCloseDate:
-          type: string
-          description: The target close date for the opportunity, formatted as `YYYY-MM-DD`.
-          example: '2024-09-18'
-    Project:
-      type: object
-      properties:
-        additionalComments:
-          type: string
-        customerBusinessProblem:
-          type: string
-        apnPrograms:
-          type: array
-          description: 'AWS Partner Network (APN) programs associated with this opportunity,
-
-            returned as an array of program names from the enumerated list below.'
-          items:
-            type: string
-            enum:
-            - APN Immersion Days
-            - APN Solution Space
-            - ATO (Authority to Operate)
-            - AWS Marketplace Campaign
-            - IS Immersion Day SFID Program
-            - ISV Workload Migration
-            - Migration Acceleration Program
-            - P3
-            - Partner Launch Initiative
-            - Partner Opportunity Acceleration Funded
-            - The Next Smart
-            - VMware Cloud on AWS
-            - Well-Architected
-            - Windows
-            - Workspaces/AppStream Accelerator Program
-            - WWPS NDPP
-        competitorName:
-          type: string
-          enum:
-          - Oracle Cloud
-          - On-Prem
-          - Co-location
-          - Akamai
-          - AliCloud
-          - Google Cloud Platform
-          - IBM Softlayer
-          - Microsoft Azure
-          - Other- Cost Optimization
-          - No Competition
-          - '*Other'
-        customerUseCase:
-          type: string
-        deliveryModels:
-          type: array
-          items:
-            type: string
-            enum:
-            - SaaS or PaaS
-            - BYOL or AMI
-            - Managed Services
-            - Professional Services
-            - Resell
-            - Other
-        expectedCustomerSpend:
-          type: array
-          items:
-            type: object
-            properties:
-              currencyCode:
-                type: string
-              amount:
-                type: string
-              frequency:
-                type: string
-                enum:
-                - Monthly
-              targetCompany:
-                type: string
-        otherCompetitorNames:
-          type: string
-        otherSolutionDescription:
-          type: string
-        relatedOpportunityIdentifier:
-          type: string
-        title:
-          type: string
-        salesActivities:
-          type: array
-          items:
-            type: string
-            enum:
-            - Initialized discussions with customer
-            - Customer has shown interest in solution
-            - Conducted POC / Demo
-            - In evaluation / planning stage
-            - Agreed on solution to Business Problem
-            - Completed Action Plan
-            - Finalized Deployment Need
-            - SOW Signed
-    ListOpportunitiesResponse:
-      type: object
-      properties:
-        opportunities:
-          type: array
-          items:
-            $ref: '#/components/schemas/ListOpportunitiesResponseItem'
-        total:
-          description: The total number of opportunities that matches the filter criteria.
-          type: integer
-          example: 100
-        currentPageCount:
-          description: The number of opportunities returned in the current page.
-          type: integer
-          example: 10
-        isNextPage:
-          description: A boolean value indicating if there are more opportunities to be fetched.
-          type: boolean
-          example: true
-        nextIndex:
-          description: The starting index to use for fetching the next page of opportunities. Only present when `isNextPage` is `true`.
-          type: integer
-          example: 10
-    Opportunity:
-      type: object
-      properties:
-        nationalSecurity:
-          type: string
-          description: 'Whether the opportunity is for a national-security or government
-
-            customer that AWS Partner Central treats as restricted. Submit `Yes`
-
-            for national-security workloads (which routes the opportunity through
-
-            AWS''s restricted review path) and `No` otherwise.'
-          enum:
-          - 'No'
-          - 'Yes'
-        customer:
-          $ref: '#/components/schemas/Customer'
-        lifeCycle:
-          $ref: '#/components/schemas/LifeCycle'
-        marketing:
-          $ref: '#/components/schemas/Marketing'
-        opportunityType:
-          type: string
-          enum:
-          - Net New Business
-          - Expansion
-          - Flat Renewal
-        primaryNeedsFromAws:
-          type: array
-          items:
-            type: string
-            enum:
-            - Co-Sell - Architectural Validation
-            - Co-Sell - Business Presentation
-            - Co-Sell - Competitive Information
-            - Co-Sell - Pricing Assistance
-            - Co-Sell - Technical Consultation
-            - Co-Sell - Total Cost of Ownership Evaluation
-            - Co-Sell - Deal Support
-            - Co-Sell - Support for Public Tender / RFx
-        project:
-          $ref: '#/components/schemas/Project'
-        softwareRevenue:
-          $ref: '#/components/schemas/SoftwareRevenue'
-        solutions:
-          type: array
-          items:
-            type: string
-        awsMarketplaceOffers:
-          type: array
-          items:
-            type: string
-          description: Array of AWS Marketplace offer identifiers associated with the opportunity.
-        awsProducts:
-          type: array
-          items:
-            type: string
-          description: 'Array of AWS product identifiers associated with the opportunity. These represent AWS services
-
-            or products that are part of the customer''s solution (e.g., AmazonBedrock, AmazonS3, AmazonEC2Trn2).'
-        dataMapper:
-          $ref: '#/components/schemas/DataMapper'
-    ListOpportunityEvents:
-      type: object
-      required:
-      - operation
-      - eventID
-      - timestamp
-      properties:
-        operation:
-          type: string
-          description: 'The operation recorded for this history event. This is a free-form string,
-
-            intentionally not enumerated. Common values include the lifecycle operations
-
-            exposed by `createOpportunity` and the `tackle-operation-id` header on
-
-            `updateOpportunity` (for example `createOpportunity`, `createDraftOpportunity`,
-
-            `updateOpportunity`, `updateDraftOpportunity`,
-
-            `updateStartEngagementOpportunity`, `startEngagement`, `closeLostOpportunity`,
-
-            `launchOpportunity`, `updateOpportunityCRMID`, `acceptOpportunity`,
-
-            `rejectOpportunity`), plus synthetic system events such as `internalUpdateEvent`
-
-            and `cloudUpdateEvent`. History records may also include CRM-sync and
-
-            partner-system operations beyond this list; clients should treat the value as
-
-            an opaque string and surface unknown values verbatim rather than rejecting
-
-            them.'
-        eventID:
-          type: string
-          example: 2lsw6rdFuCz0d7cVNCubTYGSznY
-        timestamp:
-          type: string
-          example: '2024-09-10T15:25:19Z'
-        cloudRaw:
-          type: object
-          additionalProperties: true
-          description: 'Raw cloud-provider snapshot associated with this history event. Present
-
-            only when the recorded event captured a non-empty cloud-side snapshot;
-
-            omitted on events without one. For AWS, this corresponds to the serialized
-
-            opportunity payload returned by AWS Partner Central at the time the event
-
-            was recorded; clients should treat the contents as opaque diagnostic data,
-
-            since the shape varies by cloud provider and operation.'
-        rawRequest:
-          type: object
-          properties:
-            targetCloseDate:
-              type: string
-          additionalProperties: true
-        cloudResponses:
-          description: 'Per-request results from AWS Partner Central for the operations recorded
-
-            in this event. On success, each entry''s `response` object contains the
-
-            AWS payload and `success` is `true`. On failure, `response` is `null`,
-
-            `success` is `false`, and one of `errorType`, `errorResponse`, or
-
-            `errorResponses` is populated with the AWS error detail.'
-          type: array
-          items:
-            type: object
-            properties:
-              requestID:
-                type: string
-              success:
-                type: boolean
-              timestamp:
-                type: string
-              response:
-                type: object
-                additionalProperties: true
-              errorType:
-                type: string
-              errorResponse:
-                type: string
-              errorResponses:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    fieldName:
-                      type: string
-                    errorMessage:
-                      type: string
-        cloudRequests:
-          type: array
-          items:
-            type: object
-            properties:
-              operation:
-                type: string
-              requestID:
-                type: string
-              timestamp:
-                type: string
-              request:
-                type: object
-                additionalProperties: true
-        activityDetails:
-          type: object
-          description: 'Details about the principal that performed the operation. The full set of
-
-            principal fields (`id`, `type`, `email`, `givenName`, `familyName`,
-
-            `pictureUrl`) appears alongside `displayText`.'
-          properties:
-            displayText:
-              type: string
-              description: A human-readable summary of the action that produced this event.
-            id:
-              type: string
-              description: "Identifier for the principal that performed the action.\n\n- For events caused by a person, this is the Tackle user ID.\n- For events caused by an M2M client, this is the machine principal ID.\n- For system-generated events, this is one of the reserved identifiers\n  `tackle-internal-update` (Tackle-initiated background updates) or\n  `aws-update` (updates that originated from AWS Partner Central).\n\nTreat any unrecognized identifier as an opaque string."
-            type:
-              type: string
-              description: 'Principal type. Common values include `user` and `otkuser` for actions taken
-
-                by a person, `machine` for actions taken by an M2M client, and
-
-                `tackle-automation` for actions taken by Tackle on the integrator''s behalf
-
-                (for example, scheduled retries or background reconciliation). Additional
-
-                system-generated principal types may appear over time as new automated
-
-                sources are introduced; clients should treat any unrecognized value as an
-
-                opaque string and surface it verbatim rather than rejecting the event.'
-            email:
-              type: string
-              description: Email of the principal, when known.
-            givenName:
-              type: string
-            familyName:
-              type: string
-            pictureUrl:
-              type: string
-    CreateOpportunityInput:
-      allOf:
-      - $ref: '#/components/schemas/OpportunityInput'
-      type: object
-      properties:
-        crmId:
-          type: string
-          example: 006QL00000BahjGYAR
-        hubspotCrmId:
-          type: string
-          description: HubSpot Deal ID to associate with this co-sell opportunity
-          example: '12345678'
-        awsSubmission:
-          type: object
-          properties:
-            visibility:
-              type: string
-              enum:
-              - Full
-              - Limited
-            involvementType:
-              type: string
-              enum:
-              - Co-Sell
-              - For Visibility Only
-        opportunityTeam:
-          type: array
-          items:
-            type: object
-            properties:
-              email:
-                type: string
-              firstName:
-                type: string
-              lastName:
-                type: string
-              phone:
-                type: string
-              businessTitle:
-                type: string
-                enum:
-                - PartnerAccountManager
-                - OpportunityOwner
-    Contacts:
-      type: array
-      items:
-        type: object
-        properties:
-          email:
-            type: string
-          firstName:
-            type: string
-          lastName:
-            type: string
-          phone:
-            type: string
-          businessTitle:
-            type: string
-    OpportunityMetadata:
-      type: object
-      required:
-      - id
-      - companyName
-      - createdDate
-      - lastModifiedDate
-      properties:
-        id:
-          type: string
-          example: tackle-cosell-2jhD8b41CurTOqEsG2Soinublv3
-        tackleInvitationId:
-          type: string
-          description: 'The Tackle identifier of the invitation this opportunity was created from, when the
-
-            opportunity originated from an inbound AWS-led invitation. Absent on opportunities
-
-            that were not created from an invitation.'
-          example: tackle-invitation-2sKlF3xSRGx8M724Oy3fprAX51q
-        companyName:
-          type: string
-          example: Example INC.
-        createdDate:
-          type: string
-          example: '2024-08-19T15:30:20Z'
-        lastModifiedDate:
-          type: string
-          example: '2024-08-19T16:00:08Z'
-        pendingRequestIds:
-          type: array
-          items:
-            type: string
-          example:
-          - 00123456789ABCDEFGHIJKL
-        crmId:
-          type: string
-          example: 006ABCDEFGHIJK
-        hubspotCrmId:
-          type: string
-          description: HubSpot Deal ID associated with this co-sell opportunity
-          example: '12345678'
-        crmOrgId:
-          type: string
-          description: The Salesforce organization identifier (org ID or alias) for the CRM org this opportunity's `crmId` belongs to.
-          example: 00D5g000004uvWXYZ
-        hasCloudErrors:
-          type: boolean
-          example: false
-        hasSalesforceErrors:
-          type: boolean
-          example: false
-        salesforceSyncError:
-          type: string
-          description: 'Most recent Salesforce sync error message, when the last sync attempt
-
-            failed. Absent on opportunities where the last sync attempt succeeded.'
-          example: 'INVALID_FIELD_FOR_INSERT_UPDATE: TackleCoSell__c: bad field names on insert/update call'
-        archivedAt:
-          type: string
-          format: date-time
-          description: Timestamp at which the opportunity was archived. Absent on non-archived opportunities.
-        lastCRMSyncCloud:
-          type: string
-          format: date-time
-          description: Timestamp of the last CRM sync attempt to the cloud (success or failure).
-        lastCRMSyncCloudStatus:
-          type: string
-          description: 'Status of the most recent CRM-to-cloud sync attempt for this
-
-            opportunity. Common values are `success` and `failed`. Absent on
-
-            opportunities that have never been synced to the cloud.'
-          example: success
-        lastCRMSyncCloudSuccessful:
-          type: string
-          format: date-time
-          description: Timestamp of the last successful CRM sync to the cloud; present only when the last sync succeeded.
-        lastCRMSyncReceived:
-          type: string
-          format: date-time
-          description: Timestamp of the last CRM sync received from the CRM (success or failure).
-        lastCRMSyncReceivedStatus:
-          type: string
-          description: 'Status of the most recent CRM-to-Tackle inbound sync for this
-
-            opportunity. Common values are `success` and `failed`. Absent on
-
-            opportunities that have never received an inbound CRM update.'
-          example: success
-        lastCRMSyncReceivedChanges:
-          type: object
-          description: Map of field names to their changed values from the last CRM sync received.
-          additionalProperties: true
-    ExtensionStatus:
+    TackleOperationIdUpdate:
       type: string
-      description: Rebate extension status. Output only.
+      description: 'Tackle-side operation identifier accepted on the
+
+        `tackle-operation-id` header by `POST /api/opportunities/{id}`.
+
+        The create-side values (`createOpportunity`,
+
+        `createDraftOpportunity`) are explicitly rejected with a
+
+        `400 Bad Request` — creates must be sent to
+
+        `POST /api/opportunities` instead. Test-environment-only operations
+
+        (`acceptOpportunity`, `rejectOpportunity`,
+
+        `closeByAdminOpportunity`, `confirmCloseWonOpportunity`,
+
+        `confirmCloseLostOpportunity`) are accepted only when the
+
+        calling vendor is configured for use in a test environment;
+
+        production vendors receive a `400 Bad Request` if they send
+
+        these values. The remaining operations apply to every vendor.'
       enum:
-      - EXTENSION_STATUS_UNSPECIFIED
-      - SUBMITTED
-      - APPROVED
-      - REJECTED
-    ExtensionReason:
-      type: string
-      description: Rebate extension reason. Output only.
-      enum:
-      - EXTENSION_REASON_UNSPECIFIED
-      - OTHER_EXTENSION_REASON
-      - CUSTOMER_ENGAGEMENT_DELAYED
-      - PROOF_OF_CONCEPT_LONGER_THAN_EXPECTED
-      - COMPLEX_DEAL
-    DecisionPhase:
-      type: string
-      description: Decision phase for the opportunity.
-      enum:
-      - DECISION_PHASE_UNSPECIFIED
-      - INFORMATION_GATHERING
-      - TRIAL_OR_PILOT
-      - FINAL_DECISION
-    QualificationInfo:
-      type: object
-      description: Qualification information for the opportunity.
-      properties:
-        dealNumber:
-          type: string
-          description: Output only. System-generated unique deal identifier.
-          example: DR-ABC123DEF456GH
-        operationType:
-          $ref: '#/components/schemas/OperationType'
-        contractLengthMonths:
-          type: integer
-          description: Required. Contract terms in months.
-        quantity:
-          type: integer
-          description: Optional. Number of seats or licenses. Default `1`.
-        dealSize:
-          $ref: '#/components/schemas/Money'
-        estimatedCloseDate:
-          $ref: '#/components/schemas/Date'
-        publicSector:
-          type: boolean
-          description: 'Optional. Whether the customer is a public sector organization
-
-            that requires competing offers from multiple vendors.'
-        budget:
-          $ref: '#/components/schemas/Budget'
-        authority:
-          $ref: '#/components/schemas/Authority'
-        need:
-          $ref: '#/components/schemas/Need'
-        timeline:
-          $ref: '#/components/schemas/Timeline'
-        campaignCode:
-          type: string
-          description: 'Optional. Active campaign name (issued by Google) for the
-
-            selected region and product. Campaign names are not
-
-            published in this API; check with your Google partner
-
-            contact for the valid values for your region and product
-
-            mix.'
-        msspDeal:
-          type: boolean
-          description: 'Optional. Flag to highlight if the partner will also act as
-
-            MSSP (Managed Security Service Provider).'
-        legalLanguageAccepted:
-          type: boolean
-          description: 'Required. Must be `true` for the opportunity to be created.
-
-            Cannot be edited after the opportunity is accepted.'
-        decisionPhase:
-          $ref: '#/components/schemas/DecisionPhase'
-        publicTenderAttestation:
-          type: boolean
-          description: 'Required for public-sector opportunities (`publicSector:
-
-            true`); optional otherwise. Set to `true` to attest that
-
-            the opportunity meets public-tender requirements.'
-    Error_2:
-      type: object
-      description: 'Error response body. The service emits only a human-readable
-
-        `message`. A request identifier may be included in response headers for support and troubleshooting.'
-      properties:
-        message:
-          type: string
-          description: Human-readable error message.
-    OpportunityTeamMember:
-      type: object
-      description: Opportunity team member. Output only.
-      properties:
-        name:
-          type: string
-          description: Output only. Display name of the team member.
-        email:
-          type: string
-          format: email
-          description: Output only. Email address of the team member.
-        accessLevel:
-          $ref: '#/components/schemas/AccessLevel'
-    ContractVehicle:
-      type: string
-      description: Contract vehicle for an ISV opportunity.
-      enum:
-      - CONTRACT_VEHICLE_UNSPECIFIED
-      - CLOUD_MARKETPLACE
-      - PARTNER_CONTRACT
-      - UNKNOWN
-    Money:
-      type: object
-      description: 'An amount of money with its currency type. The whole `Money`
-
-        object is replaced atomically when included on update — there is
-
-        no per-field merge of `currencyCode`, `units`, or `nanos`.'
-      properties:
-        currencyCode:
-          type: string
-          description: Three-letter ISO 4217 currency code.
-          example: USD
-        units:
-          type: string
-          description: 'Whole units of the amount, encoded as a string. For example,
-
-            `1500000` with `currencyCode: USD` and `nanos: 0` is
-
-            $1,500,000.00 USD.'
-          example: '1500000'
-        nanos:
-          type: integer
-          description: 'Sub-unit (nano) part of the amount. One unit equals 10^9
-
-            nanos; for example, `nanos: 750000000` represents 0.75 of
-
-            one unit. Must have the same sign as `units`.'
-    OpportunityCRMInfo:
-      type: object
-      description: 'CRM linkage for the opportunity. Both fields are nullable so that
-
-        callers can explicitly clear them.'
-      properties:
-        id:
-          type:
-          - string
-          - 'null'
-          description: CRM-side opportunity identifier.
-          example: 006fJ000000qVvoQAE
-        orgId:
-          type:
-          - string
-          - 'null'
-          description: CRM-side organization identifier.
-    HistoryOperationId:
-      type: string
-      description: "Operation identifier stored on history events returned by\n`GET /api/opportunities/{id}/events`. Treated as a free-form\nstring on the wire: the documented values below cover the\ncommon cases, but additional operation strings may appear as\nnew history sources are added. Clients should fall back to\na default branch when displaying an unknown value.\n\nCommon values include every operation accepted on the\n`tackle-operation-id` header by the create and update\nendpoints (see `TackleOperationIdCreate` and\n`TackleOperationIdUpdate`) plus two service-emitted\noperations:\n\n- `internalUpdateEvent` — a Tackle metadata field on the\n  opportunity changed (for example, the attribute-syncing\n  subscription).\n- `cloudUpdateEvent` — the opportunity's cloud payload\n  (`cloudRaw`) was refreshed because Google Cloud Channel\n  sent a new snapshot.\n\nThese two service-emitted values are never accepted as\n`tackle-operation-id` headers; they appear only on history\nevents."
-    CustomerInfo:
-      type: object
-      description: Customer information provided during opportunity creation.
-      properties:
-        customerDetails:
-          $ref: '#/components/schemas/CustomerDetails'
-        contact:
-          $ref: '#/components/schemas/Contact'
-        region:
-          $ref: '#/components/schemas/Region'
+      - updateOpportunity
+      - updateDraftOpportunity
+      - submitOpportunity
+      - retryCreateOpportunity
+      - closeWonOpportunity
+      - closeLostOpportunity
+      - acceptOpportunity
+      - rejectOpportunity
+      - closeByAdminOpportunity
+      - confirmCloseWonOpportunity
+      - confirmCloseLostOpportunity
     PhoneNumber:
       type: object
       description: 'Wire-format phone number. See
@@ -2537,214 +2524,29 @@ components:
         extension:
           type: string
           description: Optional. The phone number's extension.
-    Source:
+    ExtensionReason:
       type: string
-      description: "Indicates the origin of the opportunity:\n\n- `SOURCE_UNKNOWN` — origin not recorded; should not be\n  observed on supported responses.\n- `GOOGLE` — sourced by a Google sales user.\n- `GOOGLE_BDR` — sourced by a Google Business Development\n  Representative.\n- `GOOGLE_PROGRAMMATIC` — generated by a Google automated\n  system.\n- `PARTNER` — sourced by the partner (the integrator). The\n  API forces this value on opportunities created via this\n  spec."
+      description: Rebate extension reason. Output only.
       enum:
-      - SOURCE_UNKNOWN
-      - GOOGLE
-      - GOOGLE_BDR
-      - GOOGLE_PROGRAMMATIC
-      - PARTNER
-    Region:
-      type: string
-      description: 'Geographical region where the end customer is located. The partner
-
-        needs sell authorization in this region to qualify for deal
-
-        registration incentives.'
-      enum:
-      - REGION_UNSPECIFIED
-      - ANZ
-      - CEE
-      - DACH
-      - FRANCE
-      - INDIA
-      - JAPAN
-      - LATAM_BRAZIL
-      - LATAM_SPANISH_SPEAKING
-      - NE
-      - NORTH_AMERICA
-      - SEEMEA
-      - UK_AND_I
-      - OTHER_ASIA_PACIFIC
-    Contact:
+      - EXTENSION_REASON_UNSPECIFIED
+      - OTHER_EXTENSION_REASON
+      - CUSTOMER_ENGAGEMENT_DELAYED
+      - PROOF_OF_CONCEPT_LONGER_THAN_EXPECTED
+      - COMPLEX_DEAL
+    PhoneNumberShortCode:
       type: object
-      description: Contact details.
+      description: A short code — region-restricted phone number.
       properties:
-        givenName:
+        regionCode:
           type: string
-          description: Required. Contact's first name.
-        familyName:
+          description: 'Required. ISO 3166-1 alpha-2 country code (also known as the
+
+            CLDR region code).'
+          example: US
+        number:
           type: string
-          description: Required. Contact's last name.
-        email:
-          type: string
-          format: email
-          description: Required.
-        phone:
-          $ref: '#/components/schemas/PhoneNumber'
-    PartnerReadyToClose:
-      type: string
-      description: 'Partner ready-to-close indicator. Can be edited after the
-
-        opportunity is accepted. Setting to `MIGRATION_IMPL` corresponds
-
-        to Closed/Won; setting to `CLOSED_LOST` corresponds to Closed/Lost.'
-      enum:
-      - PARTNER_CLOSE_STAGE_UNSPECIFIED
-      - MIGRATION_IMPL
-      - CLOSED_LOST
-    ProductFamily:
-      type: string
-      description: Product family that the opportunity belongs to.
-      enum:
-      - PRODUCT_FAMILY_UNSPECIFIED
-      - GOOGLE_CLOUD_PLATFORM
-      - GOOGLE_WORKSPACE
-      - MAPS
-      - CHROME
-      - PSO
-    Stage:
-      type: string
-      description: "Sales stage of the opportunity. The `STAGE_UNSPECIFIED`,\n`MIGRATION_IMPL`, `CLOSED_LOST`, and `CLOSED_ADMIN` values\nare set only by the API on the integrator's behalf based on\nother fields (for example, `partnerInfo.partnerReadyToClose`);\nthey cannot be set directly. The remaining values\n(`QUALIFY`, `REFINE`, `TECH_EVAL_SOL_DEV`,\n`PROPOSAL_NEGOTIATION`) can be set on update only after the\nopportunity is `ACCEPTED`.\n\n- `QUALIFY` — initial qualification.\n- `REFINE` — qualification refined; deal scope being shaped.\n- `TECH_EVAL_SOL_DEV` — technical evaluation / solution\n  development.\n- `PROPOSAL_NEGOTIATION` — proposal and negotiation.\n- `MIGRATION_IMPL` — migration / implementation; corresponds\n  to closed-won.\n- `CLOSED_LOST` — opportunity closed as lost.\n- `CLOSED_ADMIN` — administratively closed."
-      enum:
-      - STAGE_UNSPECIFIED
-      - QUALIFY
-      - REFINE
-      - TECH_EVAL_SOL_DEV
-      - PROPOSAL_NEGOTIATION
-      - MIGRATION_IMPL
-      - CLOSED_LOST
-      - CLOSED_ADMIN
-    Budget:
-      type: string
-      description: 'Budget qualification. Required for regular and 2-tier
-
-        opportunities; optional for ISV opportunities.'
-      enum:
-      - BUDGET_UNSPECIFIED
-      - BUDGET_EXISTS_NOT_SPECIFIED
-      - CONFIRMED_NO_BUDGET
-      - EXACT_BUDGET_GIVEN
-      - REFUSE_TO_DISCLOSE
-    ProductCategory:
-      type: string
-      description: Product category that the opportunity belongs to.
-      enum:
-      - PRODUCT_CATEGORY_UNSPECIFIED
-      - GOOGLE_GEMINI_AI
-      - GCP_AI
-      - GCP_ANALYTICS
-      - GCP_ANTHOS
-      - GCP_APIGEE
-      - GCP_APPSHEET
-      - GCP_COMPUTE
-      - GCP_DATABASES
-      - GCP_DISTRIBUTED_CLOUD
-      - GCP_DUET_AI
-      - GCP_GPU
-      - GCP_LOOKER
-      - GCP_NETWORK
-      - GCP_OTHER
-      - GCP_OTHER_SECURITY
-      - GCP_PLATFORM
-      - GCP_SCCE
-      - GCP_SERVERLESS
-      - GCP_STORAGE
-      - GCP_SUPPORT
-      - GOOGLE_CLOUD_IDENTITY
-      - GOOGLE_MAPS
-      - GOOGLE_VAULT
-      - GOOGLE_VOICE
-      - GOOGLE_WORKSPACE_CORE
-      - GOOGLE_WORKSPACE_EDU
-      - GCP_AGENTSPACE
-      - CHROME_OS_ENTERPRISE
-      - CHROME_OS_EDUCATION
-      - PSO_TRAINING
-      - PSO_CONSULTING
-      - GCP_GOOGLE_SECOPS
-      - GCP_GOOGLE_THREAT_INTELLIGENCE
-      - GCP_CHROME_ENTERPRISE_PREMIUM
-      - GCP_RECAPTCHA
-      - GCP_MANAGED_HUNT
-      - GCP_MANAGED_DEFENSE
-      - GCP_WEBRISK
-      - GCP_MANDIANT_CONSULTING_SERVICES
-      - GCP_SCC
-      - GCP_GEMINI_ENTERPRISE
-    Industry:
-      type: string
-      description: Customer's primary industry.
-      enum:
-      - INDUSTRY_UNSPECIFIED
-      - ADVERTISING_MARKETING
-      - AGRICULTURE
-      - AUTOMOTIVE
-      - BUSINESS_SERVICES
-      - CONSUMER_GOODS
-      - EDUCATION
-      - ELECTRICAL_ELECTRONICS
-      - ENERGY
-      - FINANCIAL_SERVICES
-      - FOOD
-      - GAMING
-      - HEALTHCARE
-      - INDUSTRIAL_GOODS
-      - GOVERNMENT
-      - LOGISTICS
-      - MANUFACTURING
-      - MEDIA
-      - NON_PROFIT
-      - PUBLIC_SECTOR
-      - RETAIL_CONSUMER
-      - RETAIL_WHOLESALE
-      - SOFTWARE
-      - TELECOMMUNICATIONS
-      - TELECOMMUNICATIONS_MEDIA
-      - TOURISM
-      - OTHER
-    Role:
-      type: string
-      description: 'Role of a customer contact. Most values are role categories that
-
-        apply to any opportunity; `CHRONICLE_SIEM_CONTACT` and
-
-        `CHRONICLE_SOAR_CONTACT` are specific to engagements involving
-
-        Google Chronicle (Google''s SIEM and SOAR security products).'
-      enum:
-      - ROLE_UNSPECIFIED
-      - OTHER_ROLE
-      - ADMIN
-      - BILLING_CONTACT
-      - BUSINESS_DECISION_MAKER
-      - BUSINESS_USER
-      - CHANGE_CHAMPION
-      - CHRONICLE_SIEM_CONTACT
-      - CHRONICLE_SOAR_CONTACT
-      - ECONOMIC_BUYER
-      - EVALUATOR
-      - EXECUTIVE_SPONSOR
-      - INFLUENCER
-      - MAIN_DECISION_MAKER
-      - ORDERING_CONTACT
-      - PRODUCT_CONTACT
-      - TECH_CONTACT
-      - TECH_DECISION_MAKER
-    OpportunityType:
-      type: string
-      description: 'Indicates if the opportunity is a regular / ISV / 2-tier deal. If
-
-        not specified, treated as `REGULAR`. Cannot be edited after the
-
-        opportunity is accepted.'
-      enum:
-      - OPPORTUNITY_TYPE_UNSPECIFIED
-      - REGULAR
-      - TWO_TIER
-      - ISV_SOLUTION_CONNECT
+          description: Required. The short code digits.
+          example: '611'
     SupportLevel:
       type: string
       description: Support level for an ISV opportunity.
@@ -2756,74 +2558,38 @@ components:
       - UPSELL_RENEW_CROSS_SELL
       - ALIGN_SALES_ACCOUNT
       - ALREADY_CONTACT
-    IsvSolutionConnectInfo:
+    DecisionPhase:
+      type: string
+      description: Decision phase for the opportunity.
+      enum:
+      - DECISION_PHASE_UNSPECIFIED
+      - INFORMATION_GATHERING
+      - TRIAL_OR_PILOT
+      - FINAL_DECISION
+    PartnerViewType:
+      type: string
+      description: 'Indicates what view the partner has access to. Non-sourcing
+
+        service partners have limited view; no updates are allowed on the
+
+        opportunity in `LIMITED` view. Output only.'
+      enum:
+      - PARTNER_VIEW_TYPE_UNSPECIFIED
+      - FULL
+      - LIMITED
+    OpportunityTeamMember:
       type: object
-      description: 'Information for an opportunity that goes through Google''s ISV
-
-        Solution Connect program.'
+      description: Opportunity team member. Output only.
       properties:
-        isvSolutionConnectDeal:
-          type: boolean
-          description: '`true` if the deal is part of Google''s ISV Solution
-
-            Connect program. Defaults to `false`.'
-        customerContactRequested:
-          type: boolean
-          description: '`true` when the customer has requested follow-up contact
-
-            from the ISV. Must be `true` for an ISV Solution Connect
-
-            opportunity to be accepted.'
-        supportLevel:
-          $ref: '#/components/schemas/SupportLevel'
-        contractVehicle:
-          $ref: '#/components/schemas/ContractVehicle'
-        deliveryModel:
-          $ref: '#/components/schemas/DeliveryModel'
-        notes:
+        name:
           type: string
-          maxLength: 5000
-          description: 'Optional. Only available for ISV opportunities. ISV and Google
-
-            use this to keep each other up to date on selling activity.'
-        nextStep:
+          description: Output only. Display name of the team member.
+        email:
           type: string
-          maxLength: 255
-          description: 'Optional. Only available for ISV opportunities. Summarizes the
-
-            next step and who takes it.'
-    OpportunityHistoryEventCloudRequest:
-      type: object
-      description: 'One Google Cloud Channel call made on behalf of an opportunity
-
-        history event. A single event may include multiple cloud
-
-        requests (for example, when a sub-flow chains calls).'
-      required:
-      - requestID
-      - operation
-      - timestamp
-      properties:
-        requestID:
-          type: string
-          description: 'Identifier for the cloud-side request, useful for support
-
-            correlation. Equal to the `eventID` of the parent history
-
-            event for top-level requests.'
-        operation:
-          type: string
-          description: 'Cloud Channel operation name (for example,
-
-            `opportunities.create`, `opportunities.patch`).'
-        timestamp:
-          type: string
-          format: date-time
-          description: Time the cloud request was issued.
-        request:
-          description: 'The raw request payload sent to Google Cloud Channel.
-
-            Shape mirrors the cloud''s v1alpha1 schema.'
+          format: email
+          description: Output only. Email address of the team member.
+        accessLevel:
+          $ref: '#/components/schemas/AccessLevel'
     OpportunityInfo:
       type: object
       description: Contains details about the opportunity.
@@ -2873,87 +2639,16 @@ components:
             semantics.'
         opportunityAmount:
           $ref: '#/components/schemas/Money'
-    Timeline:
+    ProductFamily:
       type: string
-      description: Timeline qualification.
+      description: Product family that the opportunity belongs to.
       enum:
-      - TIMELINE_UNSPECIFIED
-      - CONFIRMED_NO_DECISION_DATE
-      - REFUSED_TO_GIVE_DATE
-      - SPECIFIC_DECISION_DATES_GIVEN
-      - VAGUE_DECISION_DATES_GIVEN
-    CreateOpportunityResponse:
-      type: object
-      required:
-      - id
-      - requestId
-      properties:
-        id:
-          type: string
-          description: Tackle-side opportunity identifier.
-          example: tackle-cosell-2eWPPnWbbSaDFWqMaYoHMeWWY7T
-        requestId:
-          type: string
-          description: 'Identifier for the enqueued cloud operation. Matches the
-
-            `eventID` reported on subsequent history events.'
-          example: 2uRzjsNKpJBs6qsxT5L2S1UMXnj
-    ExtensionRejectionReason:
-      type: string
-      description: Rebate extension rejection reason. Output only.
-      enum:
-      - EXTENSION_REJECTION_REASON_UNSPECIFIED
-      - OTHER_EXTENSION_REJECTION_REASON
-      - LACK_OF_PARTNER_ENGAGEMENT
-      - NEGATIVE_CUSTOMER_FEEDBACK
-      - PPS_REJECTION
-    SalesCycle:
-      type: object
-      description: Information on the sales cycle.
-      properties:
-        closeDate:
-          $ref: '#/components/schemas/Date'
-        partnerReadyToClose:
-          $ref: '#/components/schemas/PartnerReadyToClose'
-        closeDatePushCount:
-          type: integer
-          description: Output only. Number of times close date is pushed/changed.
-        prmSiteDetails:
-          type: string
-          description: 'Output only. Reference to the opportunity in Google''s
-
-            Partner Relationship Management (PRM) portal.'
-    WinLossInfo:
-      type: object
-      description: 'Win / loss details. Populated after the opportunity is closed.
-
-        Output only.'
-      properties:
-        lostReason:
-          type: string
-          description: Output only. Free-form reason the opportunity was lost.
-        lostMainReason:
-          type: string
-          description: Output only. Top-line categorization of the loss.
-        lostRejectedReasonDetails:
-          type: string
-          description: 'Output only. Additional detail provided when the opportunity
-
-            was rejected.'
-        winMainReason:
-          type: string
-          description: Output only. Top-line categorization of the win.
-        wonReason:
-          type: string
-          description: Output only. Free-form reason the opportunity was won.
-        winLossProducts:
-          type: array
-          description: Output only. Products attached to the win/loss outcome.
-          items:
-            type: string
-        winLossAdditionalContext:
-          type: string
-          description: Output only. Additional free-form context on the outcome.
+      - PRODUCT_FAMILY_UNSPECIFIED
+      - GOOGLE_CLOUD_PLATFORM
+      - GOOGLE_WORKSPACE
+      - MAPS
+      - CHROME
+      - PSO
     State:
       type: string
       description: "Lifecycle state of the opportunity:\n\n- `STATE_UNSPECIFIED` — placeholder default; should not be\n  sent on requests.\n- `DRAFT` — saved but not yet submitted to Google. Settable\n  by integrators.\n- `SUBMITTED` — submitted to Google for review. Settable by\n  integrators (requires `cosell:StartEngagement`).\n- `ACCEPTED` — Google has accepted the opportunity. Set by\n  Google.\n- `NOT_ACCEPTED` — Google has declined the opportunity. Set\n  by Google.\n\nDefaults to `DRAFT` when omitted on create."
@@ -2963,20 +2658,160 @@ components:
       - SUBMITTED
       - ACCEPTED
       - NOT_ACCEPTED
-    ListOpportunityHistoryResponse:
+    Stage:
+      type: string
+      description: "Sales stage of the opportunity. The `STAGE_UNSPECIFIED`,\n`MIGRATION_IMPL`, `CLOSED_LOST`, and `CLOSED_ADMIN` values\nare set only by the API on the integrator's behalf based on\nother fields (for example, `partnerInfo.partnerReadyToClose`);\nthey cannot be set directly. The remaining values\n(`QUALIFY`, `REFINE`, `TECH_EVAL_SOL_DEV`,\n`PROPOSAL_NEGOTIATION`) can be set on update only after the\nopportunity is `ACCEPTED`.\n\n- `QUALIFY` — initial qualification.\n- `REFINE` — qualification refined; deal scope being shaped.\n- `TECH_EVAL_SOL_DEV` — technical evaluation / solution\n  development.\n- `PROPOSAL_NEGOTIATION` — proposal and negotiation.\n- `MIGRATION_IMPL` — migration / implementation; corresponds\n  to closed-won.\n- `CLOSED_LOST` — opportunity closed as lost.\n- `CLOSED_ADMIN` — administratively closed."
+      enum:
+      - STAGE_UNSPECIFIED
+      - QUALIFY
+      - REFINE
+      - TECH_EVAL_SOL_DEV
+      - PROPOSAL_NEGOTIATION
+      - MIGRATION_IMPL
+      - CLOSED_LOST
+      - CLOSED_ADMIN
+    Role:
+      type: string
+      description: 'Role of a customer contact. Most values are role categories that
+
+        apply to any opportunity; `CHRONICLE_SIEM_CONTACT` and
+
+        `CHRONICLE_SOAR_CONTACT` are specific to engagements involving
+
+        Google Chronicle (Google''s SIEM and SOAR security products).'
+      enum:
+      - ROLE_UNSPECIFIED
+      - OTHER_ROLE
+      - ADMIN
+      - BILLING_CONTACT
+      - BUSINESS_DECISION_MAKER
+      - BUSINESS_USER
+      - CHANGE_CHAMPION
+      - CHRONICLE_SIEM_CONTACT
+      - CHRONICLE_SOAR_CONTACT
+      - ECONOMIC_BUYER
+      - EVALUATOR
+      - EXECUTIVE_SPONSOR
+      - INFLUENCER
+      - MAIN_DECISION_MAKER
+      - ORDERING_CONTACT
+      - PRODUCT_CONTACT
+      - TECH_CONTACT
+      - TECH_DECISION_MAKER
+    OpportunityHistoryEvent:
       type: object
       required:
-      - events
+      - operation
+      - eventID
+      - created
+      - lastModified
       properties:
-        events:
+        operation:
+          description: 'The operation that produced this history event. See
+
+            `HistoryOperationId` for the common set of values, but
+
+            treat this field as a free-form string: additional
+
+            operation strings beyond the documented catalog may
+
+            appear. Clients should fall back to a default branch
+
+            when displaying an unknown value.'
+          allOf:
+          - $ref: '#/components/schemas/HistoryOperationId'
+        eventID:
+          type: string
+          description: 'Unique identifier for the history event. Equal in value to
+
+            the `requestId` returned by the create or update response
+
+            that produced the event; the two schema families use
+
+            different casing on the wire (`eventID` here, `requestId`
+
+            on the response body) but carry the same identifier.'
+          example: 2uRzjsNKpJBs6qsxT5L2S1UMXnj
+        status:
+          type: string
+          description: 'Status of the event. Omitted from the response body for
+
+            instantaneous history items that have no async lifecycle.'
+          enum:
+          - pending
+          - in-progress
+          - retrying
+          - successful
+          - failed
+        rawRequest:
+          description: The original Tackle-shaped request that produced this event.
+        cloudRaw:
+          description: Raw cloud payload, if any, associated with this event.
+        cloudRequests:
           type: array
           items:
-            $ref: '#/components/schemas/OpportunityHistoryEvent'
-        next:
+            $ref: '#/components/schemas/OpportunityHistoryEventCloudRequest'
+        cloudResponses:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpportunityHistoryEventCloudResponse'
+        activityDetails:
+          $ref: '#/components/schemas/OpportunityHistoryEventActivityDetails'
+        created:
           type: string
-          description: 'Opaque continuation token for the next page. Omitted when the
+          format: date-time
+          description: Timestamp the event was created (RFC 3339 Nano).
+        lastModified:
+          type: string
+          format: date-time
+          description: Timestamp the event was last updated (RFC 3339 Nano).
+    Need:
+      type: string
+      description: Need qualification.
+      enum:
+      - NEED_UNSPECIFIED
+      - CLEAR_NEED
+      - COMPELLING_NEED
+      - NO_NEED
+    CustomerDetails:
+      type: object
+      description: 'Customer details used to create a new customer or map to an
 
-            page is the last.'
+        existing one.'
+      properties:
+        organizationName:
+          type: string
+          description: Required. Name of the customer organization.
+        domain:
+          type: string
+          description: Required. Customer's primary website domain.
+        address:
+          $ref: '#/components/schemas/PostalAddress'
+        industry:
+          $ref: '#/components/schemas/Industry'
+        employeeCount:
+          type: integer
+          description: 'Required. Approximate total number of employees at the
+
+            customer organization.'
+    RebateExtension:
+      type: object
+      description: Rebate extension. Output only.
+      properties:
+        requestNumber:
+          type: string
+          description: Output only. Extension request number.
+        extensionReason:
+          $ref: '#/components/schemas/ExtensionReason'
+        extensionStatus:
+          $ref: '#/components/schemas/ExtensionStatus'
+        extensionRejectionReason:
+          $ref: '#/components/schemas/ExtensionRejectionReason'
+        comments:
+          type: string
+          description: 'Output only. Free-form comments associated with the
+
+            extension request.'
     UpdateOpportunityResponse:
       type: object
       required:
@@ -2988,6 +2823,333 @@ components:
 
             `eventID` reported on subsequent history events.'
           example: 2uRzjsNKpJBs6qsxT5L2S1UMXnj
+    Region:
+      type: string
+      description: 'Geographical region where the end customer is located. The partner
+
+        needs sell authorization in this region to qualify for deal
+
+        registration incentives.'
+      enum:
+      - REGION_UNSPECIFIED
+      - ANZ
+      - CEE
+      - DACH
+      - FRANCE
+      - INDIA
+      - JAPAN
+      - LATAM_BRAZIL
+      - LATAM_SPANISH_SPEAKING
+      - NE
+      - NORTH_AMERICA
+      - SEEMEA
+      - UK_AND_I
+      - OTHER_ASIA_PACIFIC
+    ExtensionRejectionReason:
+      type: string
+      description: Rebate extension rejection reason. Output only.
+      enum:
+      - EXTENSION_REJECTION_REASON_UNSPECIFIED
+      - OTHER_EXTENSION_REJECTION_REASON
+      - LACK_OF_PARTNER_ENGAGEMENT
+      - NEGATIVE_CUSTOMER_FEEDBACK
+      - PPS_REJECTION
+    Date:
+      type: object
+      description: 'A calendar date. Any field may be zero to represent a partial
+
+        date (for example, `year: 2026, month: 0, day: 0` for "sometime
+
+        in 2026"). The whole `Date` object is replaced atomically when
+
+        included on update — there is no per-field merge.'
+      properties:
+        year:
+          type: integer
+          description: Year (1–9999), or 0 to specify a date without a year.
+        month:
+          type: integer
+          description: Month (1–12), or 0 to specify a year without a month and day.
+        day:
+          type: integer
+          description: 'Day (1–31, valid for year+month), or 0 to specify year, or
+
+            year + month.'
+    DeliveryModel:
+      type: string
+      description: Delivery model for an ISV opportunity.
+      enum:
+      - DELIVERY_MODEL_UNSPECIFIED
+      - OTHER_DELIVERY_MODEL
+      - DATA_TO_CUSTOMER_BIGQUERY
+      - VM_ON_CUSTOMER_TENANCY
+      - SAAS_ON_GOOGLE_CLOUD
+    ListOpportunitiesResponse_2:
+      type: object
+      required:
+      - opportunities
+      - total
+      - currentPageCount
+      - isNextPage
+      properties:
+        opportunities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Opportunity_2'
+        total:
+          type: integer
+          description: Total number of opportunities matching the query.
+          example: 123
+        currentPageCount:
+          type: integer
+          description: Number of items in this page.
+          example: 10
+        nextIndex:
+          type: integer
+          description: 'Offset to pass as `from` to retrieve the next page. Omitted
+
+            when there is no next page.'
+          example: 10
+        isNextPage:
+          type: boolean
+          description: True when more results are available after this page.
+    Contact:
+      type: object
+      description: Contact details.
+      properties:
+        givenName:
+          type: string
+          description: Required. Contact's first name.
+        familyName:
+          type: string
+          description: Required. Contact's last name.
+        email:
+          type: string
+          format: email
+          description: Required.
+        phone:
+          $ref: '#/components/schemas/PhoneNumber'
+    ExtensionStatus:
+      type: string
+      description: Rebate extension status. Output only.
+      enum:
+      - EXTENSION_STATUS_UNSPECIFIED
+      - SUBMITTED
+      - APPROVED
+      - REJECTED
+    AccessLevel:
+      type: string
+      description: Access level for an opportunity team member.
+      enum:
+      - ACCESS_LEVEL_UNSPECIFIED
+      - VIEW_ONLY
+      - MODIFY
+    OpportunityHistoryEventCloudResponse:
+      type: object
+      description: 'The Google Cloud Channel response received for a corresponding
+
+        `OpportunityHistoryEventCloudRequest`.'
+      required:
+      - operation
+      - timestamp
+      properties:
+        requestID:
+          type: string
+          description: 'Cloud-side request identifier this response corresponds to.
+
+            Matches the `requestID` of the paired
+
+            `OpportunityHistoryEventCloudRequest`.'
+        operation:
+          type: string
+          description: Cloud Channel operation name that was invoked.
+        timestamp:
+          type: string
+          format: date-time
+          description: Time the cloud response was received.
+        response:
+          description: 'The raw response payload received from Google Cloud Channel.
+
+            Shape mirrors the cloud''s v1alpha1 schema.'
+        error:
+          type: string
+          description: 'Cloud-side error message when the response represents a
+
+            failure. Omitted on success.'
+    IsvSolutionConnectInfo:
+      type: object
+      description: 'Information for an opportunity that goes through Google''s ISV
+
+        Solution Connect program.'
+      properties:
+        isvSolutionConnectDeal:
+          type: boolean
+          description: '`true` if the deal is part of Google''s ISV Solution
+
+            Connect program. Defaults to `false`.'
+        customerContactRequested:
+          type: boolean
+          description: '`true` when the customer has requested follow-up contact
+
+            from the ISV. Must be `true` for an ISV Solution Connect
+
+            opportunity to be accepted.'
+        supportLevel:
+          $ref: '#/components/schemas/SupportLevel'
+        contractVehicle:
+          $ref: '#/components/schemas/ContractVehicle'
+        deliveryModel:
+          $ref: '#/components/schemas/DeliveryModel'
+        notes:
+          type: string
+          maxLength: 5000
+          description: 'Optional. Only available for ISV opportunities. ISV and Google
+
+            use this to keep each other up to date on selling activity.'
+        nextStep:
+          type: string
+          maxLength: 255
+          description: 'Optional. Only available for ISV opportunities. Summarizes the
+
+            next step and who takes it.'
+    OpportunityLine:
+      type: object
+      description: Opportunity line item. Output only.
+      properties:
+        displayName:
+          type: string
+          description: Output only. Display name of the line item.
+        quantity:
+          type: integer
+          description: Output only. Number of units on the line item.
+        salesPrice:
+          $ref: '#/components/schemas/Money'
+        listPrice:
+          $ref: '#/components/schemas/Money'
+        totalPrice:
+          $ref: '#/components/schemas/Money'
+        metric:
+          type: string
+          description: 'Output only. Unit of measure for `quantity` (for example,
+
+            `seats`, `licenses`, `gigabytes`).'
+        description:
+          type: string
+          description: Output only. Free-form description of the line item.
+    IncentiveType:
+      type: string
+      description: "Output only. Incentive program the opportunity is eligible for:\n\n- `INCENTIVE_TYPE_UNSPECIFIED` — eligibility not yet\n  determined.\n- `DEAL_REGISTRATION` — partner registers the deal up front\n  and the registration drives the incentive.\n- `DEAL_REFERRAL` — partner referred the deal but does not\n  register it; incentive applies on a referral basis."
+      enum:
+      - INCENTIVE_TYPE_UNSPECIFIED
+      - DEAL_REGISTRATION
+      - DEAL_REFERRAL
+    Budget:
+      type: string
+      description: 'Budget qualification. Required for regular and 2-tier
+
+        opportunities; optional for ISV opportunities.'
+      enum:
+      - BUDGET_UNSPECIFIED
+      - BUDGET_EXISTS_NOT_SPECIFIED
+      - CONFIRMED_NO_BUDGET
+      - EXACT_BUDGET_GIVEN
+      - REFUSE_TO_DISCLOSE
+    Source:
+      type: string
+      description: "Indicates the origin of the opportunity:\n\n- `SOURCE_UNKNOWN` — origin not recorded; should not be\n  observed on supported responses.\n- `GOOGLE` — sourced by a Google sales user.\n- `GOOGLE_BDR` — sourced by a Google Business Development\n  Representative.\n- `GOOGLE_PROGRAMMATIC` — generated by a Google automated\n  system.\n- `PARTNER` — sourced by the partner (the integrator). The\n  API forces this value on opportunities created via this\n  spec."
+      enum:
+      - SOURCE_UNKNOWN
+      - GOOGLE
+      - GOOGLE_BDR
+      - GOOGLE_PROGRAMMATIC
+      - PARTNER
+    OpportunityMetadata_2:
+      type: object
+      description: 'Tackle-specific metadata attached to every opportunity. Carried in
+
+        the `$tkl-metadata` key of the payload.'
+      properties:
+        id:
+          type: string
+          description: The Tackle-side opportunity identifier.
+          example: tackle-cosell-2eWPPnWbbSaDFWqMaYoHMeWWY7T
+        companyName:
+          type: string
+          description: 'Convenience copy of the customer organization name,
+
+            populated for list views and search. Updated whenever the
+
+            underlying customer record changes; integrators that need
+
+            the canonical name should read
+
+            `customerInfo.customerDetails.organizationName`.'
+        pendingRequestIds:
+          type: array
+          description: 'Request IDs for in-flight operations that have been queued
+
+            but not yet applied to the cloud. Empty array when no
+
+            requests are pending.'
+          items:
+            type: string
+        crm:
+          $ref: '#/components/schemas/OpportunityCRMInfo'
+        cloudError:
+          type: string
+          description: 'The last cloud error encountered, cleared on the next
+
+            successful request. Absent when no error has been recorded.'
+        hasCloudErrors:
+          type: boolean
+          description: 'True when the opportunity has unresolved cloud-side errors —
+
+            that is, the most recent cloud operation failed and no
+
+            subsequent successful operation has cleared the error.'
+        archivedAt:
+          type: string
+          format: date-time
+          description: 'Timestamp when the opportunity was archived in Tackle; absent
+
+            otherwise.'
+        hasSalesforceErrors:
+          type: boolean
+          description: 'True when the opportunity has unresolved Salesforce-sync
+
+            errors — that is, the most recent sync attempt failed and
+
+            no subsequent successful sync has cleared the error.'
+        salesforceSyncError:
+          type: string
+          description: 'The last Salesforce sync error, if any. Absent when no
+
+            error has been recorded.'
+        dataMapperToken:
+          type: string
+          description: 'Write-only. Token issued by Tackle''s Data Mapper feature
+
+            (the Tackle product that imports opportunity data from
+
+            external systems and keeps selected fields in sync over
+
+            time). When provided on create, the new opportunity is
+
+            subscribed to ongoing attribute syncing from the source
+
+            data set the token references. Integrators not using Data
+
+            Mapper can omit this field.'
+        attributeSyncing:
+          $ref: '#/components/schemas/OpportunityAttributeSyncing'
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the opportunity was created in Tackle.
+        lastModified:
+          type: string
+          format: date-time
+          description: Timestamp when the opportunity was last modified in Tackle.
     PostalAddress:
       type: object
       description: 'A structured postal address compatible with Google''s address
@@ -3058,33 +3220,177 @@ components:
         organization:
           type: string
           description: Optional. Organization name at this address.
-    RebateExtension:
+    CustomerContact:
       type: object
-      description: Rebate extension. Output only.
+      description: Customer contact. Output only.
       properties:
-        requestNumber:
+        givenName:
           type: string
-          description: Output only. Extension request number.
-        extensionReason:
-          $ref: '#/components/schemas/ExtensionReason'
-        extensionStatus:
-          $ref: '#/components/schemas/ExtensionStatus'
-        extensionRejectionReason:
-          $ref: '#/components/schemas/ExtensionRejectionReason'
-        comments:
+          description: Output only. Given (first) name of the contact.
+        familyName:
           type: string
-          description: 'Output only. Free-form comments associated with the
+          description: Output only. Family (last) name of the contact.
+        title:
+          type: string
+          description: Output only. Job title at the customer organization.
+        role:
+          $ref: '#/components/schemas/Role'
+        primary:
+          type: boolean
+          description: 'Output only. True when this contact is marked as the
 
-            extension request.'
-    Authority:
+            primary contact for the customer.'
+    TackleOperationIdCreate:
       type: string
-      description: Authority qualification.
+      description: 'Tackle-side operation identifier accepted on the
+
+        `tackle-operation-id` header by `POST /api/opportunities`.
+
+        Only these two values are accepted; any other value
+
+        (including the broader update-side operations) is rejected
+
+        with a `400 Bad Request`.'
       enum:
-      - AUTHORITY_UNSPECIFIED
-      - CONFIRMED_NO_AUTHORITY_DECIDED
-      - DONT_KNOW
-      - CLEARLY_IDENTIFIED_PROCESS
-      - VAGUE_UNDERSTANDING
+      - createOpportunity
+      - createDraftOpportunity
+    ContractVehicle:
+      type: string
+      description: Contract vehicle for an ISV opportunity.
+      enum:
+      - CONTRACT_VEHICLE_UNSPECIFIED
+      - CLOUD_MARKETPLACE
+      - PARTNER_CONTRACT
+      - UNKNOWN
+    Error_2:
+      type: object
+      description: 'Error response body. The service emits only a human-readable
+
+        `message`. A request identifier may be included in response headers for support and troubleshooting.'
+      properties:
+        message:
+          type: string
+          description: Human-readable error message.
+    OpportunityHistoryEventPrincipal:
+      type: object
+      description: 'Actor attribution for a history event. For test-environment-only
+
+        operations (`acceptOpportunity`, `rejectOpportunity`,
+
+        `closeByAdminOpportunity`, `confirmCloseWonOpportunity`,
+
+        `confirmCloseLostOpportunity`) the principal is set to a
+
+        Google placeholder so that the resulting event renders as
+
+        Google-attributed in opportunity audit trails.'
+      properties:
+        id:
+          type: string
+          description: 'Stable identifier for the principal (for example, a Tackle
+
+            user ID, integrator service-account ID, or Google sales
+
+            user ID).'
+        type:
+          type: string
+          description: 'Principal kind. Common values include `user`, `integrator`,
+
+            `cloud`, and `internal`. Treat as a free-form string and
+
+            fall back to a default branch when displaying an unknown
+
+            value.'
+        givenName:
+          type: string
+          description: 'Given (first) name of the principal, when known. May be
+
+            absent for non-human principals.'
+        familyName:
+          type: string
+          description: 'Family (last) name of the principal, when known. May be
+
+            absent for non-human principals.'
+        pictureUrl:
+          type: string
+          format: uri
+          description: Optional URL of the principal's avatar image.
+        email:
+          type: string
+          format: email
+          description: Email of the principal, when known.
+    WinLossInfo:
+      type: object
+      description: 'Win / loss details. Populated after the opportunity is closed.
+
+        Output only.'
+      properties:
+        lostReason:
+          type: string
+          description: Output only. Free-form reason the opportunity was lost.
+        lostMainReason:
+          type: string
+          description: Output only. Top-line categorization of the loss.
+        lostRejectedReasonDetails:
+          type: string
+          description: 'Output only. Additional detail provided when the opportunity
+
+            was rejected.'
+        winMainReason:
+          type: string
+          description: Output only. Top-line categorization of the win.
+        wonReason:
+          type: string
+          description: Output only. Free-form reason the opportunity was won.
+        winLossProducts:
+          type: array
+          description: Output only. Products attached to the win/loss outcome.
+          items:
+            type: string
+        winLossAdditionalContext:
+          type: string
+          description: Output only. Additional free-form context on the outcome.
+    OpportunityType:
+      type: string
+      description: 'Indicates if the opportunity is a regular / ISV / 2-tier deal. If
+
+        not specified, treated as `REGULAR`. Cannot be edited after the
+
+        opportunity is accepted.'
+      enum:
+      - OPPORTUNITY_TYPE_UNSPECIFIED
+      - REGULAR
+      - TWO_TIER
+      - ISV_SOLUTION_CONNECT
+    OpportunityCRMInfo:
+      type: object
+      description: 'CRM linkage for the opportunity. Both fields are nullable so that
+
+        callers can explicitly clear them.'
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: CRM-side opportunity identifier.
+          example: 006fJ000000qVvoQAE
+        orgId:
+          type:
+          - string
+          - 'null'
+          description: CRM-side organization identifier.
+    OpportunityHistoryEventActivityDetails:
+      type: object
+      description: 'Human-readable details about a history event, intended for
+
+        display in opportunity audit trails.'
+      properties:
+        displayText:
+          type: string
+          description: Human-readable description of the operation.
+          example: Opportunity submitted to cloud
+        principal:
+          $ref: '#/components/schemas/OpportunityHistoryEventPrincipal'
     CreateOpportunityRequest:
       allOf:
       - $ref: '#/components/schemas/Opportunity_2'
@@ -3125,27 +3431,31 @@ components:
         values supplied for those two fields in the request are
 
         ignored.'
-    Date:
+    CreateOpportunityResponse:
       type: object
-      description: 'A calendar date. Any field may be zero to represent a partial
-
-        date (for example, `year: 2026, month: 0, day: 0` for "sometime
-
-        in 2026"). The whole `Date` object is replaced atomically when
-
-        included on update — there is no per-field merge.'
+      required:
+      - id
+      - requestId
       properties:
-        year:
-          type: integer
-          description: Year (1–9999), or 0 to specify a date without a year.
-        month:
-          type: integer
-          description: Month (1–12), or 0 to specify a year without a month and day.
-        day:
-          type: integer
-          description: 'Day (1–31, valid for year+month), or 0 to specify year, or
+        id:
+          type: string
+          description: Tackle-side opportunity identifier.
+          example: tackle-cosell-2eWPPnWbbSaDFWqMaYoHMeWWY7T
+        requestId:
+          type: string
+          description: 'Identifier for the enqueued cloud operation. Matches the
 
-            year + month.'
+            `eventID` reported on subsequent history events.'
+          example: 2uRzjsNKpJBs6qsxT5L2S1UMXnj
+    OperationType:
+      type: string
+      description: "Transaction type for the opportunity:\n\n- `OPERATION_TYPE_UNSPECIFIED` — placeholder default; should\n  not be sent on create.\n- `NEW` — net-new transaction with a new customer.\n- `RENEWAL` — renewal of an existing subscription.\n- `ADD_ON` — additional purchase on an existing customer.\n- `EXPANSION` — expansion of an existing subscription\n  (for example, more seats)."
+      enum:
+      - OPERATION_TYPE_UNSPECIFIED
+      - NEW
+      - RENEWAL
+      - ADD_ON
+      - EXPANSION
     PartnerInfo:
       type: object
       description: Partner information populated after the opportunity is accepted.
@@ -3183,149 +3493,32 @@ components:
           description: Output only. Timestamp when the opportunity was approved.
         partnerViewType:
           $ref: '#/components/schemas/PartnerViewType'
-    DeliveryModel:
-      type: string
-      description: Delivery model for an ISV opportunity.
-      enum:
-      - DELIVERY_MODEL_UNSPECIFIED
-      - OTHER_DELIVERY_MODEL
-      - DATA_TO_CUSTOMER_BIGQUERY
-      - VM_ON_CUSTOMER_TENANCY
-      - SAAS_ON_GOOGLE_CLOUD
-    IncentiveType:
-      type: string
-      description: "Output only. Incentive program the opportunity is eligible for:\n\n- `INCENTIVE_TYPE_UNSPECIFIED` — eligibility not yet\n  determined.\n- `DEAL_REGISTRATION` — partner registers the deal up front\n  and the registration drives the incentive.\n- `DEAL_REFERRAL` — partner referred the deal but does not\n  register it; incentive applies on a referral basis."
-      enum:
-      - INCENTIVE_TYPE_UNSPECIFIED
-      - DEAL_REGISTRATION
-      - DEAL_REFERRAL
-    PhoneNumberShortCode:
+    ListOpportunityHistoryResponse:
       type: object
-      description: A short code — region-restricted phone number.
-      properties:
-        regionCode:
-          type: string
-          description: 'Required. ISO 3166-1 alpha-2 country code (also known as the
-
-            CLDR region code).'
-          example: US
-        number:
-          type: string
-          description: Required. The short code digits.
-          example: '611'
-    OpportunityHistoryEventActivityDetails:
-      type: object
-      description: 'Human-readable details about a history event, intended for
-
-        display in opportunity audit trails.'
-      properties:
-        displayText:
-          type: string
-          description: Human-readable description of the operation.
-          example: Opportunity submitted to cloud
-        principal:
-          $ref: '#/components/schemas/OpportunityHistoryEventPrincipal'
-    TackleOperationIdCreate:
-      type: string
-      description: 'Tackle-side operation identifier accepted on the
-
-        `tackle-operation-id` header by `POST /api/opportunities`.
-
-        Only these two values are accepted; any other value
-
-        (including the broader update-side operations) is rejected
-
-        with a `400 Bad Request`.'
-      enum:
-      - createOpportunity
-      - createDraftOpportunity
-    CustomerContact:
-      type: object
-      description: Customer contact. Output only.
-      properties:
-        givenName:
-          type: string
-          description: Output only. Given (first) name of the contact.
-        familyName:
-          type: string
-          description: Output only. Family (last) name of the contact.
-        title:
-          type: string
-          description: Output only. Job title at the customer organization.
-        role:
-          $ref: '#/components/schemas/Role'
-        primary:
-          type: boolean
-          description: 'Output only. True when this contact is marked as the
-
-            primary contact for the customer.'
-    PartnerViewType:
-      type: string
-      description: 'Indicates what view the partner has access to. Non-sourcing
-
-        service partners have limited view; no updates are allowed on the
-
-        opportunity in `LIMITED` view. Output only.'
-      enum:
-      - PARTNER_VIEW_TYPE_UNSPECIFIED
-      - FULL
-      - LIMITED
-    OpportunityLine:
-      type: object
-      description: Opportunity line item. Output only.
-      properties:
-        displayName:
-          type: string
-          description: Output only. Display name of the line item.
-        quantity:
-          type: integer
-          description: Output only. Number of units on the line item.
-        salesPrice:
-          $ref: '#/components/schemas/Money'
-        listPrice:
-          $ref: '#/components/schemas/Money'
-        totalPrice:
-          $ref: '#/components/schemas/Money'
-        metric:
-          type: string
-          description: 'Output only. Unit of measure for `quantity` (for example,
-
-            `seats`, `licenses`, `gigabytes`).'
-        description:
-          type: string
-          description: Output only. Free-form description of the line item.
-    OpportunityHistoryEventCloudResponse:
-      type: object
-      description: 'The Google Cloud Channel response received for a corresponding
-
-        `OpportunityHistoryEventCloudRequest`.'
       required:
-      - operation
-      - timestamp
+      - events
       properties:
-        requestID:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpportunityHistoryEvent'
+        next:
           type: string
-          description: 'Cloud-side request identifier this response corresponds to.
+          description: 'Opaque continuation token for the next page. Omitted when the
 
-            Matches the `requestID` of the paired
-
-            `OpportunityHistoryEventCloudRequest`.'
-        operation:
-          type: string
-          description: Cloud Channel operation name that was invoked.
-        timestamp:
-          type: string
-          format: date-time
-          description: Time the cloud response was received.
-        response:
-          description: 'The raw response payload received from Google Cloud Channel.
-
-            Shape mirrors the cloud''s v1alpha1 schema.'
-        error:
-          type: string
-          description: 'Cloud-side error message when the response represents a
-
-            failure. Omitted on success.'
+            page is the last.'
+    HistoryOperationId:
+      type: string
+      description: "Operation identifier stored on history events returned by\n`GET /api/opportunities/{id}/events`. Treated as a free-form\nstring on the wire: the documented values below cover the\ncommon cases, but additional operation strings may appear as\nnew history sources are added. Clients should fall back to\na default branch when displaying an unknown value.\n\nCommon values include every operation accepted on the\n`tackle-operation-id` header by the create and update\nendpoints (see `TackleOperationIdCreate` and\n`TackleOperationIdUpdate`) plus two service-emitted\noperations:\n\n- `internalUpdateEvent` — a Tackle metadata field on the\n  opportunity changed (for example, the attribute-syncing\n  subscription).\n- `cloudUpdateEvent` — the opportunity's cloud payload\n  (`cloudRaw`) was refreshed because Google Cloud Channel\n  sent a new snapshot.\n\nThese two service-emitted values are never accepted as\n`tackle-operation-id` headers; they appear only on history\nevents."
+    Timeline:
+      type: string
+      description: Timeline qualification.
+      enum:
+      - TIMELINE_UNSPECIFIED
+      - CONFIRMED_NO_DECISION_DATE
+      - REFUSED_TO_GIVE_DATE
+      - SPECIFIC_DECISION_DATES_GIVEN
+      - VAGUE_DECISION_DATES_GIVEN
     OpportunityAttributeSyncing:
       type: object
       description: 'Subscription information for opportunities whose attributes are
@@ -3345,42 +3538,69 @@ components:
             data source — for example, when the opportunity is being
 
             re-linked to a different CRM record.'
-    AccessLevel:
-      type: string
-      description: Access level for an opportunity team member.
-      enum:
-      - ACCESS_LEVEL_UNSPECIFIED
-      - VIEW_ONLY
-      - MODIFY
-    ListOpportunitiesResponse_2:
+    QualificationInfo:
       type: object
-      required:
-      - opportunities
-      - total
-      - currentPageCount
-      - isNextPage
+      description: Qualification information for the opportunity.
       properties:
-        opportunities:
-          type: array
-          items:
-            $ref: '#/components/schemas/Opportunity_2'
-        total:
+        dealNumber:
+          type: string
+          description: Output only. System-generated unique deal identifier.
+          example: DR-ABC123DEF456GH
+        operationType:
+          $ref: '#/components/schemas/OperationType'
+        contractLengthMonths:
           type: integer
-          description: Total number of opportunities matching the query.
-          example: 123
-        currentPageCount:
+          description: Required. Contract terms in months.
+        quantity:
           type: integer
-          description: Number of items in this page.
-          example: 10
-        nextIndex:
-          type: integer
-          description: 'Offset to pass as `from` to retrieve the next page. Omitted
-
-            when there is no next page.'
-          example: 10
-        isNextPage:
+          description: Optional. Number of seats or licenses. Default `1`.
+        dealSize:
+          $ref: '#/components/schemas/Money'
+        estimatedCloseDate:
+          $ref: '#/components/schemas/Date'
+        publicSector:
           type: boolean
-          description: True when more results are available after this page.
+          description: 'Optional. Whether the customer is a public sector organization
+
+            that requires competing offers from multiple vendors.'
+        budget:
+          $ref: '#/components/schemas/Budget'
+        authority:
+          $ref: '#/components/schemas/Authority'
+        need:
+          $ref: '#/components/schemas/Need'
+        timeline:
+          $ref: '#/components/schemas/Timeline'
+        campaignCode:
+          type: string
+          description: 'Optional. Active campaign name (issued by Google) for the
+
+            selected region and product. Campaign names are not
+
+            published in this API; check with your Google partner
+
+            contact for the valid values for your region and product
+
+            mix.'
+        msspDeal:
+          type: boolean
+          description: 'Optional. Flag to highlight if the partner will also act as
+
+            MSSP (Managed Security Service Provider).'
+        legalLanguageAccepted:
+          type: boolean
+          description: 'Required. Must be `true` for the opportunity to be created.
+
+            Cannot be edited after the opportunity is accepted.'
+        decisionPhase:
+          $ref: '#/components/schemas/DecisionPhase'
+        publicTenderAttestation:
+          type: boolean
+          description: 'Required for public-sector opportunities (`publicSector:
+
+            true`); optional otherwise. Set to `true` to attest that
+
+            the opportunity meets public-tender requirements.'
     UpdateOpportunityRequest:
       allOf:
       - $ref: '#/components/schemas/Opportunity_2'
@@ -3391,6 +3611,52 @@ components:
         the existing opportunity. The opportunity `name` is immutable and
 
         is always overridden by the server with the stored value.'
+    ProductCategory:
+      type: string
+      description: Product category that the opportunity belongs to.
+      enum:
+      - PRODUCT_CATEGORY_UNSPECIFIED
+      - GOOGLE_GEMINI_AI
+      - GCP_AI
+      - GCP_ANALYTICS
+      - GCP_ANTHOS
+      - GCP_APIGEE
+      - GCP_APPSHEET
+      - GCP_COMPUTE
+      - GCP_DATABASES
+      - GCP_DISTRIBUTED_CLOUD
+      - GCP_DUET_AI
+      - GCP_GPU
+      - GCP_LOOKER
+      - GCP_NETWORK
+      - GCP_OTHER
+      - GCP_OTHER_SECURITY
+      - GCP_PLATFORM
+      - GCP_SCCE
+      - GCP_SERVERLESS
+      - GCP_STORAGE
+      - GCP_SUPPORT
+      - GOOGLE_CLOUD_IDENTITY
+      - GOOGLE_MAPS
+      - GOOGLE_VAULT
+      - GOOGLE_VOICE
+      - GOOGLE_WORKSPACE_CORE
+      - GOOGLE_WORKSPACE_EDU
+      - GCP_AGENTSPACE
+      - CHROME_OS_ENTERPRISE
+      - CHROME_OS_EDUCATION
+      - PSO_TRAINING
+      - PSO_CONSULTING
+      - GCP_GOOGLE_SECOPS
+      - GCP_GOOGLE_THREAT_INTELLIGENCE
+      - GCP_CHROME_ENTERPRISE_PREMIUM
+      - GCP_RECAPTCHA
+      - GCP_MANAGED_HUNT
+      - GCP_MANAGED_DEFENSE
+      - GCP_WEBRISK
+      - GCP_MANDIANT_CONSULTING_SERVICES
+      - GCP_SCC
+      - GCP_GEMINI_ENTERPRISE
     Opportunity_2:
       type: object
       description: 'Tackle''s opportunity payload. Mirrors the Google Cloud Channel
@@ -3522,408 +3788,142 @@ components:
             integrator. Only used for integrator-created opportunities. Can
 
             only be set on create and cannot be edited thereafter.'
-    OperationType:
-      type: string
-      description: "Transaction type for the opportunity:\n\n- `OPERATION_TYPE_UNSPECIFIED` — placeholder default; should\n  not be sent on create.\n- `NEW` — net-new transaction with a new customer.\n- `RENEWAL` — renewal of an existing subscription.\n- `ADD_ON` — additional purchase on an existing customer.\n- `EXPANSION` — expansion of an existing subscription\n  (for example, more seats)."
-      enum:
-      - OPERATION_TYPE_UNSPECIFIED
-      - NEW
-      - RENEWAL
-      - ADD_ON
-      - EXPANSION
-    TackleOperationIdUpdate:
-      type: string
-      description: 'Tackle-side operation identifier accepted on the
-
-        `tackle-operation-id` header by `POST /api/opportunities/{id}`.
-
-        The create-side values (`createOpportunity`,
-
-        `createDraftOpportunity`) are explicitly rejected with a
-
-        `400 Bad Request` — creates must be sent to
-
-        `POST /api/opportunities` instead. Test-environment-only operations
-
-        (`acceptOpportunity`, `rejectOpportunity`,
-
-        `closeByAdminOpportunity`, `confirmCloseWonOpportunity`,
-
-        `confirmCloseLostOpportunity`) are accepted only when the
-
-        calling vendor is configured for use in a test environment;
-
-        production vendors receive a `400 Bad Request` if they send
-
-        these values. The remaining operations apply to every vendor.'
-      enum:
-      - updateOpportunity
-      - updateDraftOpportunity
-      - submitOpportunity
-      - retryCreateOpportunity
-      - closeWonOpportunity
-      - closeLostOpportunity
-      - acceptOpportunity
-      - rejectOpportunity
-      - closeByAdminOpportunity
-      - confirmCloseWonOpportunity
-      - confirmCloseLostOpportunity
-    OpportunityHistoryEvent:
+    SalesCycle:
       type: object
-      required:
-      - operation
-      - eventID
-      - created
-      - lastModified
+      description: Information on the sales cycle.
       properties:
-        operation:
-          description: 'The operation that produced this history event. See
-
-            `HistoryOperationId` for the common set of values, but
-
-            treat this field as a free-form string: additional
-
-            operation strings beyond the documented catalog may
-
-            appear. Clients should fall back to a default branch
-
-            when displaying an unknown value.'
-          allOf:
-          - $ref: '#/components/schemas/HistoryOperationId'
-        eventID:
-          type: string
-          description: 'Unique identifier for the history event. Equal in value to
-
-            the `requestId` returned by the create or update response
-
-            that produced the event; the two schema families use
-
-            different casing on the wire (`eventID` here, `requestId`
-
-            on the response body) but carry the same identifier.'
-          example: 2uRzjsNKpJBs6qsxT5L2S1UMXnj
-        status:
-          type: string
-          description: 'Status of the event. Omitted from the response body for
-
-            instantaneous history items that have no async lifecycle.'
-          enum:
-          - pending
-          - in-progress
-          - retrying
-          - successful
-          - failed
-        rawRequest:
-          description: The original Tackle-shaped request that produced this event.
-        cloudRaw:
-          description: Raw cloud payload, if any, associated with this event.
-        cloudRequests:
-          type: array
-          items:
-            $ref: '#/components/schemas/OpportunityHistoryEventCloudRequest'
-        cloudResponses:
-          type: array
-          items:
-            $ref: '#/components/schemas/OpportunityHistoryEventCloudResponse'
-        activityDetails:
-          $ref: '#/components/schemas/OpportunityHistoryEventActivityDetails'
-        created:
-          type: string
-          format: date-time
-          description: Timestamp the event was created (RFC 3339 Nano).
-        lastModified:
-          type: string
-          format: date-time
-          description: Timestamp the event was last updated (RFC 3339 Nano).
-    OpportunityHistoryEventPrincipal:
-      type: object
-      description: 'Actor attribution for a history event. For test-environment-only
-
-        operations (`acceptOpportunity`, `rejectOpportunity`,
-
-        `closeByAdminOpportunity`, `confirmCloseWonOpportunity`,
-
-        `confirmCloseLostOpportunity`) the principal is set to a
-
-        Google placeholder so that the resulting event renders as
-
-        Google-attributed in opportunity audit trails.'
-      properties:
-        id:
-          type: string
-          description: 'Stable identifier for the principal (for example, a Tackle
-
-            user ID, integrator service-account ID, or Google sales
-
-            user ID).'
-        type:
-          type: string
-          description: 'Principal kind. Common values include `user`, `integrator`,
-
-            `cloud`, and `internal`. Treat as a free-form string and
-
-            fall back to a default branch when displaying an unknown
-
-            value.'
-        givenName:
-          type: string
-          description: 'Given (first) name of the principal, when known. May be
-
-            absent for non-human principals.'
-        familyName:
-          type: string
-          description: 'Family (last) name of the principal, when known. May be
-
-            absent for non-human principals.'
-        pictureUrl:
-          type: string
-          format: uri
-          description: Optional URL of the principal's avatar image.
-        email:
-          type: string
-          format: email
-          description: Email of the principal, when known.
-    CustomerDetails:
-      type: object
-      description: 'Customer details used to create a new customer or map to an
-
-        existing one.'
-      properties:
-        organizationName:
-          type: string
-          description: Required. Name of the customer organization.
-        domain:
-          type: string
-          description: Required. Customer's primary website domain.
-        address:
-          $ref: '#/components/schemas/PostalAddress'
-        industry:
-          $ref: '#/components/schemas/Industry'
-        employeeCount:
+        closeDate:
+          $ref: '#/components/schemas/Date'
+        partnerReadyToClose:
+          $ref: '#/components/schemas/PartnerReadyToClose'
+        closeDatePushCount:
           type: integer
-          description: 'Required. Approximate total number of employees at the
+          description: Output only. Number of times close date is pushed/changed.
+        prmSiteDetails:
+          type: string
+          description: 'Output only. Reference to the opportunity in Google''s
 
-            customer organization.'
-    Need:
+            Partner Relationship Management (PRM) portal.'
+    PartnerReadyToClose:
       type: string
-      description: Need qualification.
+      description: 'Partner ready-to-close indicator. Can be edited after the
+
+        opportunity is accepted. Setting to `MIGRATION_IMPL` corresponds
+
+        to Closed/Won; setting to `CLOSED_LOST` corresponds to Closed/Lost.'
       enum:
-      - NEED_UNSPECIFIED
-      - CLEAR_NEED
-      - COMPELLING_NEED
-      - NO_NEED
-    OpportunityMetadata_2:
+      - PARTNER_CLOSE_STAGE_UNSPECIFIED
+      - MIGRATION_IMPL
+      - CLOSED_LOST
+    Industry:
+      type: string
+      description: Customer's primary industry.
+      enum:
+      - INDUSTRY_UNSPECIFIED
+      - ADVERTISING_MARKETING
+      - AGRICULTURE
+      - AUTOMOTIVE
+      - BUSINESS_SERVICES
+      - CONSUMER_GOODS
+      - EDUCATION
+      - ELECTRICAL_ELECTRONICS
+      - ENERGY
+      - FINANCIAL_SERVICES
+      - FOOD
+      - GAMING
+      - HEALTHCARE
+      - INDUSTRIAL_GOODS
+      - GOVERNMENT
+      - LOGISTICS
+      - MANUFACTURING
+      - MEDIA
+      - NON_PROFIT
+      - PUBLIC_SECTOR
+      - RETAIL_CONSUMER
+      - RETAIL_WHOLESALE
+      - SOFTWARE
+      - TELECOMMUNICATIONS
+      - TELECOMMUNICATIONS_MEDIA
+      - TOURISM
+      - OTHER
+    Authority:
+      type: string
+      description: Authority qualification.
+      enum:
+      - AUTHORITY_UNSPECIFIED
+      - CONFIRMED_NO_AUTHORITY_DECIDED
+      - DONT_KNOW
+      - CLEARLY_IDENTIFIED_PROCESS
+      - VAGUE_UNDERSTANDING
+    OpportunityHistoryEventCloudRequest:
       type: object
-      description: 'Tackle-specific metadata attached to every opportunity. Carried in
+      description: 'One Google Cloud Channel call made on behalf of an opportunity
 
-        the `$tkl-metadata` key of the payload.'
+        history event. A single event may include multiple cloud
+
+        requests (for example, when a sub-flow chains calls).'
+      required:
+      - requestID
+      - operation
+      - timestamp
       properties:
-        id:
+        requestID:
           type: string
-          description: The Tackle-side opportunity identifier.
-          example: tackle-cosell-2eWPPnWbbSaDFWqMaYoHMeWWY7T
-        companyName:
+          description: 'Identifier for the cloud-side request, useful for support
+
+            correlation. Equal to the `eventID` of the parent history
+
+            event for top-level requests.'
+        operation:
           type: string
-          description: 'Convenience copy of the customer organization name,
+          description: 'Cloud Channel operation name (for example,
 
-            populated for list views and search. Updated whenever the
-
-            underlying customer record changes; integrators that need
-
-            the canonical name should read
-
-            `customerInfo.customerDetails.organizationName`.'
-        pendingRequestIds:
-          type: array
-          description: 'Request IDs for in-flight operations that have been queued
-
-            but not yet applied to the cloud. Empty array when no
-
-            requests are pending.'
-          items:
-            type: string
-        crm:
-          $ref: '#/components/schemas/OpportunityCRMInfo'
-        cloudError:
-          type: string
-          description: 'The last cloud error encountered, cleared on the next
-
-            successful request. Absent when no error has been recorded.'
-        hasCloudErrors:
-          type: boolean
-          description: 'True when the opportunity has unresolved cloud-side errors —
-
-            that is, the most recent cloud operation failed and no
-
-            subsequent successful operation has cleared the error.'
-        archivedAt:
+            `opportunities.create`, `opportunities.patch`).'
+        timestamp:
           type: string
           format: date-time
-          description: 'Timestamp when the opportunity was archived in Tackle; absent
+          description: Time the cloud request was issued.
+        request:
+          description: 'The raw request payload sent to Google Cloud Channel.
 
-            otherwise.'
-        hasSalesforceErrors:
-          type: boolean
-          description: 'True when the opportunity has unresolved Salesforce-sync
+            Shape mirrors the cloud''s v1alpha1 schema.'
+    Money:
+      type: object
+      description: 'An amount of money with its currency type. The whole `Money`
 
-            errors — that is, the most recent sync attempt failed and
+        object is replaced atomically when included on update — there is
 
-            no subsequent successful sync has cleared the error.'
-        salesforceSyncError:
+        no per-field merge of `currencyCode`, `units`, or `nanos`.'
+      properties:
+        currencyCode:
           type: string
-          description: 'The last Salesforce sync error, if any. Absent when no
-
-            error has been recorded.'
-        dataMapperToken:
+          description: Three-letter ISO 4217 currency code.
+          example: USD
+        units:
           type: string
-          description: 'Write-only. Token issued by Tackle''s Data Mapper feature
+          description: 'Whole units of the amount, encoded as a string. For example,
 
-            (the Tackle product that imports opportunity data from
+            `1500000` with `currencyCode: USD` and `nanos: 0` is
 
-            external systems and keeps selected fields in sync over
+            $1,500,000.00 USD.'
+          example: '1500000'
+        nanos:
+          type: integer
+          description: 'Sub-unit (nano) part of the amount. One unit equals 10^9
 
-            time). When provided on create, the new opportunity is
+            nanos; for example, `nanos: 750000000` represents 0.75 of
 
-            subscribed to ongoing attribute syncing from the source
-
-            data set the token references. Integrators not using Data
-
-            Mapper can omit this field.'
-        attributeSyncing:
-          $ref: '#/components/schemas/OpportunityAttributeSyncing'
-        created:
-          type: string
-          format: date-time
-          description: Timestamp when the opportunity was created in Tackle.
-        lastModified:
-          type: string
-          format: date-time
-          description: Timestamp when the opportunity was last modified in Tackle.
-  responses:
-    BadRequest:
-      description: 'Bad Request. The request was malformed or failed validation (for example, an invalid
-
-        `sortField`/`sortOrder` value, an unsupported `tackle-operation-id`, or a request body that
-
-        fails to parse as JSON).'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Invalid sortField
-    Conflict:
-      description: 'Conflict. The request cannot be applied to the resource in its current state (for example,
-
-        attempting `updateDraftOpportunity` on an opportunity that is no longer in draft state, or
-
-        `createOpportunity` with a `crmId` that already maps to an existing co-sell opportunity).'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Draft opportunity cannot be updated as it is not in draft state.
-    Unauthorized:
-      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
-
-        authenticated principal could not be resolved.'
-    Locked:
-      description: 'Locked. The request was rejected because the vendor is currently in a mid-reset state
-
-        (for example, while the vendor''s AWS Partner Central connection is being re-established).
-
-        Retry the request once the vendor''s reset has completed.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Locked
-    InternalServerError:
-      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
-
-        bodies for 5xx errors may be empty.'
-    NotFound:
-      description: Not Found. No resource exists at the requested path for the authenticated vendor.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Opportunity not found
-    BadRequest_2:
-      description: 'The request was malformed or failed validation. Common triggers
-
-        include missing required fields, invalid enum values, type
-
-        mismatches, an unrecognized `tackle-operation-id`, and (for
-
-        create) `qualificationInfo.legalLanguageAccepted` not being
-
-        `true`. The response `message` describes the specific
-
-        violation.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error_2'
-    Conflict_2:
-      description: 'The request conflicts with existing state. For
-
-        `createOpportunity` and `updateOpportunity`, this is returned
-
-        when the supplied `$tkl-metadata.crm.id` is already linked to
-
-        another co-sell opportunity for the same vendor.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error_2'
-    Unauthorized_2:
-      description: Missing or invalid authentication.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error_2'
-    Forbidden:
-      description: The caller is not authorized to perform this action.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error_2'
-    Locked_2:
-      description: 'The vendor''s co-sell configuration is in the middle of a reset
-
-        and cannot accept changes. Retry the request after a short
-
-        delay; if the lock persists for more than a few minutes,
-
-        contact Tackle support.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error_2'
-    InternalServerError_2:
-      description: 'An unexpected error occurred while processing the request.
-
-        Retry idempotent reads after a short delay; for writes, check
-
-        the opportunity history (`GET /api/opportunities/{id}/events`)
-
-        before retrying to confirm whether the prior request was
-
-        applied.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error_2'
-    NotFound_2:
-      description: The requested resource does not exist.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error_2'
+            one unit. Must have the same sign as `units`.'
+    CustomerInfo:
+      type: object
+      description: Customer information provided during opportunity creation.
+      properties:
+        customerDetails:
+          $ref: '#/components/schemas/CustomerDetails'
+        contact:
+          $ref: '#/components/schemas/Contact'
+        region:
+          $ref: '#/components/schemas/Region'
   parameters:
     opportunity_id:
       name: opportunity_id

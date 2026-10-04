@@ -92,17 +92,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   responses:
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '500'
-            detail: Internal server error
     Unauthorized:
       description: Authentication information is missing or invalid
       content:
@@ -125,6 +114,17 @@ components:
             - urn:ietf:params:scim:api:messages:2.0:Error
             status: '403'
             detail: Forbidden
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '500'
+            detail: Internal server error
   schemas:
     GroupListResponse:
       type: object

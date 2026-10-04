@@ -401,41 +401,6 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    BadRequest:
-      description: 'The request was malformed or could not be processed. Returned when the JSON body
-
-        cannot be parsed, when a required field is missing, when an unsupported
-
-        `tackle-operation-id` is supplied, or when a referenced CRM ID is invalid.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Your request could not be processed.
-    InternalServerError:
-      description: 'An unexpected error occurred while processing the request. The response body is
-
-        empty.'
-    Unauthorized:
-      description: 'The request did not include a valid Tackle MTM access token, so no principal
-
-        could be established. The response body is `{}` — the `message` field is omitted.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example: {}
-    Forbidden:
-      description: 'The authenticated principal does not have permission to perform this operation.
-
-        The response body is `{}` — the `message` field is omitted.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example: {}
   schemas:
     CustomerLookupAccount:
       type: object
@@ -490,6 +455,41 @@ components:
           type: string
           description: Human-readable description of the error condition.
           example: Your request could not be processed.
+  responses:
+    Forbidden:
+      description: 'The authenticated principal does not have permission to perform this operation.
+
+        The response body is `{}` — the `message` field is omitted.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example: {}
+    Unauthorized:
+      description: 'The request did not include a valid Tackle MTM access token, so no principal
+
+        could be established. The response body is `{}` — the `message` field is omitted.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example: {}
+    BadRequest:
+      description: 'The request was malformed or could not be processed. Returned when the JSON body
+
+        cannot be parsed, when a required field is missing, when an unsupported
+
+        `tackle-operation-id` is supplied, or when a referenced CRM ID is invalid.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Your request could not be processed.
+    InternalServerError:
+      description: 'An unexpected error occurred while processing the request. The response body is
+
+        empty.'
   securitySchemes:
     bearerAuth:
       type: http

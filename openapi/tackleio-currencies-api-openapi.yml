@@ -87,111 +87,29 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  parameters:
-    TackleOperationId:
-      name: tackle-operation-id
-      in: header
-      required: false
-      description: Optional caller-provided operation ID for request tracing.
-      schema:
-        type: string
-      example: 018f01ec-3f2b-7a70-b81e-4fc3d6a69f42
-  responses:
-    BadRequestError:
-      description: Invalid request or unsupported operation.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: missing id
-    InternalServerError:
-      description: Internal server error or upstream dependency failure.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    UnauthorizedError:
-      description: Authentication failed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: unauthorized
-    ForbiddenError:
-      description: Caller is not allowed to perform this action.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: forbidden
   schemas:
-    CurrencyConversionError:
+    MarketCurrenciesResponse:
       type: object
       properties:
-        code:
-          type: string
-        message:
-          type: string
-    CurrencyConversionResult:
-      type: object
-      properties:
-        id:
-          type: string
-        base_currency:
-          type: string
-        target_currency:
-          type: string
-        original_amount:
-          type: number
-          format: double
-        converted_amount:
-          type: number
-          format: double
-        exchange_rate:
-          type: number
-          format: double
-        rate_source_date:
-          type: string
-          format: date
-        rate_as_of_date:
-          type: string
-          format: date
-        error:
-          oneOf:
-          - $ref: '#/components/schemas/CurrencyConversionError'
-          - type: 'null'
-    CurrencyConversionResponse:
-      type: object
-      properties:
-        results:
+        currency_options:
           type: array
           items:
-            $ref: '#/components/schemas/CurrencyConversionResult'
-        success:
-          type: boolean
-          example: true
-    MarketCurrency:
-      type: object
-      properties:
-        country_name:
-          type: string
-        iso2:
-          type: string
-          description: ISO 3166-1 alpha-2 country code.
-          example: US
-        currency:
-          type: string
-          description: ISO 4217 currency code.
-          example: USD
-        notes:
-          type: string
-        source:
-          type: string
-        source_revision:
-          type: string
+            $ref: '#/components/schemas/CurrencyOption'
+        currency_markets:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/MarketCurrency'
+      example:
+        currency_options:
+        - value: USD
+          display: United States Dollar | USD ($)
+        currency_markets:
+          USD:
+          - country_name: United States
+            iso2: US
+            currency: USD
     CurrencyOption:
       type: object
       properties:
@@ -202,15 +120,6 @@ components:
         display:
           type: string
           example: United States Dollar | USD ($)
-    ErrorResponse:
-      type: object
-      required:
-      - message
-      properties:
-        message:
-          type: string
-          description: Human-readable error message.
-          example: missing id
     CurrencyConversionRequest:
       type: object
       required:
@@ -247,28 +156,119 @@ components:
           type: number
           format: double
           example: 100
-    MarketCurrenciesResponse:
+    CurrencyConversionResult:
       type: object
       properties:
-        currency_options:
+        id:
+          type: string
+        base_currency:
+          type: string
+        target_currency:
+          type: string
+        original_amount:
+          type: number
+          format: double
+        converted_amount:
+          type: number
+          format: double
+        exchange_rate:
+          type: number
+          format: double
+        rate_source_date:
+          type: string
+          format: date
+        rate_as_of_date:
+          type: string
+          format: date
+        error:
+          oneOf:
+          - $ref: '#/components/schemas/CurrencyConversionError'
+          - type: 'null'
+    MarketCurrency:
+      type: object
+      properties:
+        country_name:
+          type: string
+        iso2:
+          type: string
+          description: ISO 3166-1 alpha-2 country code.
+          example: US
+        currency:
+          type: string
+          description: ISO 4217 currency code.
+          example: USD
+        notes:
+          type: string
+        source:
+          type: string
+        source_revision:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+      - message
+      properties:
+        message:
+          type: string
+          description: Human-readable error message.
+          example: missing id
+    CurrencyConversionError:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    CurrencyConversionResponse:
+      type: object
+      properties:
+        results:
           type: array
           items:
-            $ref: '#/components/schemas/CurrencyOption'
-        currency_markets:
-          type: object
-          additionalProperties:
-            type: array
-            items:
-              $ref: '#/components/schemas/MarketCurrency'
-      example:
-        currency_options:
-        - value: USD
-          display: United States Dollar | USD ($)
-        currency_markets:
-          USD:
-          - country_name: United States
-            iso2: US
-            currency: USD
+            $ref: '#/components/schemas/CurrencyConversionResult'
+        success:
+          type: boolean
+          example: true
+  responses:
+    UnauthorizedError:
+      description: Authentication failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: unauthorized
+    ForbiddenError:
+      description: Caller is not allowed to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: forbidden
+    BadRequestError:
+      description: Invalid request or unsupported operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: missing id
+    InternalServerError:
+      description: Internal server error or upstream dependency failure.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  parameters:
+    TackleOperationId:
+      name: tackle-operation-id
+      in: header
+      required: false
+      description: Optional caller-provided operation ID for request tracing.
+      schema:
+        type: string
+      example: 018f01ec-3f2b-7a70-b81e-4fc3d6a69f42
   securitySchemes:
     bearerAuth:
       type: http

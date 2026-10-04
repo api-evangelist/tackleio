@@ -131,25 +131,6 @@ components:
             omitted from the response until the SDDS data lands.
 
             '
-    Error:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
-    ContractListResponse:
-      type: object
-      required:
-      - contracts
-      properties:
-        contracts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Contract'
-        next:
-          type: string
-          description: Opaque pagination cursor. Omitted on the last page.
     Contract:
       type: object
       required:
@@ -270,6 +251,33 @@ components:
             - `cloudMarketplace=gcp` → omitted entirely in this version.
 
             '
+    ContractListResponse:
+      type: object
+      required:
+      - contracts
+      properties:
+        contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contract'
+        next:
+          type: string
+          description: Opaque pagination cursor. Omitted on the last page.
+    Error:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+    CloudDataMsftSubscription:
+      type: object
+      required:
+      - subscription
+      properties:
+        subscription:
+          type: object
+          description: Verbatim Microsoft Subscription API payload.
     Money:
       type: object
       required:
@@ -283,14 +291,6 @@ components:
         currencyCode:
           type: string
           example: USD
-    CloudDataMsftSubscription:
-      type: object
-      required:
-      - subscription
-      properties:
-        subscription:
-          type: object
-          description: Verbatim Microsoft Subscription API payload.
   securitySchemes:
     tackleJwt:
       type: http

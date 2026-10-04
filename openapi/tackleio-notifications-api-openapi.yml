@@ -72,6 +72,16 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
           example:
             message: not found
+    NoContent:
+      description: Operation completed successfully with no response body.
+    UnauthorizedError:
+      description: Authentication failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: unauthorized
     BadRequestError:
       description: Invalid request or unsupported operation.
       content:
@@ -86,14 +96,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-    UnauthorizedError:
-      description: Authentication failed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            message: unauthorized
     ForbiddenError:
       description: Caller is not allowed to perform this action.
       content:
@@ -102,8 +104,6 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
           example:
             message: forbidden
-    NoContent:
-      description: Operation completed successfully with no response body.
   parameters:
     TackleOperationId:
       name: tackle-operation-id
