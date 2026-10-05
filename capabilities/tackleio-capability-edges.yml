@@ -1,0 +1,64 @@
+slug: tackleio
+provider: Tackle.io
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 5
+edges:
+- tag: Metering
+  spec_file: tackleio-metering-api-openapi.yml
+  capability_id: BC-4250.10
+  capability_id_l1: BC-4250
+  capability_name: Usage Metering
+  confidence: 0.85
+  evidence: POST /v1/metering/usage-records v1-create-metering-usage-records Create Usage Records
+  reason: Creating and aggregating usage records that feed marketplace billing is Usage Metering.
+- tag: Marketplace
+  spec_file: tackleio-marketplace-api-openapi.yml
+  capability_id: BC-4270.70
+  capability_id_l1: BC-4270
+  capability_name: Software Marketplace Listing Management
+  confidence: 0.75
+  evidence: Customer-facing API for managing AWS Marketplace private offers on `aws.offers.tackle.io`;
+    GET /products/{productId}/pricing getProductPricing
+  reason: Products, pricing and agreements for a software vendor's AWS Marketplace presence correspond
+    to stewardship of the offering on a cloud marketplace; some ambiguity with pricing/quote capabilities.
+- tag: Webhooks
+  spec_file: tackleio-webhooks-api-openapi.yml
+  capability_id: BC-4270.80
+  capability_id_l1: BC-4270
+  capability_name: Webhook & Event Subscription Management
+  confidence: 0.75
+  evidence: POST /v1/webhooks v1-create-or-update-webhook Create or Update a Webhook; GET /v1/webhooks/vendor
+    v1-get-vendor-webhook
+  reason: Lifecycle management of vendor- and product-level outbound webhook subscriptions maps to Webhook
+    & Event Subscription Management in the developer platform capability.
+- tag: Opportunities
+  spec_file: tackleio-opportunities-api-openapi.yml
+  capability_id: BC-410.30
+  capability_id_l1: BC-410
+  capability_name: Opportunity & Pipeline Management
+  confidence: 0.7
+  evidence: POST /api/opportunities createOpportunity Create a co-sell opportunity; GET /api/opportunities/{opportunity_id}/events
+    listOpportunityEvents
+  reason: CRUD plus lifecycle/event history over co-sell opportunities is opportunity and pipeline management;
+    channel/partner framing adds some ambiguity between Opportunity Management and Channel Sales Management.
+- tag: Subscriptions
+  spec_file: tackleio-subscriptions-api-openapi.yml
+  capability_id: BC-4240
+  capability_id_l1: BC-4240
+  capability_name: Subscription Lifecycle Management
+  confidence: 0.7
+  evidence: GET /v1/subscriptions v1-list-subscriptions List Subscriptions; schemas Subscription, Entitlements,
+    AwsEntitlement, IsFreeTrial
+  reason: Read access to marketplace subscriptions and their entitlements sits in subscription lifecycle
+    management, but with only list/get operations the specific sub-capability (provisioning vs entitlement
+    enforcement) is not determinable.
