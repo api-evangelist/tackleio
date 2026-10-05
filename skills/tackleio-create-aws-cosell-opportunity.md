@@ -2,7 +2,7 @@
 name: create-aws-cosell-opportunity
 description: Create and track an AWS Partner Central co-sell opportunity through Tackle.
 api: Tackle Co-Sell for AWS Partner Central
-operations: [listSolutions, createOpportunity, getOpportunity, listOpportunityEvents]
+operations: [listSolutions, createOpportunity, getApiOpportunitiesById, listOpportunityEvents]
 provider: tackleio
 generated: '2026-07-21'
 method: generated

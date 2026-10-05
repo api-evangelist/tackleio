@@ -2,7 +2,7 @@
 name: create-aws-private-offer
 description: Assemble and publish an AWS Marketplace private offer via Tackle Offers.
 api: Tackle Offers for AWS Marketplace
-operations: [listProducts, getProductPricing, listAllowedCurrencies, createPrivateOffer, marketplaceCreatePrivateOffer, getPrivateOffer]
+operations: [listProducts, getProductPricing, listAllowedCurrencies, postApiPrivateOffers, marketplaceCreatePrivateOffer, getApiPrivateOffersById]
 provider: tackleio
 generated: '2026-07-21'
 method: generated
