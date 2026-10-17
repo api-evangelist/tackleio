@@ -24,18 +24,6 @@ paths:
           $ref: '#/components/responses/Version_Version-200-OK'
       summary: Get API Version
 components:
-  responses:
-    Version_Version-200-OK:
-      description: Successful version response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/VersionResponse'
-          examples:
-            version-response:
-              value:
-                version: 1.0.0
-                sub_versions: []
   schemas:
     VersionResponse:
       title: VersionResponse
@@ -51,6 +39,18 @@ components:
       required:
       - version
       - sub_versions
+  responses:
+    Version_Version-200-OK:
+      description: Successful version response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/VersionResponse'
+          examples:
+            version-response:
+              value:
+                version: 1.0.0
+                sub_versions: []
   securitySchemes:
     BearerAuth:
       description: The Tackle API requires a JWT for authentication. You can get this by [getting your API credentials](https://developers.tackle.io/docs/how-to-get-an-m2m-client-id-and-secret) from the Tackle Platform then [retrieving your Access Token](https://developers.tackle.io/docs/getting-an-access-token) using our Authentication endpoint.

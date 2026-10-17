@@ -77,18 +77,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   responses:
-    Unauthorized:
-      description: Missing or invalid authentication.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Forbidden:
-      description: The caller is not authorized to perform this action.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     InternalServerError:
       description: 'An unexpected error occurred while processing the request.
 
@@ -103,7 +91,28 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid authentication.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: The caller is not authorized to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
+    Error:
+      type: object
+      description: 'Error response body. The service emits only a human-readable
+
+        `message`. A request identifier may be included in response headers for support and troubleshooting.'
+      properties:
+        message:
+          type: string
+          description: Human-readable error message.
     PicklistOption:
       type: object
       required:
@@ -189,15 +198,6 @@ components:
           value: QUALIFY
         - display: Refine
           value: REFINE
-    Error:
-      type: object
-      description: 'Error response body. The service emits only a human-readable
-
-        `message`. A request identifier may be included in response headers for support and troubleshooting.'
-      properties:
-        message:
-          type: string
-          description: Human-readable error message.
   securitySchemes:
     bearerAuth:
       type: http

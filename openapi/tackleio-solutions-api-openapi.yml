@@ -145,14 +145,14 @@ components:
         lastSynced:
           type: string
   responses:
-    Unauthorized:
-      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
-
-        authenticated principal could not be resolved.'
     InternalServerError:
       description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
 
         bodies for 5xx errors may be empty.'
+    Unauthorized:
+      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
+
+        authenticated principal could not be resolved.'
   securitySchemes:
     bearerAuth:
       type: http

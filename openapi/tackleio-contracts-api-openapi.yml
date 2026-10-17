@@ -111,26 +111,6 @@ components:
         agreement:
           type: object
           description: Verbatim AWS Agreement API payload (`describeAgreement`, `agreementSummary`, `agreementTerms`).
-    CloudDataAwsPartnerAgreement:
-      type: object
-      required:
-      - agreement
-      properties:
-        agreement:
-          type: object
-          description: 'Verbatim AWS Marketplace SDDS (Seller Delivery Data Service)
-
-            partner agreement record. SDDS reports arrive on a daily
-
-            cadence rather than at time of purchase, so this payload
-
-            can be missing for up to 24 hours after a partner contract
-
-            is created. The enclosing `cloudData` field will simply be
-
-            omitted from the response until the SDDS data lands.
-
-            '
     Contract:
       type: object
       required:
@@ -291,6 +271,26 @@ components:
         currencyCode:
           type: string
           example: USD
+    CloudDataAwsPartnerAgreement:
+      type: object
+      required:
+      - agreement
+      properties:
+        agreement:
+          type: object
+          description: 'Verbatim AWS Marketplace SDDS (Seller Delivery Data Service)
+
+            partner agreement record. SDDS reports arrive on a daily
+
+            cadence rather than at time of purchase, so this payload
+
+            can be missing for up to 24 hours after a partner contract
+
+            is created. The enclosing `cloudData` field will simply be
+
+            omitted from the response until the SDDS data lands.
+
+            '
   securitySchemes:
     tackleJwt:
       type: http

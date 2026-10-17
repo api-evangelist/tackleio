@@ -602,260 +602,13 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    Unauthorized:
-      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
-
-        authenticated principal could not be resolved.'
-    InternalServerError:
-      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
-
-        bodies for 5xx errors may be empty.'
-    NotFound:
-      description: Not Found. No resource exists at the requested path for the authenticated vendor.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Opportunity not found
-    BadRequest:
-      description: 'Bad Request. The request was malformed or failed validation (for example, an invalid
-
-        `sortField`/`sortOrder` value, an unsupported `tackle-operation-id`, or a request body that
-
-        fails to parse as JSON).'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Invalid sortField
-    Locked:
-      description: 'Locked. The request was rejected because the vendor is currently in a mid-reset state
-
-        (for example, while the vendor''s AWS Partner Central connection is being re-established).
-
-        Retry the request once the vendor''s reset has completed.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: Locked
   schemas:
-    CreateInvitationRequest:
-      type: object
-      description: 'Request body for `createInvitation` (test-environment-only). The required fields are
-
-        the values consumed when constructing the simulated invitation; other fields are
-
-        optional.'
-      required:
-      - senderAwsAccountID
-      - payload
-      properties:
-        senderAwsAccountID:
-          type: string
-          description: The AWS account ID of the simulated sender.
-          example: '123456789098'
-        engagementTitle:
-          type: string
-          description: Title of the engagement invitation.
-          example: New Collaboration Opportunity
-        expirationDate:
-          type: string
-          format: date-time
-          description: When the invitation should expire.
-        invitationDate:
-          type: string
-          format: date-time
-          description: When the invitation was sent.
-        payloadType:
-          type: string
-          enum:
-          - OpportunityInvitation
-        payload:
-          type: object
-          required:
-          - value
-          properties:
-            value:
-              type: object
-              required:
-              - customer
-              - project
-              properties:
-                receiverResponsibilities:
-                  type: array
-                  items:
-                    type: string
-                    enum:
-                    - Distributor
-                    - Reseller
-                    - HardwarePartner
-                    - ManagedServiceProvider
-                    - SoftwarePartner
-                    - ServicesPartner
-                    - TrainingPartner
-                customer:
-                  type: object
-                  properties:
-                    companyName:
-                      type: string
-                    countryCode:
-                      type: string
-                    industry:
-                      type: string
-                    websiteUrl:
-                      type: string
-                project:
-                  type: object
-                  properties:
-                    businessProblem:
-                      type: string
-                    targetCompletionDate:
-                      type: string
-                      format: date-time
-                    title:
-                      type: string
-                    expectedCustomerSpend:
-                      type: array
-                      description: 'Expected customer spend amounts associated with the invitation. Use
-
-                        the documented camelCase field name `expectedCustomerSpend` — the
-
-                        capital-E form `ExpectedCustomerSpend` is currently accepted as a
-
-                        legacy compatibility, but new integrations should always send the
-
-                        camelCase form to remain forward-compatible.'
-                      items:
-                        type: object
-                        properties:
-                          amount:
-                            type: string
-                          currencyCode:
-                            type: string
-                          frequency:
-                            type: string
-                            enum:
-                            - Monthly
-                          targetCompany:
-                            type: string
-                senderContacts:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      email:
-                        type: string
-                        format: email
-                      businessTitle:
-                        type: string
-                      firstName:
-                        type: string
-                      lastName:
-                        type: string
-                      phone:
-                        type: string
-    InvitationCustomer:
+    InvitationReceiver:
       type: object
       properties:
-        companyName:
+        alias:
           type: string
-        websiteUrl:
-          type: string
-        countryCode:
-          type: string
-        industry:
-          type: string
-          enum:
-          - Aerospace
-          - Agriculture
-          - Automotive
-          - Computers and Electronics
-          - Consumer Goods
-          - Education
-          - Energy - Oil and Gas
-          - Energy - Power and Utilities
-          - Financial Services
-          - Gaming
-          - Government
-          - Healthcare
-          - Hospitality
-          - Life Sciences
-          - Manufacturing
-          - Marketing and Advertising
-          - Media and Entertainment
-          - Mining
-          - Non-Profit Organization
-          - Professional Services
-          - Real Estate and Construction
-          - Retail
-          - Software and Internet
-          - Telecommunications
-          - Transportation and Logistics
-          - Travel
-          - Wholesale and Distribution
-          - Other
-    ListInvitationsResponseItem:
-      type: object
-      properties:
-        id:
-          type: string
-        cloudProviderId:
-          type: string
-        cloudStatus:
-          type: string
-        expirationDate:
-          type: string
-        cloudCreated:
-          type: string
-        created:
-          type: string
-        crmId:
-          type: string
-        crmOrgId:
-          type: string
-        companyName:
-          type: string
-        pendingRequestIds:
-          type: array
-          items:
-            type: string
-            example: 00123456789ABCDEFGHIJKL
-        targetCompletionDate:
-          type: string
-        title:
-          type: string
-        opportunityID:
-          type: string
-          description: 'The cloud-provider opportunity identifier this invitation is linked to, when known.
-
-            Note: `listInvitations` rows emit this field as `opportunityID` (capital `ID`), while
-
-            `getInvitation` returns the same logical value as `opportunityId` (lowercase `d`).
-
-            Consumers should handle both casings.'
-          example: O1234123
-        origin:
-          type: string
-          description: The origin of the invitation. `aws` for AWS-led invitations, `partner` for partner-led.
-          enum:
-          - aws
-          - partner
-        senderCompanyName:
-          type: string
-          description: The display name of the sending account. For AWS-led invitations this is `AWS`.
-          example: AWS
-        hasCloudErrors:
-          type: boolean
-        hasSalesforceErrors:
-          type: boolean
-        salesforceSyncError:
-          type: string
-        unifiedCreatedDate:
+        awsAccountId:
           type: string
     ListInvitationEvents:
       type: object
@@ -993,6 +746,46 @@ components:
               type: string
             pictureUrl:
               type: string
+    InvitationCustomer:
+      type: object
+      properties:
+        companyName:
+          type: string
+        websiteUrl:
+          type: string
+        countryCode:
+          type: string
+        industry:
+          type: string
+          enum:
+          - Aerospace
+          - Agriculture
+          - Automotive
+          - Computers and Electronics
+          - Consumer Goods
+          - Education
+          - Energy - Oil and Gas
+          - Energy - Power and Utilities
+          - Financial Services
+          - Gaming
+          - Government
+          - Healthcare
+          - Hospitality
+          - Life Sciences
+          - Manufacturing
+          - Marketing and Advertising
+          - Media and Entertainment
+          - Mining
+          - Non-Profit Organization
+          - Professional Services
+          - Real Estate and Construction
+          - Retail
+          - Software and Internet
+          - Telecommunications
+          - Transportation and Logistics
+          - Travel
+          - Wholesale and Distribution
+          - Other
     InvitationMetadata:
       type: object
       properties:
@@ -1014,26 +807,6 @@ components:
 
             failed. Absent on invitations where the last sync attempt succeeded.'
           example: 'INVALID_FIELD_FOR_INSERT_UPDATE: TackleCoSell__c: bad field names on insert/update call'
-    ListInvitationsResponse:
-      type: object
-      properties:
-        invitations:
-          type: array
-          items:
-            $ref: '#/components/schemas/ListInvitationsResponseItem'
-        total:
-          type: integer
-          example: 100
-        currentPageCount:
-          type: integer
-          example: 10
-        isNextPage:
-          type: boolean
-          example: true
-        nextIndex:
-          description: The starting index to use for fetching the next page of invitations. Only present when `isNextPage` is `true`.
-          type: integer
-          example: 10
     OpportunityInvitationPayload:
       type: object
       properties:
@@ -1073,49 +846,121 @@ components:
                 type: string
               businessTitle:
                 type: string
-    InvitationProject:
+    CreateInvitationRequest:
       type: object
-      properties:
-        businessProblem:
-          type: string
-        targetCompletionDate:
-          type: string
-        title:
-          type: string
-        expectedCustomerSpend:
-          type: array
-          items:
-            type: object
-            properties:
-              amount:
-                type: string
-              currencyCode:
-                type: string
-              frequency:
-                type: string
-                enum:
-                - Monthly
-              targetCompany:
-                type: string
-    Error:
-      type: object
-      description: 'Error envelope returned for typed error responses. Some 4xx and 5xx responses
+      description: 'Request body for `createInvitation` (test-environment-only). The required fields are
 
-        (such as direct `Unauthorized` and `Internal Server Error` responses) may instead
+        the values consumed when constructing the simulated invitation; other fields are
 
-        return an empty body; consumers should be tolerant of that.'
+        optional.'
+      required:
+      - senderAwsAccountID
+      - payload
       properties:
-        message:
+        senderAwsAccountID:
           type: string
-          description: A short, human-readable description of the error.
-          example: Opportunity not found
-    InvitationReceiver:
-      type: object
-      properties:
-        alias:
+          description: The AWS account ID of the simulated sender.
+          example: '123456789098'
+        engagementTitle:
           type: string
-        awsAccountId:
+          description: Title of the engagement invitation.
+          example: New Collaboration Opportunity
+        expirationDate:
           type: string
+          format: date-time
+          description: When the invitation should expire.
+        invitationDate:
+          type: string
+          format: date-time
+          description: When the invitation was sent.
+        payloadType:
+          type: string
+          enum:
+          - OpportunityInvitation
+        payload:
+          type: object
+          required:
+          - value
+          properties:
+            value:
+              type: object
+              required:
+              - customer
+              - project
+              properties:
+                receiverResponsibilities:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                    - Distributor
+                    - Reseller
+                    - HardwarePartner
+                    - ManagedServiceProvider
+                    - SoftwarePartner
+                    - ServicesPartner
+                    - TrainingPartner
+                customer:
+                  type: object
+                  properties:
+                    companyName:
+                      type: string
+                    countryCode:
+                      type: string
+                    industry:
+                      type: string
+                    websiteUrl:
+                      type: string
+                project:
+                  type: object
+                  properties:
+                    businessProblem:
+                      type: string
+                    targetCompletionDate:
+                      type: string
+                      format: date-time
+                    title:
+                      type: string
+                    expectedCustomerSpend:
+                      type: array
+                      description: 'Expected customer spend amounts associated with the invitation. Use
+
+                        the documented camelCase field name `expectedCustomerSpend` — the
+
+                        capital-E form `ExpectedCustomerSpend` is currently accepted as a
+
+                        legacy compatibility, but new integrations should always send the
+
+                        camelCase form to remain forward-compatible.'
+                      items:
+                        type: object
+                        properties:
+                          amount:
+                            type: string
+                          currencyCode:
+                            type: string
+                          frequency:
+                            type: string
+                            enum:
+                            - Monthly
+                          targetCompany:
+                            type: string
+                senderContacts:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                        format: email
+                      businessTitle:
+                        type: string
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      phone:
+                        type: string
     InvitationResponse:
       type: object
       properties:
@@ -1178,6 +1023,120 @@ components:
           - EXPIRED
         metadata:
           $ref: '#/components/schemas/InvitationMetadata'
+    Error:
+      type: object
+      description: 'Error envelope returned for typed error responses. Some 4xx and 5xx responses
+
+        (such as direct `Unauthorized` and `Internal Server Error` responses) may instead
+
+        return an empty body; consumers should be tolerant of that.'
+      properties:
+        message:
+          type: string
+          description: A short, human-readable description of the error.
+          example: Opportunity not found
+    ListInvitationsResponse:
+      type: object
+      properties:
+        invitations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListInvitationsResponseItem'
+        total:
+          type: integer
+          example: 100
+        currentPageCount:
+          type: integer
+          example: 10
+        isNextPage:
+          type: boolean
+          example: true
+        nextIndex:
+          description: The starting index to use for fetching the next page of invitations. Only present when `isNextPage` is `true`.
+          type: integer
+          example: 10
+    InvitationProject:
+      type: object
+      properties:
+        businessProblem:
+          type: string
+        targetCompletionDate:
+          type: string
+        title:
+          type: string
+        expectedCustomerSpend:
+          type: array
+          items:
+            type: object
+            properties:
+              amount:
+                type: string
+              currencyCode:
+                type: string
+              frequency:
+                type: string
+                enum:
+                - Monthly
+              targetCompany:
+                type: string
+    ListInvitationsResponseItem:
+      type: object
+      properties:
+        id:
+          type: string
+        cloudProviderId:
+          type: string
+        cloudStatus:
+          type: string
+        expirationDate:
+          type: string
+        cloudCreated:
+          type: string
+        created:
+          type: string
+        crmId:
+          type: string
+        crmOrgId:
+          type: string
+        companyName:
+          type: string
+        pendingRequestIds:
+          type: array
+          items:
+            type: string
+            example: 00123456789ABCDEFGHIJKL
+        targetCompletionDate:
+          type: string
+        title:
+          type: string
+        opportunityID:
+          type: string
+          description: 'The cloud-provider opportunity identifier this invitation is linked to, when known.
+
+            Note: `listInvitations` rows emit this field as `opportunityID` (capital `ID`), while
+
+            `getInvitation` returns the same logical value as `opportunityId` (lowercase `d`).
+
+            Consumers should handle both casings.'
+          example: O1234123
+        origin:
+          type: string
+          description: The origin of the invitation. `aws` for AWS-led invitations, `partner` for partner-led.
+          enum:
+          - aws
+          - partner
+        senderCompanyName:
+          type: string
+          description: The display name of the sending account. For AWS-led invitations this is `AWS`.
+          example: AWS
+        hasCloudErrors:
+          type: boolean
+        hasSalesforceErrors:
+          type: boolean
+        salesforceSyncError:
+          type: string
+        unifiedCreatedDate:
+          type: string
   parameters:
     invitation_id:
       name: invitation_id
@@ -1193,6 +1152,47 @@ components:
       schema:
         type: string
         example: tackle-invitation-2sKlF3xSRGx8M724Oy3fprAX51q
+  responses:
+    BadRequest:
+      description: 'Bad Request. The request was malformed or failed validation (for example, an invalid
+
+        `sortField`/`sortOrder` value, an unsupported `tackle-operation-id`, or a request body that
+
+        fails to parse as JSON).'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Invalid sortField
+    InternalServerError:
+      description: 'Internal Server Error. An unexpected error occurred while processing the request. Response
+
+        bodies for 5xx errors may be empty.'
+    Unauthorized:
+      description: 'Unauthorized. The request did not include valid Tackle MTM bearer credentials, or the
+
+        authenticated principal could not be resolved.'
+    Locked:
+      description: 'Locked. The request was rejected because the vendor is currently in a mid-reset state
+
+        (for example, while the vendor''s AWS Partner Central connection is being re-established).
+
+        Retry the request once the vendor''s reset has completed.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Locked
+    NotFound:
+      description: Not Found. No resource exists at the requested path for the authenticated vendor.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: Opportunity not found
   securitySchemes:
     bearerAuth:
       type: http

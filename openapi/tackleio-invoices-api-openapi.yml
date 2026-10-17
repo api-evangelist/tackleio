@@ -36,17 +36,44 @@ paths:
       - BearerAuth: []
 components:
   schemas:
-    Metadata:
-      title: Metadata
+    InvoicesResponse:
+      title: InvoicesResponse
       type: object
-      description: Metadata for a given request
       properties:
-        link:
-          type: string
-          format: uri
-          example: https://api.tackle.io
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Invoice'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
       required:
-      - link
+      - data
+      - metadata
+    InvoiceId:
+      type: string
+      example: 12345-abcde
+    Money:
+      type: object
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+          enum:
+          - EUR
+          - CAD
+          - USD
+          - GBP
+      required:
+      - amount
+      - currency
+    AwsCloud:
+      type: string
+      description: AWS Cloud
+      default: aws
+      enum:
+      - aws
+      example: aws
     Customer:
       type: object
       properties:
@@ -57,9 +84,44 @@ components:
           description: Marketplace Account Number
         address:
           $ref: '#/components/schemas/Address'
-    InvoiceId:
-      type: string
-      example: 12345-abcde
+    Address:
+      type: object
+      properties:
+        country:
+          type:
+          - string
+          - 'null'
+        city:
+          type:
+          - string
+          - 'null'
+        zip_code:
+          type:
+          - string
+          - 'null'
+        email_domain:
+          type:
+          - string
+          - 'null'
+    ReportingProduct:
+      title: Product
+      type: object
+      properties:
+        name:
+          type: string
+          default: Example Product
+        id:
+          default: example-product-code-12345
+          anyOf:
+          - $ref: '#/components/schemas/AwsProductId'
+          - $ref: '#/components/schemas/GcpProductId'
+        tackle_product_ref_id:
+          type:
+          - string
+          - 'null'
+      required:
+      - name
+      - id
     Invoice:
       title: Invoice
       type: object
@@ -91,68 +153,10 @@ components:
       - transaction
       - customer
       - cloud_marketplace
-    422Reports:
-      title: Reports-422-Response
-      type: object
-      properties:
-        code:
-          type: string
-        error:
-          type: string
-        errors:
-          type: array
-          items: {}
-      required:
-      - code
-      - error
-      - errors
-    Address:
-      type: object
-      properties:
-        country:
-          type:
-          - string
-          - 'null'
-        city:
-          type:
-          - string
-          - 'null'
-        zip_code:
-          type:
-          - string
-          - 'null'
-        email_domain:
-          type:
-          - string
-          - 'null'
-    AwsCloud:
+    AwsProductId:
       type: string
-      description: AWS Cloud
-      default: aws
-      enum:
-      - aws
-      example: aws
-    Transaction:
-      title: Transaction
-      type: object
-      properties:
-        id:
-          type: string
-        seller_revenue:
-          $ref: '#/components/schemas/Money'
-        marketplace_fee:
-          $ref: '#/components/schemas/Money'
-        net_amount:
-          $ref: '#/components/schemas/NetAmount'
-      required:
-      - id
-      - seller_revenue
-      - marketplace_fee
-      - net_amount
-    GcpProductId:
-      type: string
-      description: GCP Solution ID
-      example: tackle-for-gcp
+      description: AWS Product Code
+      example: 1test1a2b3c4d5e6f7g8h9ijk
       minLength: 0
     Error:
       title: ErrorResponse
@@ -179,29 +183,6 @@ components:
       - code
       - error
       - errors
-    NetAmount:
-      allOf:
-      - $ref: '#/components/schemas/Money'
-      description: Amount to be disbursed by cloud provider after any marketplace fees have been assessed
-    ReportingProduct:
-      title: Product
-      type: object
-      properties:
-        name:
-          type: string
-          default: Example Product
-        id:
-          default: example-product-code-12345
-          anyOf:
-          - $ref: '#/components/schemas/AwsProductId'
-          - $ref: '#/components/schemas/GcpProductId'
-        tackle_product_ref_id:
-          type:
-          - string
-          - 'null'
-      required:
-      - name
-      - id
     GcpCloud:
       type: string
       description: GCP Cloud
@@ -209,39 +190,58 @@ components:
       enum:
       - gcp
       example: gcp
-    AwsProductId:
-      type: string
-      description: AWS Product Code
-      example: 1test1a2b3c4d5e6f7g8h9ijk
-      minLength: 0
-    InvoicesResponse:
-      title: InvoicesResponse
+    NetAmount:
+      allOf:
+      - $ref: '#/components/schemas/Money'
+      description: Amount to be disbursed by cloud provider after any marketplace fees have been assessed
+    422Reports:
+      title: Reports-422-Response
       type: object
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Invoice'
-        metadata:
-          $ref: '#/components/schemas/Metadata'
-      required:
-      - data
-      - metadata
-    Money:
-      type: object
-      properties:
-        amount:
-          type: number
-        currency:
+        code:
           type: string
-          enum:
-          - EUR
-          - CAD
-          - USD
-          - GBP
+        error:
+          type: string
+        errors:
+          type: array
+          items: {}
       required:
-      - amount
-      - currency
+      - code
+      - error
+      - errors
+    Metadata:
+      title: Metadata
+      type: object
+      description: Metadata for a given request
+      properties:
+        link:
+          type: string
+          format: uri
+          example: https://api.tackle.io
+      required:
+      - link
+    GcpProductId:
+      type: string
+      description: GCP Solution ID
+      example: tackle-for-gcp
+      minLength: 0
+    Transaction:
+      title: Transaction
+      type: object
+      properties:
+        id:
+          type: string
+        seller_revenue:
+          $ref: '#/components/schemas/Money'
+        marketplace_fee:
+          $ref: '#/components/schemas/Money'
+        net_amount:
+          $ref: '#/components/schemas/NetAmount'
+      required:
+      - id
+      - seller_revenue
+      - marketplace_fee
+      - net_amount
   responses:
     Reports_400-Bad-Request:
       description: Example response
@@ -281,6 +281,19 @@ components:
                   - marketplace
                   msg: 'value is not a valid enumeration member; permitted: ''aws'', ''gcp'''
                   type: type_error.enum
+    401-Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            unauthorized:
+              value:
+                code: unauthorized
+                error: client_id and client_secret are invalid.
+                error_type: service_exception
+                errors: []
     Reports_200-OK-Invoices:
       description: Example success response containing a list of Invoice objects
       content:
@@ -371,29 +384,7 @@ components:
                   cloud_marketplace: aws
                 metadata:
                   link: https:api.tackle.io/v1/invoices?start_date=2021-01-01&end_date=2021-02-01&cloud=aws
-    401-Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          examples:
-            unauthorized:
-              value:
-                code: unauthorized
-                error: client_id and client_secret are invalid.
-                error_type: service_exception
-                errors: []
   parameters:
-    start_date:
-      name: start_date
-      description: Start date for a query
-      in: query
-      required: true
-      schema:
-        type: string
-        format: date
-        example: '2021-06-01'
     Marketplace:
       name: cloud
       in: query
@@ -405,6 +396,15 @@ components:
         example: aws
       description: Cloud Marketplace
       required: true
+    start_date:
+      name: start_date
+      description: Start date for a query
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+        example: '2021-06-01'
     end_date:
       name: end_date
       description: End date for a query

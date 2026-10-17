@@ -104,6 +104,23 @@ components:
       required:
       - client_id
       - client_secret
+    AuthenticationResponse:
+      title: AuthenticationResponse
+      type: object
+      properties:
+        access_token:
+          description: JWT
+          type: string
+        expires_in:
+          description: Number of seconds until the token expires
+          type: integer
+        token_type:
+          description: Token type
+          type: string
+      required:
+      - access_token
+      - expires_in
+      - token_type
     Error:
       title: ErrorResponse
       type: object
@@ -129,23 +146,6 @@ components:
       - code
       - error
       - errors
-    AuthenticationResponse:
-      title: AuthenticationResponse
-      type: object
-      properties:
-        access_token:
-          description: JWT
-          type: string
-        expires_in:
-          description: Number of seconds until the token expires
-          type: integer
-        token_type:
-          description: Token type
-          type: string
-      required:
-      - access_token
-      - expires_in
-      - token_type
   securitySchemes:
     BearerAuth:
       description: The Tackle API requires a JWT for authentication. You can get this by [getting your API credentials](https://developers.tackle.io/docs/how-to-get-an-m2m-client-id-and-secret) from the Tackle Platform then [retrieving your Access Token](https://developers.tackle.io/docs/getting-an-access-token) using our Authentication endpoint.

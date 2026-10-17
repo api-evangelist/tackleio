@@ -407,40 +407,6 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    Unauthorized:
-      description: Authentication information is missing or invalid
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '401'
-            detail: Unauthorized
-    Forbidden:
-      description: Access forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '403'
-            detail: Forbidden
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ScimError'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            status: '500'
-            detail: Internal server error
   schemas:
     User:
       type: object
@@ -504,93 +470,42 @@ components:
           $ref: '#/components/schemas/Meta'
         urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:
           $ref: '#/components/schemas/EnterpriseUser'
-    Name:
-      type: object
-      required:
-      - givenName
-      - familyName
-      properties:
-        givenName:
-          type: string
-          description: First name
-          example: John
-        familyName:
-          type: string
-          description: Last name
-          example: Doe
-    Email:
-      type: object
-      required:
-      - value
-      - primary
-      properties:
-        value:
-          type: string
-          format: email
-          description: Email address
-          example: john.doe@example.com
-        type:
-          type: string
-          description: Type of email address
-          example: work
-        primary:
-          type: boolean
-          description: Whether this is the primary email
-          example: true
-    UserListResponse:
+    ScimError:
       type: object
       required:
       - schemas
-      - totalResults
-      - itemsPerPage
-      - startIndex
-      - Resources
+      - status
+      - detail
       properties:
         schemas:
           type: array
           items:
             type: string
           example:
-          - urn:ietf:params:scim:api:messages:2.0:ListResponse
-        totalResults:
-          type: integer
-          description: Total number of results
-          example: 100
-        itemsPerPage:
-          type: integer
-          description: Number of results per page
-          example: 50
-        startIndex:
-          type: integer
-          description: 1-based index of the first result
-          example: 1
-        Resources:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-    Meta:
-      type: object
-      readOnly: true
-      properties:
-        resourceType:
+          - urn:ietf:params:scim:api:messages:2.0:Error
+        status:
           type: string
-          description: The resource type
-          example: User
-        created:
+          description: HTTP status code as string
+          example: '400'
+        detail:
           type: string
-          format: date-time
-          description: When the resource was created
-          example: '2024-01-15T10:30:00Z'
-        lastModified:
+          description: Human-readable error description
+          example: Invalid request
+        scimType:
           type: string
-          format: date-time
-          description: When the resource was last modified
-          example: '2024-01-15T10:30:00Z'
-        location:
-          type: string
-          format: uri
-          description: URL to the resource
-          example: https://scim-api.tackle.io/scim/v2/Users/user123
+          description: SCIM-specific error type
+          enum:
+          - invalidFilter
+          - tooMany
+          - uniqueness
+          - mutability
+          - invalidSyntax
+          - invalidPath
+          - noTarget
+          - invalidValue
+          - invalidVers
+          - sensitive
+          example: invalidValue
     UserInput:
       type: object
       required:
@@ -646,23 +561,46 @@ components:
             $ref: '#/components/schemas/Photo'
         urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:
           $ref: '#/components/schemas/EnterpriseUser'
-    PatchOp:
+    UserListResponse:
       type: object
       required:
       - schemas
-      - Operations
+      - totalResults
+      - itemsPerPage
+      - startIndex
+      - Resources
       properties:
         schemas:
           type: array
           items:
             type: string
           example:
-          - urn:ietf:params:scim:api:messages:2.0:PatchOp
-        Operations:
+          - urn:ietf:params:scim:api:messages:2.0:ListResponse
+        totalResults:
+          type: integer
+          description: Total number of results
+          example: 100
+        itemsPerPage:
+          type: integer
+          description: Number of results per page
+          example: 50
+        startIndex:
+          type: integer
+          description: 1-based index of the first result
+          example: 1
+        Resources:
           type: array
           items:
-            $ref: '#/components/schemas/PatchOperation'
-          description: List of patch operations to perform
+            $ref: '#/components/schemas/User'
+    Manager:
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          description: Manager's user ID
+          example: manager456
     Photo:
       type: object
       required:
@@ -678,15 +616,6 @@ components:
           format: uri
           description: URL to the photo
           example: https://example.com/photo.jpg
-    Manager:
-      type: object
-      required:
-      - value
-      properties:
-        value:
-          type: string
-          description: Manager's user ID
-          example: manager456
     PatchOperation:
       type: object
       required:
@@ -712,42 +641,60 @@ components:
           - type: integer
           - type: object
           - type: array
-    ScimError:
+    Meta:
+      type: object
+      readOnly: true
+      properties:
+        resourceType:
+          type: string
+          description: The resource type
+          example: User
+        created:
+          type: string
+          format: date-time
+          description: When the resource was created
+          example: '2024-01-15T10:30:00Z'
+        lastModified:
+          type: string
+          format: date-time
+          description: When the resource was last modified
+          example: '2024-01-15T10:30:00Z'
+        location:
+          type: string
+          format: uri
+          description: URL to the resource
+          example: https://scim-api.tackle.io/scim/v2/Users/user123
+    Name:
+      type: object
+      required:
+      - givenName
+      - familyName
+      properties:
+        givenName:
+          type: string
+          description: First name
+          example: John
+        familyName:
+          type: string
+          description: Last name
+          example: Doe
+    PatchOp:
       type: object
       required:
       - schemas
-      - status
-      - detail
+      - Operations
       properties:
         schemas:
           type: array
           items:
             type: string
           example:
-          - urn:ietf:params:scim:api:messages:2.0:Error
-        status:
-          type: string
-          description: HTTP status code as string
-          example: '400'
-        detail:
-          type: string
-          description: Human-readable error description
-          example: Invalid request
-        scimType:
-          type: string
-          description: SCIM-specific error type
-          enum:
-          - invalidFilter
-          - tooMany
-          - uniqueness
-          - mutability
-          - invalidSyntax
-          - invalidPath
-          - noTarget
-          - invalidValue
-          - invalidVers
-          - sensitive
-          example: invalidValue
+          - urn:ietf:params:scim:api:messages:2.0:PatchOp
+        Operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatchOperation'
+          description: List of patch operations to perform
     EnterpriseUser:
       type: object
       properties:
@@ -769,6 +716,59 @@ components:
           example: Platform
         manager:
           $ref: '#/components/schemas/Manager'
+    Email:
+      type: object
+      required:
+      - value
+      - primary
+      properties:
+        value:
+          type: string
+          format: email
+          description: Email address
+          example: john.doe@example.com
+        type:
+          type: string
+          description: Type of email address
+          example: work
+        primary:
+          type: boolean
+          description: Whether this is the primary email
+          example: true
+  responses:
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '500'
+            detail: Internal server error
+    Unauthorized:
+      description: Authentication information is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '401'
+            detail: Unauthorized
+    Forbidden:
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScimError'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            status: '403'
+            detail: Forbidden
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

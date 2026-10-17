@@ -240,98 +240,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
 components:
   schemas:
-    UsageDimension:
-      type: object
-      properties:
-        description:
-          type:
-          - string
-          - 'null'
-          description: Human-friendly name of the usage dimension.
-        sku:
-          type:
-          - string
-          - 'null'
-          description: API identifier of the usage dimension in AWS Marketplace.
-        price:
-          type:
-          - string
-          - 'null'
-          description: Price per unit.
-        aws_discount_percentage:
-          type:
-          - string
-          - 'null'
-          description: Display-only discount percentage.
-    PricingUnit:
-      type: object
-      description: AMI-only pricing unit.
-      properties:
-        unit:
-          type:
-          - string
-          - 'null'
-        hourly_price:
-          type:
-          - string
-          - 'null'
-        duration_price:
-          type:
-          - string
-          - 'null'
-    Agreement:
-      type: object
-      description: 'A marketplace agreement (entitlement) between a seller and a buyer for
-
-        a product. For AWS this maps to an AWS Marketplace Agreement.
-
-        '
-      properties:
-        id:
-          type: string
-          description: Marketplace agreement identifier (AWS `AgreementId`).
-        status:
-          type: string
-          description: For AWS, active agreements have status `ACTIVE`.
-        productid:
-          type: string
-          description: Marketplace product ID (AWS Product Code).
-        public_productid:
-          type: string
-          description: 'Public marketplace product ID (AWS encrypted product ID). Use this
-
-            value as the `productId` path parameter for
-
-            `GET /products/{productId}/pricing`.
-
-            '
-        product_type:
-          type: string
-          description: For AWS, one of `SaaSProduct`, `AmiProduct`, or `ContainerProduct`.
-        offerid:
-          type: string
-          description: Marketplace ID of the offer that produced this agreement.
-        buyer_billing_account_ref:
-          type: string
-          description: Marketplace ID of the buyer's billing account (12-digit AWS account number).
-        start_date:
-          type: string
-          format: date-time
-        end_date:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: AWS pay-as-you-go agreements do not have an end date.
-      required:
-      - id
-      - status
-      - productid
-      - public_productid
-      - product_type
-      - offerid
-      - buyer_billing_account_ref
-      - start_date
     ProductPricing:
       type: object
       description: 'Pricing dimensions, billing term defaults, and payment model defaults
@@ -437,6 +345,82 @@ components:
           format: date
         allow_auto_renew:
           type: boolean
+    UsageDimension:
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+          description: Human-friendly name of the usage dimension.
+        sku:
+          type:
+          - string
+          - 'null'
+          description: API identifier of the usage dimension in AWS Marketplace.
+        price:
+          type:
+          - string
+          - 'null'
+          description: Price per unit.
+        aws_discount_percentage:
+          type:
+          - string
+          - 'null'
+          description: Display-only discount percentage.
+    Agreement:
+      type: object
+      description: 'A marketplace agreement (entitlement) between a seller and a buyer for
+
+        a product. For AWS this maps to an AWS Marketplace Agreement.
+
+        '
+      properties:
+        id:
+          type: string
+          description: Marketplace agreement identifier (AWS `AgreementId`).
+        status:
+          type: string
+          description: For AWS, active agreements have status `ACTIVE`.
+        productid:
+          type: string
+          description: Marketplace product ID (AWS Product Code).
+        public_productid:
+          type: string
+          description: 'Public marketplace product ID (AWS encrypted product ID). Use this
+
+            value as the `productId` path parameter for
+
+            `GET /products/{productId}/pricing`.
+
+            '
+        product_type:
+          type: string
+          description: For AWS, one of `SaaSProduct`, `AmiProduct`, or `ContainerProduct`.
+        offerid:
+          type: string
+          description: Marketplace ID of the offer that produced this agreement.
+        buyer_billing_account_ref:
+          type: string
+          description: Marketplace ID of the buyer's billing account (12-digit AWS account number).
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: AWS pay-as-you-go agreements do not have an end date.
+      required:
+      - id
+      - status
+      - productid
+      - public_productid
+      - product_type
+      - offerid
+      - buyer_billing_account_ref
+      - start_date
     ScheduledPayment:
       type: object
       properties:
@@ -451,43 +435,6 @@ components:
           - string
           - 'null'
           description: Amount the buyer should be invoiced.
-    AgreementList:
-      type: object
-      description: Paginated list of agreements.
-      properties:
-        entitlements:
-          type: array
-          items:
-            $ref: '#/components/schemas/Agreement'
-        limit:
-          type: integer
-        next_token:
-          type:
-          - string
-          - 'null'
-          description: Opaque cursor for the next page; absent on the last page.
-      required:
-      - entitlements
-    Error:
-      type: object
-      description: 'Error response. Endpoints in the **Private Offers** and **Marketplace**
-
-        tags return the error in a `message` field. The **Partners** endpoint
-
-        returns the error in an `error` field. At least one of the two will
-
-        always be populated.
-
-        '
-      properties:
-        message:
-          type: string
-          description: Error message (Private Offers and Marketplace endpoints).
-          example: private offer not found
-        error:
-          type: string
-          description: Error message (Partners endpoint).
-          example: authorization failed
     PricingDimension:
       type: object
       properties:
@@ -535,6 +482,59 @@ components:
           - string
           - 'null'
           description: Display-only discount percentage.
+    Error:
+      type: object
+      description: 'Error response. Endpoints in the **Private Offers** and **Marketplace**
+
+        tags return the error in a `message` field. The **Partners** endpoint
+
+        returns the error in an `error` field. At least one of the two will
+
+        always be populated.
+
+        '
+      properties:
+        message:
+          type: string
+          description: Error message (Private Offers and Marketplace endpoints).
+          example: private offer not found
+        error:
+          type: string
+          description: Error message (Partners endpoint).
+          example: authorization failed
+    PricingUnit:
+      type: object
+      description: AMI-only pricing unit.
+      properties:
+        unit:
+          type:
+          - string
+          - 'null'
+        hourly_price:
+          type:
+          - string
+          - 'null'
+        duration_price:
+          type:
+          - string
+          - 'null'
+    AgreementList:
+      type: object
+      description: Paginated list of agreements.
+      properties:
+        entitlements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Agreement'
+        limit:
+          type: integer
+        next_token:
+          type:
+          - string
+          - 'null'
+          description: Opaque cursor for the next page; absent on the last page.
+      required:
+      - entitlements
     Product:
       type: object
       description: 'An AWS Marketplace product owned by the calling seller. The fields
@@ -587,8 +587,8 @@ components:
       - name
       - status
   responses:
-    Forbidden:
-      description: Caller is authenticated but not authorized for this resource.
+    BadRequest:
+      description: Request was malformed or failed validation.
       content:
         application/json:
           schema:
@@ -599,8 +599,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Request was malformed or failed validation.
+    Forbidden:
+      description: Caller is authenticated but not authorized for this resource.
       content:
         application/json:
           schema:
