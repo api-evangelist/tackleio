@@ -64,6 +64,184 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Tackle.io is a company surfaced as a portfolio company of bessemer-venture-partners and added to the API Evangelist network as a stub for enrichment. Sector: cloud. This profile is a lead awaiting the enrichment pipeline.
+Tackle.io is the Cloud Marketplace and Co-Sell platform that helps software vendors list, sell, co-sell, and meter through the AWS, Microsoft Azure, and Google Cloud marketplaces. The Tackle developer surface spans nine services: a core Platform API (authentication, webhooks, metering/usage records, products, subscriptions, disbursements, invoices, registrations), a Prospect buyer-signal scoring API, Co-Sell APIs for AWS Partner Central, Microsoft Partner Center, and Google Cloud, Private Offer APIs for the AWS and Microsoft marketplaces, a public Contracts API, and a SCIM 2.0 user-provisioning API. Authentication is OAuth 2.0 client-credentials (machine-to-machine) issuing short-lived JWT bearer tokens gated by fine-grained RBAC permissions.
 
-Backed by: bessemer-venture-partners — https://tackle.io
+**Areas:** Company · Cloud · Cloud Marketplace · Co-Sell · AWS Marketplace · Azure Marketplace · Google Cloud Marketplace · Private Offers · Metering · SCIM · Webhook · B2B SaaS
+
+## Tackle.io on APIs.io
+
+Everything profiled for Tackle.io is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/tackleio/](https://apis.io/providers/tackleio/)** — or go straight to one of the APIs or properties below.
+
+### APIs (27)
+
+- [Tackle.io Authentication API](https://apis.io/apis/tackleio/tackleio-authentication-api/) — Operations for API Authentication
+- [Tackle.io Contracts API](https://apis.io/apis/tackleio/tackleio-contracts-api/) — The Contracts API from Tackle.io — 2 operation(s) for contracts.
+- [Tackle.io Currencies API](https://apis.io/apis/tackleio/tackleio-currencies-api/) — Microsoft marketplace currency and conversion helpers.
+- [Tackle.io Customers API](https://apis.io/apis/tackleio/tackleio-customers-api/) — Look up customer accounts in Microsoft Partner Center before creating a referral. Use these endpoints to determine `customerProfile.ids` and the…
+- [Tackle.io Disbursements API](https://apis.io/apis/tackleio/tackleio-disbursements-api/) — The Disbursements API from Tackle.io — 1 operation(s) for disbursements.
+- [Tackle.io Entitlements API](https://apis.io/apis/tackleio/tackleio-entitlements-api/) — Legacy entitlements endpoint - returns flat role objects
+- [Tackle.io Groups API](https://apis.io/apis/tackleio/tackleio-groups-api/) — SCIM 2.0 Groups endpoint - returns full Group resources (RFC 7643 §4.2)
+- [Tackle.io Invitations API](https://apis.io/apis/tackleio/tackleio-invitations-api/) — Create (test-environment-only), read, update, and list co-sell invitations — AWS-led requests to partner with you on a specific opportunity. Use the update…
+- [Tackle.io Invoices API](https://apis.io/apis/tackleio/tackleio-invoices-api/) — The Invoices API from Tackle.io — 1 operation(s) for invoices.
+- [Tackle.io Marketplace API](https://apis.io/apis/tackleio/tackleio-marketplace-api/) — AWS Marketplace context endpoints used to assemble offers and amendments.
+- [Tackle.io Metering API](https://apis.io/apis/tackleio/tackleio-metering-api/) — The Metering API from Tackle.io — 2 operation(s) for metering.
+- [Tackle.io Notifications API](https://apis.io/apis/tackleio/tackleio-notifications-api/) — Buyer instruction notification operations.
+- [Tackle.io Opportunities API](https://apis.io/apis/tackleio/tackleio-opportunities-api/) — Create, read, update, and list co-sell opportunities — the partner- originated (Outbound / Partner Referral) and AWS-originated (Inbound / AWS Referral)…
+- [Tackle.io Partners API](https://apis.io/apis/tackleio/tackleio-partners-api/) — Look up partner organizations in Microsoft Partner Center. Use the returned `organizationId` when adding a non-Microsoft partner via `inviteContexts`.
+- [Tackle.io Private Offer Actions API](https://apis.io/apis/tackleio/tackleio-private-offer-actions-api/) — Private offer lifecycle actions such as archive, cancel, and sync.
+- [Tackle.io Private Offers API](https://apis.io/apis/tackleio/tackleio-private-offers-api/) — AWS private-offer lifecycle (create, read, update, cancel, push to marketplace).
+- [Tackle.io Products API](https://apis.io/apis/tackleio/tackleio-products-api/) — Microsoft product and plan detail lookup.
+- [Tackle.io Referrals API](https://apis.io/apis/tackleio/tackleio-referrals-api/) — Create, read, update, and list events on Microsoft Partner Center co-sell referrals (both outbound and inbound).
+- [Tackle.io Registrations API](https://apis.io/apis/tackleio/tackleio-registrations-api/) — Operations for Order Registrations
+- [Tackle.io Scores API](https://apis.io/apis/tackleio/tackleio-scores-api/) — Score domains and search scored accounts.
+- [Tackle.io Service Provider API](https://apis.io/apis/tackleio/tackleio-service-provider-api/) — Service provider configuration and capabilities
+- [Tackle.io Settings API](https://apis.io/apis/tackleio/tackleio-settings-api/) — Vendor-level reference data, including the picklist endpoint that supplies the acceptable values for opportunity fields.
+- [Tackle.io Solutions API](https://apis.io/apis/tackleio/tackleio-solutions-api/) — List the co-sell solutions registered with AWS Partner Central for your account. Solution identifiers are referenced by `solutions` on opportunities.
+- [Tackle.io Subscriptions API](https://apis.io/apis/tackleio/tackleio-subscriptions-api/) — Operations for Subscriptions
+- [Tackle.io Users API](https://apis.io/apis/tackleio/tackleio-users-api/) — User management operations
+- [Tackle.io Version API](https://apis.io/apis/tackleio/tackleio-version-api/) — Operations for API Versions
+- [Tackle.io Webhooks API](https://apis.io/apis/tackleio/tackleio-webhooks-api/) — Operations for Webhooks
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [Tackleio Webhooks](https://apis.io/asyncapis/tackleio/tackleio-webhooks/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [Tackle API MCP Server](https://apis.io/servers/tackleio/tackle-api-mcp-server/)
+
+#### Collections (28)
+
+Postman and Open Collection request collections.
+
+- [Tackle Public Contracts Authentication API](https://apis.io/collections/tackleio/open-tackleio-authentication-api/)
+- [Tackle Public Authentication Contracts API](https://apis.io/collections/tackleio/open-tackleio-contracts-api/)
+- [Tackle Public Contracts Authentication Currencies API](https://apis.io/collections/tackleio/open-tackleio-currencies-api/)
+- [Tackle Public Contracts Authentication Customers API](https://apis.io/collections/tackleio/open-tackleio-customers-api/)
+- [Tackle Public Contracts Authentication Disbursements API](https://apis.io/collections/tackleio/open-tackleio-disbursements-api/)
+- [Tackle Public Contracts Authentication Entitlements API](https://apis.io/collections/tackleio/open-tackleio-entitlements-api/)
+- [Tackle Public Contracts Authentication Groups API](https://apis.io/collections/tackleio/open-tackleio-groups-api/)
+- [Tackle Public Contracts Authentication Invitations API](https://apis.io/collections/tackleio/open-tackleio-invitations-api/)
+- [Tackle Public Contracts Authentication Invoices API](https://apis.io/collections/tackleio/open-tackleio-invoices-api/)
+- [Tackle Public Contracts Authentication Marketplace API](https://apis.io/collections/tackleio/open-tackleio-marketplace-api/)
+- [Tackle Public Contracts Authentication Metering API](https://apis.io/collections/tackleio/open-tackleio-metering-api/)
+- [Tackle Public Contracts Authentication Notifications API](https://apis.io/collections/tackleio/open-tackleio-notifications-api/)
+- [Tackle Public Contracts Authentication Opportunities API](https://apis.io/collections/tackleio/open-tackleio-opportunities-api/)
+- [Tackle Public Contracts Authentication Partners API](https://apis.io/collections/tackleio/open-tackleio-partners-api/)
+- [Tackle Public Contracts Authentication Private Offer Actions API](https://apis.io/collections/tackleio/open-tackleio-private-offer-actions-api/)
+- [Tackle Public Contracts Authentication Private Offers API](https://apis.io/collections/tackleio/open-tackleio-private-offers-api/)
+- [Tackle Public Contracts Authentication Products API](https://apis.io/collections/tackleio/open-tackleio-products-api/)
+- [Tackle Contracts Authentication public API](https://apis.io/collections/tackleio/open-tackleio-public-api/)
+- [Tackle Public Contracts Authentication Referrals API](https://apis.io/collections/tackleio/open-tackleio-referrals-api/)
+- [Tackle Public Contracts Authentication Registrations API](https://apis.io/collections/tackleio/open-tackleio-registrations-api/)
+- [Tackle Public Contracts Authentication Scores API](https://apis.io/collections/tackleio/open-tackleio-scores-api/)
+- [Tackle Public Contracts Authentication Service Provider API](https://apis.io/collections/tackleio/open-tackleio-service-provider-api/)
+- [Tackle Public Contracts Authentication Settings API](https://apis.io/collections/tackleio/open-tackleio-settings-api/)
+- [Tackle Public Contracts Authentication Solutions API](https://apis.io/collections/tackleio/open-tackleio-solutions-api/)
+- [Tackle Public Contracts Authentication Subscriptions API](https://apis.io/collections/tackleio/open-tackleio-subscriptions-api/)
+- …and 3 more published on APIs.io
+
+#### Overlays (9)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Tackleio Contracts Overlay](https://apis.io/overlays/tackleio/tackleio-contracts-overlay/)
+- [Tackleio Cosell Aws Overlay](https://apis.io/overlays/tackleio/tackleio-cosell-aws-overlay/)
+- [Tackleio Cosell Gcp Overlay](https://apis.io/overlays/tackleio/tackleio-cosell-gcp-overlay/)
+- [Tackleio Cosell Msft Overlay](https://apis.io/overlays/tackleio/tackleio-cosell-msft-overlay/)
+- [Tackleio Offers Aws Overlay](https://apis.io/overlays/tackleio/tackleio-offers-aws-overlay/)
+- [Tackleio Offers Msft Overlay](https://apis.io/overlays/tackleio/tackleio-offers-msft-overlay/)
+- [Tackleio Platform Overlay](https://apis.io/overlays/tackleio/tackleio-platform-overlay/)
+- [Tackleio Prospect Overlay](https://apis.io/overlays/tackleio/tackleio-prospect-overlay/)
+- [Tackleio Scim Overlay](https://apis.io/overlays/tackleio/tackleio-scim-overlay/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Tackleio Authentication](https://apis.io/security/tackleio/tackleio-authentication/)
+- [Tackleio Domain Security](https://apis.io/security/tackleio/tackleio-domain-security/)
+- [Tackleio Trust Center](https://apis.io/security/tackleio/tackleio-trust-center/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Tackleio Scopes](https://apis.io/scopes/tackleio/tackleio-scopes/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://tackle.io)
+- [Documentation](https://developers.tackle.io/docs/getting-started)
+- [Getting started](https://developers.tackle.io/docs/getting-started)
+- [API reference](https://developers.tackle.io/reference)
+- [Support](https://help.tackle.io/)
+- [Blog](https://tackle.io/resources-category/blogs/)
+- [Terms of service](https://tackle.io/terms-conditions/)
+- [Privacy policy](https://tackle.io/privacy-policy-tackle-platform/)
+- [Status](https://status.tackle.io)
+
+## API Evangelist rating
+
+**Kin Score 57.1** — strong · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 76.7 |
+| Contract quality | 64.8 |
+| Contract governance | 4.5 |
+| Operational transparency | 47.4 |
+| Developer ergonomics | 50.6 |
+| Access clarity | 36.8 |
+
+**Agent readiness 46.2** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | documented (partial credit) |
+| MCP Server | documented (partial credit) |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | partial |
+| Rate Limit Signal | — |
+| Event Surface Described | yes |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | — |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 39.2** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/tackleio/](https://apis.io/providers/tackleio/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Tackle.io: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/tackleio/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
